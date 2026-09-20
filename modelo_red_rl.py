@@ -24,12 +24,12 @@ class RNDModule(nn.Module):
             nn.Linear(128, output_dim)
         )
         
-        # Mediante descenso de gradiente se ajustan los pesos de la red predictora[cite: 12].
+        # Mediante descenso de gradiente se ajustan los pesos de la red predictora
         self.optimizer = optim.Adam(self.predictor_net.parameters(), lr=1e-4)
         
     def normalize_state(self, state):
-        # Es fundamental normalizar el vector de observación (media 0, varianza 1) antes de pasarlo por las redes[cite: 12].
-        # Esto evita inestabilidad numérica generada al mezclar distintas escalas[cite: 12].
+        # Es fundamental normalizar el vector de observación (media 0, varianza 1) antes de pasarlo por las redes
+        # Esto evita inestabilidad numérica generada al mezclar distintas escalas
         mean = state.mean()
         std = state.std() + 1e-8
         return (state - mean) / std
@@ -39,21 +39,21 @@ class RNDModule(nn.Module):
         if not isinstance(state, torch.Tensor):
             state = torch.tensor(state, dtype=torch.float32)
             
-        # 1. Normalización del vector de observación[cite: 12].
+        # 1. Normalización del vector de observación
         norm_state = self.normalize_state(state)
         
-        # 2. Paso por la Red Objetivo (g) y la Red Predictora (f)[cite: 12].
+        # 2. Paso por la Red Objetivo (g) y la Red Predictora (f)
         target_features = self.target_net(norm_state)
         predicted_features = self.predictor_net(norm_state)
         
-        # 3. Cálculo del Error Cuadrático Medio (MSE) para obtener la recompensa escalar[cite: 12].
+        # 3. Cálculo del Error Cuadrático Medio (MSE) para obtener la recompensa escalar
         mse = nn.MSELoss(reduction='none')
         intrinsic_reward = mse(predicted_features, target_features).mean(dim=-1)
         
-        return intrinsic_reward.detach().numpy() # R_int[cite: 12].
+        return intrinsic_reward.detach().numpy() # R_int.
         
     def update_predictor(self, state):
-        # Entrenamiento en lotes mediante retropropagación[cite: 12].
+        # Entrenamiento en lotes mediante retropropagación.
         if not isinstance(state, torch.Tensor):
             state = torch.tensor(state, dtype=torch.float32)
             
@@ -71,61 +71,61 @@ class RNDModule(nn.Module):
 
 class RewardCalculator:
     def __init__(self, w1=1.0, w2=1.0, w3=2.0, p_cambio=0.5):
-        # Pesos de importancia; w3 > w2 para priorizar el flujo peatonal[cite: 12].
+        # Pesos de importancia; w3 > w2 para priorizar el flujo peatonal.
         self.w1 = w1
         self.w2 = w2
         self.w3 = w3
-        self.p_cambio = p_cambio # Penalización leve por cambio de fase[cite: 12].
+        self.p_cambio = p_cambio # Penalización leve por cambio de fase.
         
     def calculate_extrinsic_reward(self, delta_q, delta_w_veh, delta_w_ped, phase_changed):
-        # Se emplea una Recompensa Basada en la Diferencia (Delta Reward) para garantizar estabilidad[cite: 12].
+        # Se emplea una Recompensa Basada en la Diferencia (Delta Reward) para garantizar estabilidad.
         penalizacion_cambio = self.p_cambio if phase_changed else 0.0
         
-        # Fórmula: R_ext = -(w1 * delta_Q + w2 * delta_W_veh + w3 * delta_W_ped) - P_cambio[cite: 12].
+        # Fórmula: R_ext = -(w1 * delta_Q + w2 * delta_W_veh + w3 * delta_W_ped) - P_cambio.
         r_ext = -(self.w1 * delta_q + self.w2 * delta_w_veh + self.w3 * delta_w_ped) - penalizacion_cambio
         return r_ext
 
     def calculate_total_reward(self, r_ext, r_int, lambda_t):
-        # El Actor-Crítico recibe la suma ponderada en el instante t[cite: 12].
-        # Fórmula: R_total = R_ext + lambda_t * R_int[cite: 12].
+        # El Actor-Crítico recibe la suma ponderada en el instante t.
+        # Fórmula: R_total = R_ext + lambda_t * R_int.
         return r_ext + (lambda_t * r_int)
 
 
 class TrafficLightAgent:
     def __init__(self, input_dim):
-        # Espacio de acciones discreto (Discrete (4)) para Selección Directa de Fase[cite: 12].
+        # Espacio de acciones discreto (Discrete (4)) para Selección Directa de Fase.
         self.num_actions = 4
         self.rnd_module = RNDModule(input_dim=input_dim)
         self.reward_calc = RewardCalculator()
         
-        # El coeficiente de exploración lambda_t sigue un decaimiento programado[cite: 12].
-        self.lambda_t = 1.0 # Inicio del entrenamiento: lambda_t alto (ej. 1.0)[cite: 12].
+        # El coeficiente de exploración lambda_t sigue un decaimiento programado.
+        self.lambda_t = 1.0 # Inicio del entrenamiento: lambda_t alto (ej. 1.0).
         
     def decay_lambda(self, progress):
         # Decaimiento lineal progresivo. 
-        # Mitad del entrenamiento: equivalente a 0.5[cite: 12].
-        # Final del entrenamiento: cercano a 0 (ej. 0.01) para enfocarse 100% en optimizar el flujo vehicular[cite: 12].
+        # Mitad del entrenamiento: equivalente a 0.5.
+        # Final del entrenamiento: cercano a 0 (ej. 0.01) para enfocarse 100% en optimizar el flujo vehicular.
         self.lambda_t = max(0.01, 1.0 - progress)
         
     def select_phase(self, action_index):
-        # Las acciones se mapean a cadenas de estado predefinidas en SUMO[cite: 12].
+        # Las acciones se mapean a cadenas de estado predefinidas en SUMO.
         if action_index == 0:
-            return "Fase 0 (Norte-Sur Directo + Peatones)" #[cite: 12].
+            return "Fase 0 (Norte-Sur Directo + Peatones)" #.
         elif action_index == 1:
-            return "Fase 1 (Norte-Sur Giros)" #[cite: 12].
+            return "Fase 1 (Norte-Sur Giros)" #.
         elif action_index == 2:
-            return "Fase 2 (Este-Oeste Directo + Peatones)" #[cite: 12].
+            return "Fase 2 (Este-Oeste Directo + Peatones)" #.
         elif action_index == 3:
-            return "Fase 3 (Este-Oeste Giros)" #[cite: 12].
+            return "Fase 3 (Este-Oeste Giros)" #.
         
     def enforce_safety_constraints(self, current_phase, next_phase, green_time):
-        # Restricciones de seguridad vial: Si cambia de fase, se fuerza fase amarilla y todo-rojo de despeje[cite: 12].
+        # Restricciones de seguridad vial: Si cambia de fase, se fuerza fase amarilla y todo-rojo de despeje.
         if current_phase != next_phase:
-            return "Iniciar transición (Amarillo -> Todo-Rojo)" #[cite: 12].
+            return "Iniciar transición (Amarillo -> Todo-Rojo)" #.
             
-        # Garantizar tiempo mínimo (ej. 15s) para cruce peatonal seguro[cite: 12].
+        # Garantizar tiempo mínimo (ej. 15s) para cruce peatonal seguro.
         if green_time < 15.0:
-            return "Mantener fase (Tiempo verde mínimo no cumplido)" #[cite: 12].
+            return "Mantener fase (Tiempo verde mínimo no cumplido)" #.
             
         return "Cambio de fase permitido"
     
