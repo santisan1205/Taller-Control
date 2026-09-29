@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-09-20T15:52:03.509419-05:00 by Eclipse SUMO netedit 1.27.1
+<neteditConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/neteditConfiguration.xsd">
+
+    <input>
+        <sumocfg-file value="C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.sumocfg"/>
+        <additional-files value="C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.poly.xml.gz,C:\Users\andre\Sumo\2026-09-12-17-03-26\output.add.xml"/>
+        <route-files value="C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.bus.trips.xml,C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.motorcycle.trips.xml,C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.passenger.trips.xml,C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.pedestrian.rou.xml"/>
+        <sumo-net-file value="C:\Users\andre\Sumo\2026-09-12-17-03-26\Config_actualizado.net.xml"/>
+    </input>
+
+    <output>
+        <output.street-names value="true"/>
+    </output>
+
+    <processing>
+        <geometry.min-radius.fix.railways value="false"/>
+        <geometry.avoid-overlap value="false"/>
+        <geometry.max-grade.fix value="false"/>
+        <offset.disable-normalization value="true"/>
+    </processing>
+
+    <junctions>
+        <no-internal-links value="false"/>
+        <no-turnarounds value="true"/>
+    </junctions>
+
+    <pedestrian>
+        <walkingareas value="1"/>
+    </pedestrian>
+
+</neteditConfiguration>
+-->
+
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+    <tlLogic id="cluster_10564135211_11749189838_12136544949_12136544951_#7more" type="static" programID="0" offset="0">
+        <phase duration="21" state="rrrrrGGGGggrrrrrrrggGGGG"/>
+        <phase duration="3"  state="rrrrryyyyggrrrrrrrggyyyy"/>
+        <phase duration="6"  state="rrrrrrrrrGgrrrrrrrGGrrrr"/>
+        <phase duration="3"  state="rrrrrrrrrygrrrrrrryyrrrr"/>
+        <phase duration="23" state="GGGGGGrrrrGrrrrrrrrrrrrr"/>
+        <phase duration="3"  state="yyyyyyrrrryrrrrrrrrrrrrr"/>
+        <phase duration="2"  state="rrrrrrrrrrrrrrrrrrrrrrrr"/>
+        <phase duration="23" state="rrrrrrrrrrGGGGGGGGrrGrrr"/>
+        <phase duration="3"  state="rrrrrrrrrryyyyyyyyrryrrr"/>
+        <phase duration="3"  state="rrrrrrrrrrrrrrrrrrrrrrrr"/>
+    </tlLogic>
+</additional>

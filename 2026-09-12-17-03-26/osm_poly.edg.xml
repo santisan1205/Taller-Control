@@ -1,0 +1,1045 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-09-20T17:58:19.959465-05:00 by Eclipse SUMO netedit 1.27.1
+<neteditConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/neteditConfiguration.xsd">
+
+    <input>
+        <sumocfg-file value="C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.sumocfg"/>
+        <additional-files value="C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.poly.xml.gz,C:\Users\andre\Sumo\2026-09-12-17-03-26\output.add.xml"/>
+        <route-files value="C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.bus.trips.xml,C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.motorcycle.trips.xml,C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.passenger.trips.xml,C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.pedestrian.rou.xml"/>
+        <sumo-net-file value="C:\Users\andre\Sumo\2026-09-12-17-03-26\Config_actualizado.net.xml"/>
+    </input>
+
+    <output>
+        <output.street-names value="true"/>
+    </output>
+
+    <processing>
+        <geometry.min-radius.fix.railways value="false"/>
+        <geometry.avoid-overlap value="false"/>
+        <geometry.max-grade.fix value="false"/>
+        <offset.disable-normalization value="true"/>
+    </processing>
+
+    <junctions>
+        <no-internal-links value="false"/>
+        <no-turnarounds value="true"/>
+    </junctions>
+
+    <pedestrian>
+        <walkingareas value="1"/>
+    </pedestrian>
+
+</neteditConfiguration>
+-->
+
+<edges version="1.20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/edges_file.xsd">
+    <location netOffset="-604129.34,-523513.88" convBoundary="0.00,0.00,1085.36,1174.33" origBoundary="-74.061635,4.718707,-74.051284,4.752596" projParameter="+proj=utm +zone=18 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"/>
+
+    <edge id="-1022038556" from="9426151166" to="9426151168" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="342.26,435.16 334.58,404.26 334.66,402.68 336.33,401.17 380.44,388.92 391.10,385.72" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1022038556 1126646068"/>
+        </lane>
+    </edge>
+    <edge id="-1022165848#0" from="9427290871" to="9427290870" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="599.74,269.86 609.70,268.98 608.03,250.53 603.41,250.95" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1022165848"/>
+        </lane>
+    </edge>
+    <edge id="-1022165848#1" from="9427290870" to="9427290871" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="603.41,250.95 586.78,252.43 588.45,270.87 599.74,269.86" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1022165848"/>
+        </lane>
+    </edge>
+    <edge id="-1022165850#0" from="9427290872" to="9427290877" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="516.65,278.42 524.97,277.38 522.67,259.17 512.87,260.39" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1022165850"/>
+        </lane>
+    </edge>
+    <edge id="-1022165850#1" from="9427290877" to="9427290872" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="512.87,260.39 502.62,261.67 504.93,279.88 516.65,278.42" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1022165850"/>
+        </lane>
+    </edge>
+    <edge id="-1022165851" from="9427290878" to="9427290879" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1022165851"/>
+        </lane>
+    </edge>
+    <edge id="-1026513016" from="9464346343" to="9464346341" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="363.82,528.01 338.29,534.12 356.34,612.78 359.61,627.00" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1026513016 1211892241"/>
+        </lane>
+    </edge>
+    <edge id="-1061372073" from="9156757732" to="9751612194" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1061372073"/>
+        </lane>
+    </edge>
+    <edge id="-1126625671" from="9427290877" to="9427290820" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1126625671"/>
+        </lane>
+    </edge>
+    <edge id="-1133034631#0" from="cluster_10564135205_11749189839_3266988437_5129187741_#3more" to="cluster_10564135211_11749189838_12136544949_12136544951_#7more" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="408.40,444.42 420.28,441.16 699.90,370.23" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="1133034631 371826755"/>
+        </lane>
+        <param key="origFrom" value="9831934539"/>
+        <param key="origTo" value="12349519009"/>
+    </edge>
+    <edge id="-1155108644" from="cluster_312473401_3645292509_7033913614" to="312473376" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="417.61,613.78 439.14,759.81" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1155108644"/>
+        </lane>
+        <param key="origFrom" value="3645292509"/>
+    </edge>
+    <edge id="-1162648030#1" from="9464346341" to="cluster_312473401_3645292509_7033913614" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="359.61,627.00 408.80,615.79" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1162648030"/>
+        </lane>
+        <param key="origTo" value="312473401"/>
+    </edge>
+    <edge id="-1162648030#2" from="1091500444" to="9464346341" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="207.18,661.74 312.66,637.70 359.61,627.00" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1162648030"/>
+        </lane>
+    </edge>
+    <edge id="-1169160824" from="310000616" to="310554870" priority="10" type="highway.tertiary" numLanes="1" speed="13.89" shape="760.91,533.20 772.28,769.87 782.44,965.16" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1169160824"/>
+        </lane>
+    </edge>
+    <edge id="-1211892243" from="cluster_10657953484_9156665903" to="8915376761" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="544.08,584.09 539.85,565.37 534.18,540.14 557.09,535.05 541.22,467.34 515.92,473.87" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1211892243 1145164906 963835928"/>
+        </lane>
+        <param key="origFrom" value="10657953484"/>
+    </edge>
+    <edge id="-1334897886#0" from="cluster_10564135211_11749189838_12136544949_12136544951_#7more" to="cluster_10564135163_13571629282_5146149679" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="711.32,367.85 715.93,366.97 743.36,361.26 748.46,360.26" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="1334897886 1015918435 1334897887"/>
+        </lane>
+        <param key="origFrom" value="12136544949"/>
+        <param key="origTo" value="13571629282"/>
+    </edge>
+    <edge id="-1334897887#0" from="cluster_10564135163_13571629282_5146149679" to="12349519010" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="748.46,360.26 756.81,358.46" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="1334897887"/>
+        </lane>
+        <param key="origFrom" value="13571629282"/>
+    </edge>
+    <edge id="-1334897888" from="cluster_10564135211_11749189838_12136544949_12136544951_#7more" to="7805007173" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="724.14,400.71 726.02,406.03 755.79,482.89 762.07,507.81 764.92,532.18 776.69,768.17 796.93,1174.33" width="2.00" allow="bicycle">
+        <lane index="0">
+            <param key="origId" value="1334897888 1311122622"/>
+        </lane>
+        <param key="origFrom" value="12136544951"/>
+    </edge>
+    <edge id="-1410208415#0" from="12194837597" to="12957781082" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="804.24,348.12 912.08,321.69 923.97,318.80 991.64,302.12" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="1410208415"/>
+        </lane>
+    </edge>
+    <edge id="-1410208415#1" from="12349519010" to="12194837597" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="1410208415"/>
+        </lane>
+    </edge>
+    <edge id="-1479478865#1" from="13571629300" to="cluster_10564135212_13571629279_13571629299" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="768.27,422.75 757.26,392.72" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1479478865"/>
+        </lane>
+        <param key="origTo" value="13571629299"/>
+    </edge>
+    <edge id="-1479478865#2" from="13571629298" to="13571629300" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1479478865"/>
+        </lane>
+    </edge>
+    <edge id="-1479478866" from="13571678201" to="13571629300" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1479478866"/>
+        </lane>
+    </edge>
+    <edge id="-28224387#0" from="7033913606" to="310000616" priority="3" type="highway.residential" numLanes="1" speed="8.33" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+    </edge>
+    <edge id="-28224387#1" from="9057378584" to="7033913606" priority="3" type="highway.residential" numLanes="1" speed="8.33" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+    </edge>
+    <edge id="-28224387#2" from="8915376752" to="9057378584" priority="3" type="highway.residential" numLanes="1" speed="8.33" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+    </edge>
+    <edge id="-28224387#3" from="7030388928" to="8915376752" priority="3" type="highway.residential" numLanes="1" speed="8.33" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+    </edge>
+    <edge id="-28224387#4" from="cluster_10657953484_9156665903" to="7030388928" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="544.08,584.09 612.78,567.97" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+        <param key="origFrom" value="10657953484"/>
+    </edge>
+    <edge id="-28224387#6" from="9057378579" to="cluster_10657953484_9156665903" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="510.91,591.89 538.16,585.49" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+        <param key="origTo" value="9156665903"/>
+    </edge>
+    <edge id="-28224387#7" from="8915376762" to="9057378579" priority="3" type="highway.residential" numLanes="1" speed="8.33" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+    </edge>
+    <edge id="-28224387#8" from="cluster_312473401_3645292509_7033913614" to="8915376762" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="425.10,612.02 470.37,601.39" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+        <param key="origFrom" value="7033913614"/>
+    </edge>
+    <edge id="-28483618#1" from="cluster_4051964010_6515550876" to="cluster_312918940_4051964009" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="356.70,302.22 373.20,300.89" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28483618"/>
+        </lane>
+        <param key="origFrom" value="6515550876"/>
+        <param key="origTo" value="4051964009"/>
+    </edge>
+    <edge id="-28483618#5" from="5932472875" to="cluster_4051964010_6515550876" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="154.35,316.33 159.75,315.69 163.40,315.42 225.26,311.77 272.49,308.97 351.61,302.62" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28483618"/>
+        </lane>
+        <param key="origTo" value="4051964010"/>
+    </edge>
+    <edge id="-359900301" from="3645281194" to="3645281193" priority="3" type="highway.residential" numLanes="1" speed="13.89" shape="638.67,313.26 448.76,338.55 394.63,345.77" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="359900301"/>
+        </lane>
+    </edge>
+    <edge id="-422989560" from="4227126191" to="4227126189" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="422989560"/>
+        </lane>
+    </edge>
+    <edge id="-693972020" from="6515550878" to="cluster_4051964010_6515550876" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="356.10,281.81 356.65,290.59 356.70,302.22" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="693972020 693972019"/>
+        </lane>
+        <param key="origTo" value="6515550876"/>
+    </edge>
+    <edge id="-752092984" from="cluster_10657953484_9156665903" to="7030388916" priority="1" type="highway.path" numLanes="1" speed="5.56" shape="538.16,585.49 540.95,598.38" width="2.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="752092984"/>
+        </lane>
+        <param key="origFrom" value="9156665903"/>
+    </edge>
+    <edge id="-752092985" from="7030388928" to="7030388915" priority="1" type="highway.path" numLanes="1" speed="5.56" width="2.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="752092985"/>
+        </lane>
+    </edge>
+    <edge id="-752714435" from="7033913606" to="7030384529" priority="1" type="highway.path" numLanes="1" speed="5.56" shape="741.64,537.73 755.51,772.06 767.07,967.18 776.46,1122.32 776.37,1125.57 777.03,1136.49" width="2.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="752714435"/>
+        </lane>
+    </edge>
+    <edge id="-752714448" from="cluster_312473401_3645292509_7033913614" to="7033913613" priority="1" type="highway.path" numLanes="1" speed="5.56" shape="425.10,612.02 452.85,811.45" width="2.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="752714448"/>
+        </lane>
+        <param key="origFrom" value="7033913614"/>
+    </edge>
+    <edge id="-916426379#0" from="4226807642" to="310000616" priority="10" type="highway.tertiary" numLanes="1" speed="13.89" shape="743.24,460.34 750.98,480.49 756.70,500.55 759.55,517.49 760.91,533.20" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="916426379"/>
+        </lane>
+    </edge>
+    <edge id="-916426379#2" from="cluster_10564135211_11749189838_12136544949_12136544951_#7more" to="4226807642" priority="10" type="highway.tertiary" numLanes="1" speed="13.89" shape="720.48,401.60 722.58,407.24 728.00,420.72 743.24,460.34" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="916426379"/>
+        </lane>
+        <param key="origFrom" value="11749189838"/>
+    </edge>
+    <edge id="-963835926" from="8915376751" to="4226807642" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="699.41,426.96 678.63,433.36 690.22,475.88 713.09,469.06 729.96,464.20 743.24,460.34" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="963835926 1211892245"/>
+        </lane>
+    </edge>
+    <edge id="-963835927" from="8915376756" to="8915376752" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="597.29,450.28 626.47,442.46 641.91,505.89 619.14,512.13 626.83,544.44 631.38,563.61" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="963835927 1211892244"/>
+        </lane>
+    </edge>
+    <edge id="-963835928" from="8915376761" to="cluster_10657953484_9156665903" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="515.92,473.87 541.22,467.34 557.09,535.05 534.18,540.14 539.85,565.37 544.08,584.09" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="963835928 1145164906 1211892243"/>
+        </lane>
+        <param key="origTo" value="10657953484"/>
+    </edge>
+    <edge id="-963835929" from="8915376766" to="8915376762" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="424.31,500.25 464.29,489.02 478.45,543.43 459.13,548.39 466.74,584.25 470.37,601.39" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="963835929 1211892242"/>
+        </lane>
+    </edge>
+    <edge id="-978873857" from="9057378583" to="9057378579" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="496.79,626.03 476.43,628.47 479.37,649.68 518.12,644.31 511.66,597.34 510.91,591.89" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="978873857 1211892246"/>
+        </lane>
+    </edge>
+    <edge id="-978873858#0" from="9057378585" to="9057378584" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="671.34,628.53 664.40,577.87 661.47,556.55" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="978873858 1211892247"/>
+        </lane>
+    </edge>
+    <edge id="-978873858#1" from="9057378586" to="9057378585" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="978873858"/>
+        </lane>
+    </edge>
+    <edge id="-978873859" from="9057378587" to="9057378585" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="978873859"/>
+        </lane>
+    </edge>
+    <edge id="-991029397" from="9696760121" to="9398669952" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="742.99,207.56 771.68,207.32 773.82,247.94 775.94,287.46 725.61,287.47 718.68,288.16" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029397 1124067333"/>
+        </lane>
+    </edge>
+    <edge id="-991029398#0" from="9156757727" to="11227531033" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029398"/>
+        </lane>
+    </edge>
+    <edge id="-991029398#1" from="9156757724" to="9156757727" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029398"/>
+        </lane>
+    </edge>
+    <edge id="-991029398#2" from="9156757723" to="9156757724" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029398"/>
+        </lane>
+    </edge>
+    <edge id="-991029399#0" from="9427290878" to="9156757724" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029399"/>
+        </lane>
+    </edge>
+    <edge id="-991029399#1" from="9427290879" to="9427290878" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="434.72,265.51 416.13,267.67 420.40,312.26 440.03,310.25" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029399"/>
+        </lane>
+    </edge>
+    <edge id="-991029399#2" from="9156757727" to="9427290879" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029399"/>
+        </lane>
+    </edge>
+    <edge id="-991029400#0" from="9156757730" to="9427290872" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029400"/>
+        </lane>
+    </edge>
+    <edge id="-991029400#1" from="9156757728" to="9156757730" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029400"/>
+        </lane>
+    </edge>
+    <edge id="-991029401#0" from="9156757730" to="9156757729" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029401"/>
+        </lane>
+    </edge>
+    <edge id="-991029401#1" from="9156757731" to="9156757730" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029401"/>
+        </lane>
+    </edge>
+    <edge id="-991029402#0" from="9156757732" to="9427290871" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029402"/>
+        </lane>
+    </edge>
+    <edge id="-991029402#1" from="9156757733" to="9156757732" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029402"/>
+        </lane>
+    </edge>
+    <edge id="-991029403" from="9156757734" to="9156757732" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029403"/>
+        </lane>
+    </edge>
+    <edge id="-E8" from="310000659" to="J21" priority="-1" numLanes="2" speed="13.89">
+        <lane index="0" allow="pedestrian" width="2.00"/>
+        <lane index="1" disallow="pedestrian"/>
+    </edge>
+    <edge id="-E9" from="cluster_10564135211_11749189838_12136544949_12136544951_#7more" to="310000659" priority="-1" numLanes="2" speed="13.89">
+        <lane index="0" allow="pedestrian" width="2.00"/>
+        <lane index="1" disallow="pedestrian"/>
+    </edge>
+    <edge id="1022165848#0" from="9427290870" to="9427290871" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="603.41,250.95 608.03,250.53 609.70,268.98 599.74,269.86" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1022165848"/>
+        </lane>
+    </edge>
+    <edge id="1022165848#1" from="9427290871" to="9427290870" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="599.74,269.86 588.45,270.87 586.78,252.43 603.41,250.95" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1022165848"/>
+        </lane>
+    </edge>
+    <edge id="1022165850#0" from="9427290877" to="9427290872" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="512.87,260.39 522.67,259.17 524.97,277.38 516.65,278.42" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1022165850"/>
+        </lane>
+    </edge>
+    <edge id="1022165850#1" from="9427290872" to="9427290877" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="516.65,278.42 504.93,279.88 502.62,261.67 512.87,260.39" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1022165850"/>
+        </lane>
+    </edge>
+    <edge id="1022165851" from="9427290879" to="9427290878" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1022165851"/>
+        </lane>
+    </edge>
+    <edge id="1061372073" from="9751612194" to="9156757732" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1061372073"/>
+        </lane>
+    </edge>
+    <edge id="1124067333" from="9398669952" to="9696760121" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="718.68,288.16 725.61,287.47 775.94,287.46 773.82,247.94 771.68,207.32 742.99,207.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1124067333 991029397"/>
+        </lane>
+    </edge>
+    <edge id="1126625671" from="9427290820" to="9427290877" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1126625671"/>
+        </lane>
+    </edge>
+    <edge id="1126646068" from="9426151168" to="9426151166" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="391.10,385.72 380.44,388.92 336.33,401.17 334.66,402.68 334.58,404.26 342.26,435.16" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1126646068 1022038556"/>
+        </lane>
+    </edge>
+    <edge id="1133034618#0" from="10564135138" to="cluster_10564135205_11749189839_3266988437_5129187741_#3more" priority="1" type="highway.footway" numLanes="1" speed="2.78" shape="0.00,607.85 7.57,604.23 14.33,599.79 20.27,594.80 26.62,587.65 34.26,578.02 36.87,575.64 41.11,571.81 47.77,567.88 52.72,565.63 130.98,545.63 174.17,535.10 392.80,481.76" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1133034618"/>
+        </lane>
+        <param key="origTo" value="11749189839"/>
+    </edge>
+    <edge id="1133034618#2" from="cluster_10564135205_11749189839_3266988437_5129187741_#3more" to="11749189841" priority="1" type="highway.footway" numLanes="1" speed="2.78" shape="392.80,481.76 510.41,453.06 705.03,405.46 712.85,403.53" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1133034618"/>
+        </lane>
+        <param key="origFrom" value="11749189839"/>
+    </edge>
+    <edge id="1133034629#1" from="cluster_10564135212_13571629279_13571629299" to="13571629288" priority="1" type="highway.footway" numLanes="1" speed="2.78" shape="757.26,392.72 759.14,392.26" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1133034629"/>
+        </lane>
+        <param key="origFrom" value="13571629299"/>
+    </edge>
+    <edge id="1133034629#2" from="13571629288" to="12349519015" priority="1" type="highway.footway" numLanes="1" speed="2.78" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1133034629"/>
+        </lane>
+    </edge>
+    <edge id="1133034629#3" from="12349519015" to="10564135112" priority="1" type="highway.footway" numLanes="1" speed="2.78" shape="767.22,390.29 1021.63,325.57 1085.36,309.35" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1133034629"/>
+        </lane>
+    </edge>
+    <edge id="1133034631#2" from="cluster_10564135205_11749189839_3266988437_5129187741_#3more" to="5720986056" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="400.00,446.75 373.49,454.06 181.17,501.18" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="1133034631 1133034632"/>
+        </lane>
+        <param key="origFrom" value="9831934538"/>
+    </edge>
+    <edge id="1133034632" from="5720986056" to="cluster_10564135205_11749189839_3266988437_5129187741_#3more" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="181.17,501.18 373.49,454.06 400.00,446.75" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="1133034632 1133034631"/>
+        </lane>
+        <param key="origTo" value="9831934538"/>
+    </edge>
+    <edge id="1133034637#3" from="cluster_10564135163_13571629282_5146149679" to="12726378586" priority="12" type="highway.primary" numLanes="3" speed="11.11" shape="759.95,367.83 778.08,363.35 914.04,329.98 925.74,327.11 994.40,310.65 1000.55,309.17 1010.77,306.72" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1133034637"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1133034637"/>
+        </lane>
+        <lane index="2">
+            <param key="origId" value="1133034637"/>
+        </lane>
+        <param key="origFrom" value="10564135163"/>
+    </edge>
+    <edge id="1133034638" from="10564135208" to="cluster_10564135163_13571629282_5146149679" priority="12" type="highway.primary" numLanes="3" speed="11.11" shape="719.73,377.75 746.26,371.20 749.30,370.45 752.35,369.71" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1133034638 1133034637 1133034637"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1133034638 1133034637 1133034637"/>
+        </lane>
+        <lane index="2">
+            <param key="origId" value="1133034638 1133034637 1133034637"/>
+        </lane>
+        <param key="origTo" value="5146149679"/>
+    </edge>
+    <edge id="1133034639#1" from="cluster_10564135211_11749189838_12136544949_12136544951_#7more" to="cluster_10564135205_11749189839_3266988437_5129187741_#3more" priority="12" type="highway.primary" numLanes="3" speed="11.11" shape="710.20,396.15 403.61,471.00 391.86,473.86" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1133034639"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1133034639"/>
+        </lane>
+        <lane index="2">
+            <param key="origId" value="1133034639"/>
+        </lane>
+        <param key="origFrom" value="12729754511"/>
+        <param key="origTo" value="10564135205"/>
+    </edge>
+    <edge id="1133034640#0" from="cluster_10564135205_11749189839_3266988437_5129187741_#3more" to="cluster_10564135211_11749189838_12136544949_12136544951_#7more" priority="12" type="highway.primary" numLanes="3" speed="11.11" shape="409.79,454.44 696.95,383.39 704.33,381.50" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1133034640"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1133034640"/>
+        </lane>
+        <lane index="2">
+            <param key="origId" value="1133034640"/>
+        </lane>
+        <param key="origFrom" value="5129187741"/>
+        <param key="origTo" value="13571629283"/>
+    </edge>
+    <edge id="1133034641" from="10564135215" to="5932637359" priority="10" type="highway.tertiary" numLanes="2" speed="13.89" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1133034641"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1133034641"/>
+        </lane>
+    </edge>
+    <edge id="1155108644" from="312473376" to="cluster_312473401_3645292509_7033913614" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="439.14,759.81 417.61,613.78" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1155108644"/>
+        </lane>
+        <param key="origTo" value="3645292509"/>
+    </edge>
+    <edge id="1162648030#1" from="cluster_312473401_3645292509_7033913614" to="9464346341" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="408.80,615.79 359.61,627.00" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1162648030"/>
+        </lane>
+        <param key="origFrom" value="312473401"/>
+    </edge>
+    <edge id="1162648030#2" from="9464346341" to="1091500444" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="359.61,627.00 312.66,637.70 207.18,661.74" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1162648030"/>
+        </lane>
+    </edge>
+    <edge id="1169160817#0" from="13571629278" to="cluster_10564135212_13571629279_13571629299" priority="12" type="highway.primary" numLanes="3" speed="11.11" shape="1012.89,320.19 1002.87,322.63 839.77,362.30 787.51,376.87 773.61,380.36 764.90,382.55" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1169160817"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1169160817"/>
+        </lane>
+        <lane index="2">
+            <param key="origId" value="1169160817"/>
+        </lane>
+        <param key="origTo" value="13571629279"/>
+    </edge>
+    <edge id="1169160817#3" from="cluster_10564135212_13571629279_13571629299" to="cluster_10564135211_11749189838_12136544949_12136544951_#7more" priority="12" type="highway.primary" numLanes="3" speed="11.11" shape="754.48,385.16 751.65,385.87 724.23,392.75 721.37,393.40" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1169160817 1133034636 1133034612"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1169160817 1133034636 1133034612"/>
+        </lane>
+        <lane index="2">
+            <param key="origId" value="1169160817 1133034636 1133034612"/>
+        </lane>
+        <param key="origFrom" value="10564135212"/>
+        <param key="origTo" value="13571629280"/>
+    </edge>
+    <edge id="1169160822#1" from="cluster_10564135211_11749189838_12136544949_12136544951_#7more" to="10564135208" priority="12" type="highway.primary" numLanes="3" speed="11.11" shape="715.56,378.72 719.73,377.75" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1169160822"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1169160822"/>
+        </lane>
+        <lane index="2">
+            <param key="origId" value="1169160822"/>
+        </lane>
+        <param key="origFrom" value="12136544952"/>
+    </edge>
+    <edge id="1169160824" from="310554870" to="310000616" priority="10" type="highway.tertiary" numLanes="1" speed="13.89" shape="782.44,965.16 772.28,769.87 760.91,533.20" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1169160824"/>
+        </lane>
+    </edge>
+    <edge id="1211892241" from="9464346341" to="9464346343" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="359.61,627.00 356.34,612.78 338.29,534.12 363.82,528.01" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1211892241 1026513016"/>
+        </lane>
+    </edge>
+    <edge id="1211892242" from="8915376762" to="8915376766" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="470.37,601.39 466.74,584.25 459.13,548.39 478.45,543.43 464.29,489.02 424.31,500.25" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1211892242 963835929"/>
+        </lane>
+    </edge>
+    <edge id="1211892244" from="8915376752" to="8915376756" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="631.38,563.61 626.83,544.44 619.14,512.13 641.91,505.89 626.47,442.46 597.29,450.28" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1211892244 963835927"/>
+        </lane>
+    </edge>
+    <edge id="1211892245" from="4226807642" to="8915376751" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="743.24,460.34 729.96,464.20 713.09,469.06 690.22,475.88 678.63,433.36 699.41,426.96" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1211892245 963835926"/>
+        </lane>
+    </edge>
+    <edge id="1211892246" from="9057378579" to="9057378583" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="510.91,591.89 511.66,597.34 518.12,644.31 479.37,649.68 476.43,628.47 496.79,626.03" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1211892246 978873857"/>
+        </lane>
+    </edge>
+    <edge id="1211892247" from="9057378584" to="9057378585" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="661.47,556.55 664.40,577.87 671.34,628.53" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1211892247 978873858"/>
+        </lane>
+    </edge>
+    <edge id="1264663520#0" from="11749189841" to="cluster_10564135211_11749189838_12136544949_12136544951_#7more" priority="1" type="highway.footway" numLanes="1" speed="2.78" shape="712.85,403.53 720.48,401.60" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1264663520"/>
+        </lane>
+        <param key="origTo" value="11749189838"/>
+    </edge>
+    <edge id="1264663520#2" from="cluster_10564135211_11749189838_12136544949_12136544951_#7more" to="cluster_10564135212_13571629279_13571629299" priority="1" type="highway.footway" numLanes="1" speed="2.78" shape="724.14,400.71 727.42,399.99 754.30,393.44 757.26,392.72" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1264663520 1133034630 1133034629"/>
+        </lane>
+        <param key="origFrom" value="12136544951"/>
+        <param key="origTo" value="13571629299"/>
+    </edge>
+    <edge id="1301573904#0" from="10564135215" to="cluster_10564135205_11749189839_3266988437_5129187741_#3more" priority="12" type="highway.primary" numLanes="3" speed="11.11" shape="173.24,511.77 382.17,461.24 389.88,459.37" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1301573904"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1301573904"/>
+        </lane>
+        <lane index="2">
+            <param key="origId" value="1301573904"/>
+        </lane>
+        <param key="origTo" value="3266988437"/>
+    </edge>
+    <edge id="1301573905#0" from="cluster_312473401_3645292509_7033913614" to="cluster_10564135205_11749189839_3266988437_5129187741_#3more" priority="3" type="highway.residential" numLanes="2" speed="13.89" shape="408.80,615.79 393.63,488.71 392.80,481.76" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1301573905"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1301573905"/>
+        </lane>
+        <param key="origFrom" value="312473401"/>
+        <param key="origTo" value="11749189839"/>
+    </edge>
+    <edge id="1303041849#0" from="cluster_10564135205_11749189839_3266988437_5129187741_#3more" to="5932637359" priority="12" type="highway.primary" numLanes="3" speed="11.11" shape="391.86,473.86 181.57,525.17 172.18,527.46" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1303041849"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1303041849"/>
+        </lane>
+        <lane index="2">
+            <param key="origId" value="1303041849"/>
+        </lane>
+        <param key="origFrom" value="10564135205"/>
+    </edge>
+    <edge id="1317611939" from="8915380567" to="12194837597" priority="1" type="highway.footway" numLanes="1" speed="2.78" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1317611939"/>
+        </lane>
+    </edge>
+    <edge id="1334897887#0" from="12349519010" to="cluster_10564135163_13571629282_5146149679" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="756.81,358.46 748.46,360.26" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="1334897887"/>
+        </lane>
+        <param key="origTo" value="13571629282"/>
+    </edge>
+    <edge id="1334897887#1" from="cluster_10564135163_13571629282_5146149679" to="cluster_10564135211_11749189838_12136544949_12136544951_#7more" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="748.46,360.26 743.36,361.26 715.93,366.97 711.32,367.85" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="1334897887 1015918435 1334897886"/>
+        </lane>
+        <param key="origFrom" value="13571629282"/>
+        <param key="origTo" value="12136544949"/>
+    </edge>
+    <edge id="1334897891#2" from="cluster_10564135211_11749189838_12136544949_12136544951_#7more" to="11749189841" priority="1" type="highway.footway" numLanes="1" speed="2.78" shape="710.20,396.15 712.85,403.53" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1334897891"/>
+        </lane>
+        <param key="origFrom" value="12729754511"/>
+    </edge>
+    <edge id="1334897897" from="cluster_10564135211_11749189838_12136544949_12136544951_#7more" to="12136544972" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="711.97,368.11 710.70,362.00 708.90,357.57 706.36,352.18 698.43,332.40 683.88,294.63 664.92,240.38 653.49,208.37 647.01,187.58 611.98,9.64" width="2.00" allow="bicycle">
+        <lane index="0">
+            <param key="origId" value="1334897897"/>
+        </lane>
+        <param key="origFrom" value="12136544949"/>
+    </edge>
+    <edge id="1374486327#1" from="12726378583" to="12726378584" priority="1" type="highway.pedestrian" numLanes="1" speed="2.78" shape="761.44,372.27 748.77,375.15 750.68,380.86 763.27,377.73" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1374486327"/>
+        </lane>
+    </edge>
+    <edge id="1374486327#2" from="12726378584" to="12726378583" priority="1" type="highway.pedestrian" numLanes="1" speed="2.78" shape="763.27,377.73 766.96,376.81 765.30,371.39 761.44,372.27" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1374486327"/>
+        </lane>
+    </edge>
+    <edge id="1374486328#0" from="12349519015" to="cluster_10564135212_13571629279_13571629299" priority="1" type="highway.footway" numLanes="1" speed="2.78" shape="767.22,390.29 764.90,382.55" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1374486328"/>
+        </lane>
+        <param key="origTo" value="13571629279"/>
+    </edge>
+    <edge id="1374486328#1" from="cluster_10564135212_13571629279_13571629299" to="12726378584" priority="1" type="highway.footway" numLanes="1" speed="2.78" shape="764.90,382.55 763.27,377.73" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1374486328"/>
+        </lane>
+        <param key="origFrom" value="13571629279"/>
+    </edge>
+    <edge id="1374486329" from="12726378584" to="12726378583" priority="1" type="highway.footway" numLanes="1" speed="2.78" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1374486329"/>
+        </lane>
+    </edge>
+    <edge id="1374843820#0" from="12726378583" to="cluster_10564135163_13571629282_5146149679" priority="1" type="highway.footway" numLanes="1" speed="2.78" shape="761.44,372.27 759.95,367.83" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1374843820"/>
+        </lane>
+        <param key="origTo" value="10564135163"/>
+    </edge>
+    <edge id="1374843820#1" from="cluster_10564135163_13571629282_5146149679" to="12349519010" priority="1" type="highway.footway" numLanes="1" speed="2.78" shape="759.95,367.83 756.81,358.46" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1374843820"/>
+        </lane>
+        <param key="origFrom" value="10564135163"/>
+    </edge>
+    <edge id="1384482349" from="12726378586" to="13571629278" priority="3" type="highway.residential" numLanes="2" speed="13.89" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="1384482349"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="1384482349"/>
+        </lane>
+    </edge>
+    <edge id="1410208415#0" from="12957781082" to="12194837597" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="991.64,302.12 923.97,318.80 912.08,321.69 804.24,348.12" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="1410208415"/>
+        </lane>
+    </edge>
+    <edge id="1410208415#1" from="12194837597" to="12349519010" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="1410208415"/>
+        </lane>
+    </edge>
+    <edge id="1479478862" from="13571629288" to="13571629289" priority="1" type="highway.footway" numLanes="1" speed="2.78" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="1479478862"/>
+        </lane>
+    </edge>
+    <edge id="1479478865#1" from="cluster_10564135212_13571629279_13571629299" to="13571629300" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="757.26,392.72 768.27,422.75" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1479478865"/>
+        </lane>
+        <param key="origFrom" value="13571629299"/>
+    </edge>
+    <edge id="1479478865#2" from="13571629300" to="13571629298" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1479478865"/>
+        </lane>
+    </edge>
+    <edge id="1479478866" from="13571629300" to="13571678201" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="1479478866"/>
+        </lane>
+    </edge>
+    <edge id="28026681#0" from="311887730" to="3645281193" priority="10" type="highway.tertiary" numLanes="2" speed="8.33" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28026681"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="28026681"/>
+        </lane>
+    </edge>
+    <edge id="28026681#1" from="3645281193" to="cluster_10564135205_11749189839_3266988437_5129187741_#3more" priority="10" type="highway.tertiary" numLanes="2" speed="8.33" shape="394.63,345.77 405.58,424.19 407.50,438.00 408.40,444.42" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28026681"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="28026681"/>
+        </lane>
+        <param key="origFrom" value="9831934536"/>
+        <param key="origTo" value="9831934536 9831934539"/>
+    </edge>
+    <edge id="28224387#0" from="310000616" to="7033913606" priority="3" type="highway.residential" numLanes="1" speed="8.33" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+    </edge>
+    <edge id="28224387#1" from="7033913606" to="9057378584" priority="3" type="highway.residential" numLanes="1" speed="8.33" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+    </edge>
+    <edge id="28224387#2" from="9057378584" to="8915376752" priority="3" type="highway.residential" numLanes="1" speed="8.33" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+    </edge>
+    <edge id="28224387#3" from="8915376752" to="7030388928" priority="3" type="highway.residential" numLanes="1" speed="8.33" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+    </edge>
+    <edge id="28224387#4" from="7030388928" to="cluster_10657953484_9156665903" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="612.78,567.97 544.08,584.09" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+        <param key="origTo" value="10657953484"/>
+    </edge>
+    <edge id="28224387#6" from="cluster_10657953484_9156665903" to="9057378579" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="538.16,585.49 510.91,591.89" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+        <param key="origFrom" value="9156665903"/>
+    </edge>
+    <edge id="28224387#7" from="9057378579" to="8915376762" priority="3" type="highway.residential" numLanes="1" speed="8.33" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+    </edge>
+    <edge id="28224387#8" from="8915376762" to="cluster_312473401_3645292509_7033913614" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="470.37,601.39 425.10,612.02" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28224387"/>
+        </lane>
+        <param key="origTo" value="7033913614"/>
+    </edge>
+    <edge id="28483618#1" from="cluster_312918940_4051964009" to="cluster_4051964010_6515550876" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="373.20,300.89 356.70,302.22" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28483618"/>
+        </lane>
+        <param key="origFrom" value="4051964009"/>
+        <param key="origTo" value="6515550876"/>
+    </edge>
+    <edge id="28483618#3" from="cluster_4051964010_6515550876" to="5932472875" priority="3" type="highway.residential" numLanes="1" speed="8.33" shape="351.61,302.62 272.49,308.97 225.26,311.77 163.40,315.42 159.75,315.69 154.35,316.33" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="28483618"/>
+        </lane>
+        <param key="origFrom" value="4051964010"/>
+    </edge>
+    <edge id="314055127#1" from="cluster_10564135205_11749189839_3266988437_5129187741_#3more" to="9426151168" priority="10" type="highway.tertiary" numLanes="2" speed="13.89" shape="400.00,446.75 396.88,425.41 391.10,385.72" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="314055127"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="314055127"/>
+        </lane>
+        <param key="origFrom" value="9831934538 9831934537"/>
+        <param key="origTo" value="9831934537"/>
+    </edge>
+    <edge id="314055127#3" from="9426151168" to="cluster_312918940_4051964009" priority="10" type="highway.tertiary" numLanes="2" speed="13.89" shape="391.10,385.72 378.68,300.47" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="314055127"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="314055127"/>
+        </lane>
+        <param key="origTo" value="312918940"/>
+    </edge>
+    <edge id="314055127#4" from="cluster_312918940_4051964009" to="5129163583" priority="10" type="highway.tertiary" numLanes="2" speed="13.89" shape="378.68,300.47 369.85,239.89" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="314055127"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="314055127"/>
+        </lane>
+        <param key="origFrom" value="312918940"/>
+    </edge>
+    <edge id="359900155#0" from="307752350" to="9398669952" priority="10" type="highway.tertiary" numLanes="2" speed="8.33" shape="650.12,0.00 650.95,5.05 675.09,145.40 676.14,152.80 681.53,175.89 686.49,195.06 690.57,209.09 699.31,235.73 718.68,288.16" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="359900155"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="359900155"/>
+        </lane>
+    </edge>
+    <edge id="359900155#1" from="9398669952" to="9398669953" priority="10" type="highway.tertiary" numLanes="2" speed="8.33" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="359900155"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="359900155"/>
+        </lane>
+    </edge>
+    <edge id="359900155#2" from="9398669953" to="cluster_10564135163_13571629282_5146149679" priority="10" type="highway.tertiary" numLanes="2" speed="8.33" shape="722.77,298.06 745.49,353.07 748.46,360.26" spreadType="center" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="359900155"/>
+        </lane>
+        <lane index="1">
+            <param key="origId" value="359900155"/>
+        </lane>
+        <param key="origTo" value="13571629282"/>
+    </edge>
+    <edge id="359900301" from="3645281193" to="3645281194" priority="3" type="highway.residential" numLanes="1" speed="13.89" shape="394.63,345.77 448.76,338.55 638.67,313.26" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="359900301"/>
+        </lane>
+    </edge>
+    <edge id="371826755" from="cluster_10564135211_11749189838_12136544949_12136544951_#7more" to="cluster_10564135205_11749189839_3266988437_5129187741_#3more" priority="1" type="highway.cycleway" numLanes="1" speed="5.56" shape="699.90,370.23 420.28,441.16 408.40,444.42" width="1.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="371826755 1133034631"/>
+        </lane>
+        <param key="origFrom" value="12349519009"/>
+        <param key="origTo" value="9831934539"/>
+    </edge>
+    <edge id="422989560" from="4227126189" to="4227126191" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="422989560"/>
+        </lane>
+    </edge>
+    <edge id="693972019" from="cluster_4051964010_6515550876" to="6515550878" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="356.70,302.22 356.65,290.59 356.10,281.81" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="693972019 693972020"/>
+        </lane>
+        <param key="origFrom" value="6515550876"/>
+    </edge>
+    <edge id="752092984" from="7030388916" to="cluster_10657953484_9156665903" priority="1" type="highway.path" numLanes="1" speed="5.56" shape="540.95,598.38 538.16,585.49" width="2.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="752092984"/>
+        </lane>
+        <param key="origTo" value="9156665903"/>
+    </edge>
+    <edge id="752092985" from="7030388915" to="7030388928" priority="1" type="highway.path" numLanes="1" speed="5.56" width="2.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="752092985"/>
+        </lane>
+    </edge>
+    <edge id="752714435" from="7030384529" to="7033913606" priority="1" type="highway.path" numLanes="1" speed="5.56" shape="777.03,1136.49 776.37,1125.57 776.46,1122.32 767.07,967.18 755.51,772.06 741.64,537.73" width="2.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="752714435"/>
+        </lane>
+    </edge>
+    <edge id="752714448" from="7033913613" to="cluster_312473401_3645292509_7033913614" priority="1" type="highway.path" numLanes="1" speed="5.56" shape="452.85,811.45 425.10,612.02" width="2.00" allow="pedestrian bicycle">
+        <lane index="0">
+            <param key="origId" value="752714448"/>
+        </lane>
+        <param key="origTo" value="7033913614"/>
+    </edge>
+    <edge id="916426379#0" from="310000616" to="4226807642" priority="10" type="highway.tertiary" numLanes="1" speed="13.89" shape="760.91,533.20 759.55,517.49 756.70,500.55 750.98,480.49 743.24,460.34" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="916426379"/>
+        </lane>
+    </edge>
+    <edge id="916426379#1" from="4226807642" to="cluster_10564135211_11749189838_12136544949_12136544951_#7more" priority="10" type="highway.tertiary" numLanes="1" speed="13.89" shape="743.24,460.34 728.00,420.72 722.58,407.24 720.48,401.60" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone">
+        <lane index="0">
+            <param key="origId" value="916426379"/>
+        </lane>
+        <param key="origTo" value="11749189838"/>
+    </edge>
+    <edge id="963835936#0" from="12349519010" to="8915380567" priority="1" type="highway.footway" numLanes="1" speed="2.78" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="963835936"/>
+        </lane>
+    </edge>
+    <edge id="963835936#1" from="8915380567" to="9398669953" priority="1" type="highway.footway" numLanes="1" speed="2.78" spreadType="center" width="2.00" allow="pedestrian">
+        <lane index="0">
+            <param key="origId" value="963835936"/>
+        </lane>
+    </edge>
+    <edge id="978873858#1" from="9057378585" to="9057378586" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="978873858"/>
+        </lane>
+    </edge>
+    <edge id="978873859" from="9057378585" to="9057378587" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="978873859"/>
+        </lane>
+    </edge>
+    <edge id="991029398#0" from="11227531033" to="9156757727" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029398"/>
+        </lane>
+    </edge>
+    <edge id="991029398#1" from="9156757727" to="9156757724" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029398"/>
+        </lane>
+    </edge>
+    <edge id="991029398#2" from="9156757724" to="9156757723" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029398"/>
+        </lane>
+    </edge>
+    <edge id="991029399#0" from="9156757724" to="9427290878" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029399"/>
+        </lane>
+    </edge>
+    <edge id="991029399#1" from="9427290878" to="9427290879" priority="1" type="highway.service" numLanes="1" speed="5.56" shape="440.03,310.25 420.40,312.26 416.13,267.67 434.72,265.51" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029399"/>
+        </lane>
+    </edge>
+    <edge id="991029399#2" from="9427290879" to="9156757727" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029399"/>
+        </lane>
+    </edge>
+    <edge id="991029400#0" from="9427290872" to="9156757730" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029400"/>
+        </lane>
+    </edge>
+    <edge id="991029400#1" from="9156757730" to="9156757728" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029400"/>
+        </lane>
+    </edge>
+    <edge id="991029401#0" from="9156757729" to="9156757730" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029401"/>
+        </lane>
+    </edge>
+    <edge id="991029401#1" from="9156757730" to="9156757731" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029401"/>
+        </lane>
+    </edge>
+    <edge id="991029402#0" from="9427290871" to="9156757732" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029402"/>
+        </lane>
+    </edge>
+    <edge id="991029402#1" from="9156757732" to="9156757733" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029402"/>
+        </lane>
+    </edge>
+    <edge id="991029403" from="9156757732" to="9156757734" priority="1" type="highway.service" numLanes="1" speed="5.56" allow="pedestrian delivery bicycle">
+        <lane index="0">
+            <param key="origId" value="991029403"/>
+        </lane>
+    </edge>
+    <edge id="E8" from="J21" to="310000659" priority="-1" numLanes="1" speed="13.89" disallow="pedestrian"/>
+    <edge id="E9" from="310000659" to="cluster_10564135211_11749189838_12136544949_12136544951_#7more" priority="-1" numLanes="1" speed="13.89" disallow="pedestrian"/>
+</edges>

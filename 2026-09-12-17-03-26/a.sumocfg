@@ -1,0 +1,11 @@
+<configuration>
+    <input>
+        <net-file value="Config_actualizado.net.xml"/>
+        <route-files value="rutas_aleatorias.rou.xml, flujos_especificos.rou.xml"/>
+        <additional-files value="poligonos_mapa.poly.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="90000"/>
+    </time>
+</configuration>

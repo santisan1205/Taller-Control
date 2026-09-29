@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-09-12 17:03:57.351376 by Eclipse SUMO osmWebWizard.py v1_27_1+0000-7717f2379d9
+<configuration>
+    <net-file value="C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.net.xml.gz"/>
+    <output-trip-file value="C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.pedestrian.trips.xml"/>
+    <route-file value="C:\Users\andre\Sumo\2026-09-12-17-03-26\osm.pedestrian.rou.xml"/>
+    <persons value="True"/>
+    <prefix value="ped"/>
+    <vehicle-class value="pedestrian"/>
+    <fringe-factor value="1"/>
+    <seed value="45"/>
+    <max-distance value="2000.0"/>
+    <insertion-density value="10.0"/>
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="ped_pedestrian" vClass="pedestrian"/>
+    <person id="ped0" depart="0.00" type="ped_pedestrian">
+        <walk from="-1211892243" to="-978873858#1"/>
+    </person>
+    <person id="ped1" depart="34.56" type="ped_pedestrian">
+        <walk from="402782364#1" to="268663045#0"/>
+    </person>
+    <person id="ped2" depart="69.13" type="ped_pedestrian">
+        <walk from="-268663323#2" to="-402782364#1"/>
+    </person>
+    <person id="ped3" depart="103.69" type="ped_pedestrian">
+        <walk from="-1334897887#0" to="-1334897886#0"/>
+    </person>
+    <person id="ped4" depart="138.26" type="ped_pedestrian">
+        <walk from="978873858#1" to="978873859"/>
+    </person>
+    <person id="ped5" depart="172.82" type="ped_pedestrian">
+        <walk from="1374486329" to="1133034629#2"/>
+    </person>
+    <person id="ped6" depart="207.39" type="ped_pedestrian">
+        <walk from="-1410208415#0" to="1334897887#1"/>
+    </person>
+    <person id="ped7" depart="241.95" type="ped_pedestrian">
+        <walk from="1374486327#2" to="1133034629#2"/>
+    </person>
+    <person id="ped8" depart="276.52" type="ped_pedestrian">
+        <walk from="-1334897887#0" to="1317611939"/>
+    </person>
+    <person id="ped9" depart="311.08" type="ped_pedestrian">
+        <walk from="-1162648030#2" to="1211892247"/>
+    </person>
+    <person id="ped10" depart="345.65" type="ped_pedestrian">
+        <walk from="752714448" to="-28224387#7"/>
+    </person>
+    <person id="ped11" depart="380.21" type="ped_pedestrian">
+        <walk from="991029399#2" to="-991029399#2"/>
+    </person>
+    <person id="ped12" depart="414.78" type="ped_pedestrian">
+        <walk from="1133034629#2" to="1479478865#2"/>
+    </person>
+    <person id="ped13" depart="449.34" type="ped_pedestrian">
+        <walk from="1374486328#1" to="371826755"/>
+    </person>
+    <person id="ped14" depart="483.91" type="ped_pedestrian">
+        <walk from="1211892247" to="28224387#2"/>
+    </person>
+    <person id="ped15" depart="518.47" type="ped_pedestrian">
+        <walk from="-1410208415#0" to="1374486329"/>
+    </person>
+    <person id="ped16" depart="553.04" type="ped_pedestrian">
+        <walk from="1374843820#0" to="1334897891#2"/>
+    </person>
+    <person id="ped17" depart="587.60" type="ped_pedestrian">
+        <walk from="1211892242" to="-978873858#1"/>
+    </person>
+    <person id="ped18" depart="622.17" type="ped_pedestrian">
+        <walk from="-1479478865#2" to="1133034632"/>
+    </person>
+    <person id="ped19" depart="656.73" type="ped_pedestrian">
+        <walk from="752092984" to="28224387#8"/>
+    </person>
+    <person id="ped20" depart="691.30" type="ped_pedestrian">
+        <walk from="963835936#1" to="-1479478866"/>
+    </person>
+    <person id="ped21" depart="725.86" type="ped_pedestrian">
+        <walk from="963835936#1" to="1133034618#2"/>
+    </person>
+    <person id="ped22" depart="760.43" type="ped_pedestrian">
+        <walk from="1133034629#3" to="1374486327#1"/>
+    </person>
+    <person id="ped23" depart="794.99" type="ped_pedestrian">
+        <walk from="1133034618#0" to="1479478866"/>
+    </person>
+    <person id="ped24" depart="829.56" type="ped_pedestrian">
+        <walk from="-978873859" to="-752714448"/>
+    </person>
+    <person id="ped25" depart="864.12" type="ped_pedestrian">
+        <walk from="1162648030#1" to="-1026513016"/>
+    </person>
+    <person id="ped26" depart="898.69" type="ped_pedestrian">
+        <walk from="402782363#2" to="402782364#1"/>
+    </person>
+    <person id="ped27" depart="933.25" type="ped_pedestrian">
+        <walk from="-1334897887#0" to="-1479478865#2"/>
+    </person>
+    <person id="ped28" depart="967.82" type="ped_pedestrian">
+        <walk from="-752092985" to="-28224387#8"/>
+    </person>
+    <person id="ped29" depart="1002.38" type="ped_pedestrian">
+        <walk from="1374843820#1" to="1133034618#2"/>
+    </person>
+    <person id="ped30" depart="1036.95" type="ped_pedestrian">
+        <walk from="28224387#2" to="978873858#1"/>
+    </person>
+    <person id="ped31" depart="1071.51" type="ped_pedestrian">
+        <walk from="693972019" to="-268663323#0"/>
+    </person>
+    <person id="ped32" depart="1106.08" type="ped_pedestrian">
+        <walk from="1022165850#0" to="991029401#0"/>
+    </person>
+    <person id="ped33" depart="1140.64" type="ped_pedestrian">
+        <walk from="-963835927" to="1211892242"/>
+    </person>
+    <person id="ped34" depart="1175.21" type="ped_pedestrian">
+        <walk from="752714448" to="28224387#7"/>
+    </person>
+    <person id="ped35" depart="1209.77" type="ped_pedestrian">
+        <walk from="991029399#2" to="991029399#1"/>
+    </person>
+    <person id="ped36" depart="1244.34" type="ped_pedestrian">
+        <walk from="-991029401#1" to="-991029400#1"/>
+    </person>
+    <person id="ped37" depart="1278.90" type="ped_pedestrian">
+        <walk from="991029401#1" to="-1022165850#1"/>
+    </person>
+    <person id="ped38" depart="1313.47" type="ped_pedestrian">
+        <walk from="-1479478865#1" to="1479478865#2"/>
+    </person>
+    <person id="ped39" depart="1348.03" type="ped_pedestrian">
+        <walk from="-268663045#0" to="-268663045#1"/>
+    </person>
+    <person id="ped40" depart="1382.60" type="ped_pedestrian">
+        <walk from="1022165851" to="-991029399#2"/>
+    </person>
+    <person id="ped41" depart="1417.16" type="ped_pedestrian">
+        <walk from="1133034618#2" to="1133034618#0"/>
+    </person>
+    <person id="ped42" depart="1451.73" type="ped_pedestrian">
+        <walk from="1374486327#1" to="963835936#0"/>
+    </person>
+    <person id="ped43" depart="1486.29" type="ped_pedestrian">
+        <walk from="-752092985" to="-978873857"/>
+    </person>
+    <person id="ped44" depart="1520.86" type="ped_pedestrian">
+        <walk from="1133034631#2" to="-1479478866"/>
+    </person>
+    <person id="ped45" depart="1555.42" type="ped_pedestrian">
+        <walk from="1410208415#1" to="1374843820#1"/>
+    </person>
+    <person id="ped46" depart="1589.99" type="ped_pedestrian">
+        <walk from="1133034631#2" to="1374843820#0"/>
+    </person>
+    <person id="ped47" depart="1624.55" type="ped_pedestrian">
+        <walk from="1374843820#1" to="1133034632"/>
+    </person>
+    <person id="ped48" depart="1659.12" type="ped_pedestrian">
+        <walk from="1022165848#1" to="1022165848#0"/>
+    </person>
+    <person id="ped49" depart="1693.68" type="ped_pedestrian">
+        <walk from="268663045#2" to="-402782364#1"/>
+    </person>
+    <person id="ped50" depart="1728.24" type="ped_pedestrian">
+        <walk from="1264663520#2" to="1479478865#2"/>
+    </person>
+    <person id="ped51" depart="1762.81" type="ped_pedestrian">
+        <walk from="-402782363#1" to="402782363#1"/>
+    </person>
+    <person id="ped52" depart="1797.37" type="ped_pedestrian">
+        <walk from="28224387#6" to="1211892247"/>
+    </person>
+    <person id="ped53" depart="1831.94" type="ped_pedestrian">
+        <walk from="-752714448" to="-28224387#8"/>
+    </person>
+    <person id="ped54" depart="1866.50" type="ped_pedestrian">
+        <walk from="-28224387#4" to="28224387#3"/>
+    </person>
+    <person id="ped55" depart="1901.07" type="ped_pedestrian">
+        <walk from="-991029398#0" to="991029398#1"/>
+    </person>
+    <person id="ped56" depart="1935.63" type="ped_pedestrian">
+        <walk from="-402782364#1" to="-268663045#3"/>
+    </person>
+    <person id="ped57" depart="1970.20" type="ped_pedestrian">
+        <walk from="-1026513016" to="-28224387#7"/>
+    </person>
+    <person id="ped58" depart="2004.76" type="ped_pedestrian">
+        <walk from="752092984" to="-1211892243"/>
+    </person>
+    <person id="ped59" depart="2039.33" type="ped_pedestrian">
+        <walk from="-752092984" to="28224387#3"/>
+    </person>
+    <person id="ped60" depart="2073.89" type="ped_pedestrian">
+        <walk from="752092984" to="28224387#4"/>
+    </person>
+    <person id="ped61" depart="2108.46" type="ped_pedestrian">
+        <walk from="-1410208415#1" to="-1479478866"/>
+    </person>
+    <person id="ped62" depart="2143.02" type="ped_pedestrian">
+        <walk from="-978873858#1" to="-28224387#4"/>
+    </person>
+    <person id="ped63" depart="2177.59" type="ped_pedestrian">
+        <walk from="963835936#0" to="-1479478866"/>
+    </person>
+    <person id="ped64" depart="2212.15" type="ped_pedestrian">
+        <walk from="-1479478865#2" to="1479478865#2"/>
+    </person>
+    <person id="ped65" depart="2246.72" type="ped_pedestrian">
+        <walk from="1410208415#1" to="1334897887#1"/>
+    </person>
+    <person id="ped66" depart="2281.28" type="ped_pedestrian">
+        <walk from="-1211892243" to="-28224387#7"/>
+    </person>
+    <person id="ped67" depart="2315.85" type="ped_pedestrian">
+        <walk from="-963835928" to="-28224387#0"/>
+    </person>
+    <person id="ped68" depart="2350.41" type="ped_pedestrian">
+        <walk from="1374843820#0" to="1133034632"/>
+    </person>
+    <person id="ped69" depart="2384.98" type="ped_pedestrian">
+        <walk from="-963835927" to="-1162648030#1"/>
+    </person>
+    <person id="ped70" depart="2419.54" type="ped_pedestrian">
+        <walk from="-268663323#2" to="693972019"/>
+    </person>
+    <person id="ped71" depart="2454.11" type="ped_pedestrian">
+        <walk from="1334897887#0" to="1133034618#0"/>
+    </person>
+    <person id="ped72" depart="2488.67" type="ped_pedestrian">
+        <walk from="268663045#2" to="402782364#0"/>
+    </person>
+    <person id="ped73" depart="2523.24" type="ped_pedestrian">
+        <walk from="1211892241" to="-28224387#0"/>
+    </person>
+    <person id="ped74" depart="2557.80" type="ped_pedestrian">
+        <walk from="268663323#1" to="268663045#2"/>
+    </person>
+    <person id="ped75" depart="2592.37" type="ped_pedestrian">
+        <walk from="-402782363#0" to="402782363#2"/>
+    </person>
+    <person id="ped76" depart="2626.93" type="ped_pedestrian">
+        <walk from="752092984" to="-28224387#8"/>
+    </person>
+    <person id="ped77" depart="2661.50" type="ped_pedestrian">
+        <walk from="1133034631#2" to="-1410208415#0"/>
+    </person>
+    <person id="ped78" depart="2696.06" type="ped_pedestrian">
+        <walk from="1374486328#1" to="1334897887#1"/>
+    </person>
+    <person id="ped79" depart="2730.63" type="ped_pedestrian">
+        <walk from="1334897887#1" to="963835936#1"/>
+    </person>
+    <person id="ped80" depart="2765.19" type="ped_pedestrian">
+        <walk from="28224387#4" to="-978873857"/>
+    </person>
+    <person id="ped81" depart="2799.76" type="ped_pedestrian">
+        <walk from="-268663045#3" to="-402782363#0"/>
+    </person>
+    <person id="ped82" depart="2834.32" type="ped_pedestrian">
+        <walk from="-1022165851" to="991029399#1"/>
+    </person>
+    <person id="ped83" depart="2868.89" type="ped_pedestrian">
+        <walk from="1374486327#2" to="1133034618#0"/>
+    </person>
+    <person id="ped84" depart="2903.45" type="ped_pedestrian">
+        <walk from="1133034632" to="1479478865#1"/>
+    </person>
+    <person id="ped85" depart="2938.02" type="ped_pedestrian">
+        <walk from="752092985" to="-28224387#4"/>
+    </person>
+    <person id="ped86" depart="2972.58" type="ped_pedestrian">
+        <walk from="-402782363#1" to="-268663045#2"/>
+    </person>
+    <person id="ped87" depart="3007.15" type="ped_pedestrian">
+        <walk from="1211892247" to="-28224387#7"/>
+    </person>
+    <person id="ped88" depart="3041.71" type="ped_pedestrian">
+        <walk from="-1334897887#0" to="-1479478866"/>
+    </person>
+    <person id="ped89" depart="3076.28" type="ped_pedestrian">
+        <walk from="1133034629#1" to="1374486327#2"/>
+    </person>
+    <person id="ped90" depart="3110.84" type="ped_pedestrian">
+        <walk from="28224387#2" to="-752092984"/>
+    </person>
+    <person id="ped91" depart="3145.41" type="ped_pedestrian">
+        <walk from="-978873858#0" to="-752714448"/>
+    </person>
+    <person id="ped92" depart="3179.97" type="ped_pedestrian">
+        <walk from="1133034629#2" to="-1410208415#1"/>
+    </person>
+    <person id="ped93" depart="3214.54" type="ped_pedestrian">
+        <walk from="-28224387#2" to="-978873858#0"/>
+    </person>
+    <person id="ped94" depart="3249.10" type="ped_pedestrian">
+        <walk from="-1410208415#1" to="1133034629#2"/>
+    </person>
+    <person id="ped95" depart="3283.67" type="ped_pedestrian">
+        <walk from="1022165848#0" to="991029402#1"/>
+    </person>
+    <person id="ped96" depart="3318.23" type="ped_pedestrian">
+        <walk from="-1334897886#0" to="1334897891#2"/>
+    </person>
+    <person id="ped97" depart="3352.80" type="ped_pedestrian">
+        <walk from="1133034618#0" to="-1334897886#0"/>
+    </person>
+    <person id="ped98" depart="3387.36" type="ped_pedestrian">
+        <walk from="1479478865#2" to="-1334897886#0"/>
+    </person>
+    <person id="ped99" depart="3421.93" type="ped_pedestrian">
+        <walk from="1334897887#0" to="1374843820#0"/>
+    </person>
+    <person id="ped100" depart="3456.49" type="ped_pedestrian">
+        <walk from="-268663045#0" to="-268663323#2"/>
+    </person>
+    <person id="ped101" depart="3491.05" type="ped_pedestrian">
+        <walk from="-28224387#4" to="-1162648030#1"/>
+    </person>
+    <person id="ped102" depart="3525.62" type="ped_pedestrian">
+        <walk from="-1410208415#0" to="1374486328#0"/>
+    </person>
+    <person id="ped103" depart="3560.18" type="ped_pedestrian">
+        <walk from="-991029398#0" to="991029398#2"/>
+    </person>
+    <person id="ped104" depart="3594.75" type="ped_pedestrian">
+        <walk from="693972019" to="268663045#3"/>
+    </person>
+</routes>
