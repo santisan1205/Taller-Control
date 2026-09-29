@@ -91,45 +91,6 @@ class RewardCalculator:
         return r_ext + (lambda_t * r_int)
 
 
-class TrafficLightAgent:
-    def __init__(self, input_dim):
-        # Espacio de acciones discreto (Discrete (4)) para Selección Directa de Fase.
-        self.num_actions = 4
-        self.rnd_module = RNDModule(input_dim=input_dim)
-        self.reward_calc = RewardCalculator()
-        
-        # El coeficiente de exploración lambda_t sigue un decaimiento programado.
-        self.lambda_t = 1.0 # Inicio del entrenamiento: lambda_t alto (ej. 1.0).
-        
-    def decay_lambda(self, progress):
-        # Decaimiento lineal progresivo. 
-        # Mitad del entrenamiento: equivalente a 0.5.
-        # Final del entrenamiento: cercano a 0 (ej. 0.01) para enfocarse 100% en optimizar el flujo vehicular.
-        self.lambda_t = max(0.01, 1.0 - progress)
-        
-    def select_phase(self, action_index):
-        # Las acciones se mapean a cadenas de estado predefinidas en SUMO.
-        if action_index == 0:
-            return "Fase 0 (Norte-Sur Directo + Peatones)" #.
-        elif action_index == 1:
-            return "Fase 1 (Norte-Sur Giros)" #.
-        elif action_index == 2:
-            return "Fase 2 (Este-Oeste Directo + Peatones)" #.
-        elif action_index == 3:
-            return "Fase 3 (Este-Oeste Giros)" #.
-        
-    def enforce_safety_constraints(self, current_phase, next_phase, green_time):
-        # Restricciones de seguridad vial: Si cambia de fase, se fuerza fase amarilla y todo-rojo de despeje.
-        if current_phase != next_phase:
-            return "Iniciar transición (Amarillo -> Todo-Rojo)" #.
-            
-        # Garantizar tiempo mínimo (ej. 15s) para cruce peatonal seguro.
-        if green_time < 15.0:
-            return "Mantener fase (Tiempo verde mínimo no cumplido)" #.
-            
-        return "Cambio de fase permitido"
-    
-    
 class MAPPOActor(nn.Module):
     def __init__(self, obs_dim, action_dim):
         """

@@ -2285,7 +2285,7 @@
         <phase duration="3"  state="rrrrrrrrrryyyyyyyyrryrrr"/>
         <phase duration="3"  state="rrrrrrrrrrrrrrrrrrrrrrrr"/>
     </tlLogic>
-    <tlLogic id="cluster_10564135212_13571629279_13571629299" type="actuated" programID="0" offset="0">
+    <tlLogic id="cluster_10564135212_13571629279_13571629299" type="static" programID="0" offset="0">
         <phase duration="42" state="GGGGrrr" minDur="5" maxDur="50"/>
         <phase duration="3"  state="yyyyrrr"/>
         <phase duration="37" state="rrrrGGG" minDur="5" maxDur="50"/>
