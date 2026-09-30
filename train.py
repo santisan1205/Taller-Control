@@ -136,4 +136,12 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False):
     print("Entrenamiento completado y modelos guardados.")
 
 if __name__ == '__main__':
-    train()
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Entrena RND-MAPPO sobre el escenario SUMO de Bogotá.')
+    parser.add_argument('--episodios', type=int, default=100)
+    parser.add_argument('--pasos', type=int, default=720, help='Pasos por episodio (720 = episodio completo de 1h simulada)')
+    parser.add_argument('--gui', action='store_true', help='Muestra la ventana de sumo-gui durante el entrenamiento')
+    args = parser.parse_args()
+
+    train(episodios=args.episodios, pasos_por_episodio=args.pasos, use_gui=args.gui)
