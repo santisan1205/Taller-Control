@@ -8,7 +8,7 @@ import numpy as np
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class RNDModule(nn.Module):
-    def __init__(self, input_dim, output_dim=64):
+    def __init__(self, input_dim, output_dim=64, lr=1e-4):
         super(RNDModule, self).__init__()
         
         # Red Objetivo (g): Posee pesos aleatorios congelados.
@@ -28,7 +28,7 @@ class RNDModule(nn.Module):
         )
         
         # Mediante descenso de gradiente se ajustan los pesos de la red predictora
-        self.optimizer = optim.Adam(self.predictor_net.parameters(), lr=1e-4)
+        self.optimizer = optim.Adam(self.predictor_net.parameters(), lr=lr)
         
         # Enviar redes a la GPU
         self.target_net.to(device)

@@ -19,17 +19,29 @@ def obtener_estado_global(obs_dict, agents):
     """
     return np.concatenate([obs_dict[agent] for agent in agents])
 
-def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
+def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=None,
+          lr_actor=3e-4, lr_critic=1e-3, clip_ratio=0.2, entropy_coef=0.01, ppo_epochs=4,
+          gamma=0.99, lam=0.95, rnd_lr=1e-4,
+          w1=1.0, w2=1.0, w3=2.0, p_cambio=0.5):
     # Semilla: fija la inicialización de las redes (torch) y la demanda de trafico
     # (sumo_seed), para poder reproducir una corrida y comparar varias semillas.
-    # Si no se da semilla, se preserva el comportamiento original (todo aleatorio,
-    # rutas de salida sin sufijo) para no romper la corrida base ya guardada.
+    # tag: etiqueta libre para distinguir en disco una corrida con hiperparámetros
+    # distintos (p.ej. "entropy02") sin que se pise con otras.
+    # Si no se da ninguno de los dos, se preserva el comportamiento original (todo
+    # aleatorio, rutas de salida sin sufijo) para no romper la corrida base ya guardada.
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
         torch.manual_seed(seed)
-        out_csv_name = f'resultados/seed{seed}/mappo_rnd_train'
-        sufijo_pesos = f'_seed{seed}'
+    partes_sufijo = []
+    if seed is not None:
+        partes_sufijo.append(f'seed{seed}')
+    if tag:
+        partes_sufijo.append(tag)
+    if partes_sufijo:
+        etiqueta = '_'.join(partes_sufijo)
+        out_csv_name = f'resultados/{etiqueta}/mappo_rnd_train'
+        sufijo_pesos = f'_{etiqueta}'
     else:
         out_csv_name = 'resultados/mappo_rnd_train'
         sufijo_pesos = ''
@@ -59,12 +71,16 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
     # Se envía a la GPU si está disponible, de lo contrario a la CPU
     actores = {agent: MAPPOActor(obs_dims[agent], action_dims[agent]).to(device) for agent in agentes}
     critic = MAPPOCritic(global_obs_dim).to(device)
-    trainers = {agent: MAPPOTrainer(actores[agent], critic) for agent in agentes}
+    trainers = {
+        agent: MAPPOTrainer(actores[agent], critic, lr_actor=lr_actor, lr_critic=lr_critic,
+                             clip_ratio=clip_ratio, entropy_coef=entropy_coef)
+        for agent in agentes
+    }
 
     # Un buffer y un módulo RND por agente para rastrear la curiosidad local
     buffers = {agent: RolloutBuffer() for agent in agentes}
-    rnd_modules = {agent: RNDModule(obs_dims[agent]) for agent in agentes}
-    reward_calc = RewardCalculator()
+    rnd_modules = {agent: RNDModule(obs_dims[agent], lr=rnd_lr) for agent in agentes}
+    reward_calc = RewardCalculator(w1=w1, w2=w2, w3=w3, p_cambio=p_cambio)
     
     # Hiperparámetros de entrenamiento
     EPISODIOS = episodios
@@ -134,11 +150,11 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
         for agent in agentes:
             # Calcular GAE y extraer tensores del buffer
             
-            buffer_tensors = buffers[agent].calcular_ventajas_gae(next_global_val)
-            
+            buffer_tensors = buffers[agent].calcular_ventajas_gae(next_global_val, gamma=gamma, lam=lam)
+
             # Actualizar redes Actor y Crítico (cada agente actualiza su propio Actor;
             # el Crítico, al ser compartido, recibe una actualización por agente)
-            actor_loss, critic_loss = trainers[agent].update(buffer_tensors)
+            actor_loss, critic_loss = trainers[agent].update(buffer_tensors, ppo_epochs=ppo_epochs)
             
             # Vaciar el buffer para la siguiente política (On-Policy)
             buffers[agent].limpiar()
@@ -169,6 +185,28 @@ if __name__ == '__main__':
     parser.add_argument('--pasos', type=int, default=720, help='Pasos por episodio (720 = episodio completo de 1h simulada)')
     parser.add_argument('--gui', action='store_true', help='Muestra la ventana de sumo-gui durante el entrenamiento')
     parser.add_argument('--seed', type=int, default=None, help='Semilla para redes y demanda (reproducibilidad / comparar varias corridas)')
+    parser.add_argument('--tag', default=None, help='Etiqueta libre para nombrar esta corrida en disco (p.ej. entropy02)')
+
+    # Hiperparámetros de PPO / GAE
+    parser.add_argument('--lr-actor', type=float, default=3e-4)
+    parser.add_argument('--lr-critic', type=float, default=1e-3)
+    parser.add_argument('--clip-ratio', type=float, default=0.2)
+    parser.add_argument('--entropy-coef', type=float, default=0.01, help='Mas alto = mas exploracion')
+    parser.add_argument('--ppo-epochs', type=int, default=4)
+    parser.add_argument('--gamma', type=float, default=0.99, help='Factor de descuento (GAE)')
+    parser.add_argument('--lam', type=float, default=0.95, help='Lambda de GAE')
+    parser.add_argument('--rnd-lr', type=float, default=1e-4, help='Tasa de aprendizaje de la red predictora de RND')
+
+    # Pesos de la recompensa extrinseca (w3 no tiene efecto hoy: no hay peatones en el escenario SUMO)
+    parser.add_argument('--w1', type=float, default=1.0, help='Peso de Δcola')
+    parser.add_argument('--w2', type=float, default=1.0, help='Peso de Δespera vehicular')
+    parser.add_argument('--w3', type=float, default=2.0, help='Peso de Δespera peatonal (inerte: sin peatones en el escenario)')
+    parser.add_argument('--p-cambio', type=float, default=0.5, help='Penalizacion por cambiar de fase')
     args = parser.parse_args()
 
-    train(episodios=args.episodios, pasos_por_episodio=args.pasos, use_gui=args.gui, seed=args.seed)
+    train(episodios=args.episodios, pasos_por_episodio=args.pasos, use_gui=args.gui,
+          seed=args.seed, tag=args.tag,
+          lr_actor=args.lr_actor, lr_critic=args.lr_critic, clip_ratio=args.clip_ratio,
+          entropy_coef=args.entropy_coef, ppo_epochs=args.ppo_epochs,
+          gamma=args.gamma, lam=args.lam, rnd_lr=args.rnd_lr,
+          w1=args.w1, w2=args.w2, w3=args.w3, p_cambio=args.p_cambio)
