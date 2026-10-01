@@ -18,7 +18,7 @@ def obtener_estado_global(obs_dict, agents):
     """
     return np.concatenate([obs_dict[agent] for agent in agents])
 
-def train(episodios=10, pasos_por_episodio=720, use_gui=False): # CAMBIAR DESPUÉS (primera prueba) -> eps=100, pasos=720
+def train(episodios=150, pasos_por_episodio=750, use_gui=False): # CAMBIAR DESPUÉS (primera prueba) -> eps=100, pasos=720
     # 1. Inicialización del Entorno con el escenario SUMO real (sector de Bogotá modelado)
     RED_XML = os.path.join(CARPETA_SUMO, 'Config_actualizado.net.xml')
     RUTAS_XML = ','.join([
