@@ -1,9 +1,19 @@
 import os
+<<<<<<< HEAD
 import random
+=======
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+>>>>>>> c788ea711fe7ec79a8e8171569e7dc325a88cf02
 import numpy as np
 import torch
 from setup_entorno import crear_entorno_sumo, CARPETA_SUMO
 from modelo_red_rl import MAPPOActor, MAPPOCritic, RolloutBuffer, MAPPOTrainer, RNDModule, RewardCalculator
+
+# 1. Define el dispositivo de cómputo: GPU si está disponible, de lo contrario CPU
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+
+print(f"Usando dispositivo: {device}")
 
 def obtener_estado_global(obs_dict, agents):
     """
@@ -12,6 +22,7 @@ def obtener_estado_global(obs_dict, agents):
     """
     return np.concatenate([obs_dict[agent] for agent in agents])
 
+<<<<<<< HEAD
 def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
     # Semilla: fija la inicialización de las redes (torch) y la demanda de trafico
     # (sumo_seed), para poder reproducir una corrida y comparar varias semillas.
@@ -28,6 +39,9 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
         sufijo_pesos = ''
     sumo_seed = seed if seed is not None else 'random'
 
+=======
+def train(episodios=10, pasos_por_episodio=720, use_gui=False): # CAMBIAR DESPUÉS (primera prueba) -> eps=100, pasos=720
+>>>>>>> c788ea711fe7ec79a8e8171569e7dc325a88cf02
     # 1. Inicialización del Entorno con el escenario SUMO real (sector de Bogotá modelado)
     RED_XML = os.path.join(CARPETA_SUMO, 'Config_actualizado.net.xml')
     RUTAS_XML = ','.join([
@@ -49,8 +63,9 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
     # 2. Inicialización de Redes y Módulos
     # Un Actor independiente por agente (dimensiones heterogéneas impiden compartir pesos)
     # y un único Crítico centralizado que observa el estado global de la red (paradigma CTDE)
-    actores = {agent: MAPPOActor(obs_dims[agent], action_dims[agent]) for agent in agentes}
-    critic = MAPPOCritic(global_obs_dim)
+    # Se envía a la GPU si está disponible, de lo contrario a la CPU
+    actores = {agent: MAPPOActor(obs_dims[agent], action_dims[agent]).to(device) for agent in agentes}
+    critic = MAPPOCritic(global_obs_dim).to(device)
     trainers = {agent: MAPPOTrainer(actores[agent], critic) for agent in agentes}
 
     # Un buffer y un módulo RND por agente para rastrear la curiosidad local
@@ -71,16 +86,16 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
         recompensa_acumulada = 0
         
         for paso in range(PASOS_POR_EPISODIO):
+            # El Crítico evalúa el estado actual de toda la ciudad en la GPU
+            estado_global_tensor = torch.tensor(estado_global, dtype=torch.float32).to(device)
+            valor_global = critic(estado_global_tensor).item()
             acciones = {}
             log_probs = {}
             valores_estado = {}
             
-            # El Crítico evalúa el estado actual de toda la ciudad
-            valor_global = critic(torch.tensor(estado_global, dtype=torch.float32)).item()
-            
             # Cada agente decide su acción de forma descentralizada
             for agent in agentes:
-                obs_tensor = torch.tensor(obs_dict[agent], dtype=torch.float32)
+                obs_tensor = torch.tensor(obs_dict[agent], dtype=torch.float32).to(device)
                 accion, log_prob = actores[agent].get_action(obs_tensor)
                 
                 acciones[agent] = accion
@@ -120,10 +135,12 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
         print(f"Episodio {episodio + 1}/{EPISODIOS} | Recompensa Total: {recompensa_acumulada:.2f} | Lambda RND: {lambda_t:.2f}")
         
         # Siguiente valor para calcular la ventaja (Bootstrapping)
-        next_global_val = critic(torch.tensor(estado_global, dtype=torch.float32)).item()
+        estado_global_next = torch.tensor(estado_global, dtype=torch.float32).to(device)
+        next_global_val = critic(estado_global_next).item()
         
         for agent in agentes:
             # Calcular GAE y extraer tensores del buffer
+            
             buffer_tensors = buffers[agent].calcular_ventajas_gae(next_global_val)
             
             # Actualizar redes Actor y Crítico (cada agente actualiza su propio Actor;
@@ -152,6 +169,7 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
     print("Entrenamiento completado y modelos guardados.")
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     import argparse
 
     parser = argparse.ArgumentParser(description='Entrena RND-MAPPO sobre el escenario SUMO de Bogotá.')
@@ -162,3 +180,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     train(episodios=args.episodios, pasos_por_episodio=args.pasos, use_gui=args.gui, seed=args.seed)
+=======
+    train()
+>>>>>>> c788ea711fe7ec79a8e8171569e7dc325a88cf02

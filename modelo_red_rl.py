@@ -4,6 +4,9 @@ import torch.optim as optim
 from torch.distributions import Categorical
 import numpy as np
 
+# Definir la GPU dedicada
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 class RNDModule(nn.Module):
     def __init__(self, input_dim, output_dim=64):
         super(RNDModule, self).__init__()
@@ -27,6 +30,10 @@ class RNDModule(nn.Module):
         # Mediante descenso de gradiente se ajustan los pesos de la red predictora
         self.optimizer = optim.Adam(self.predictor_net.parameters(), lr=1e-4)
         
+        # Enviar redes a la GPU
+        self.target_net.to(device)
+        self.predictor_net.to(device)
+        
     def normalize_state(self, state):
         # Es fundamental normalizar el vector de observación (media 0, varianza 1) antes de pasarlo por las redes
         # Esto evita inestabilidad numérica generada al mezclar distintas escalas
@@ -39,6 +46,9 @@ class RNDModule(nn.Module):
         if not isinstance(state, torch.Tensor):
             state = torch.tensor(state, dtype=torch.float32)
             
+        # Enviar el tensor a la GPU
+        state = state.to(device)
+            
         # 1. Normalización del vector de observación
         norm_state = self.normalize_state(state)
         
@@ -50,12 +60,14 @@ class RNDModule(nn.Module):
         mse = nn.MSELoss(reduction='none')
         intrinsic_reward = mse(predicted_features, target_features).mean(dim=-1)
         
-        return intrinsic_reward.detach().numpy() # R_int.
+        return intrinsic_reward.cpu().detach().numpy() # R_int.
         
     def update_predictor(self, state):
         # Entrenamiento en lotes mediante retropropagación.
         if not isinstance(state, torch.Tensor):
             state = torch.tensor(state, dtype=torch.float32)
+            
+        state = state.to(device)
             
         norm_state = self.normalize_state(state)
         target_features = self.target_net(norm_state)
@@ -118,7 +130,9 @@ class MAPPOActor(nn.Module):
         dist = self.forward(obs)
         action = dist.sample()
         log_prob = dist.log_prob(action)
-        return action.item(), log_prob
+        
+        # Desconectar log_prob de la GPU y del grafo de gradientes extrayendo solo su valor numérico
+        return action.item(), log_prob.detach().cpu().item()
 
 
 class MAPPOCritic(nn.Module):
@@ -196,12 +210,12 @@ class RolloutBuffer:
         
         # Convertir a tensores para el optimizador
         return (
-            torch.tensor(self.obs, dtype=torch.float32),
-            torch.tensor(self.global_obs, dtype=torch.float32),
-            torch.tensor(self.actions, dtype=torch.float32),
-            torch.tensor(self.log_probs, dtype=torch.float32),
-            torch.tensor(retornos, dtype=torch.float32),
-            torch.tensor(ventajas, dtype=torch.float32)
+            torch.tensor(self.obs, dtype=torch.float32).to(device),
+            torch.tensor(self.global_obs, dtype=torch.float32).to(device),
+            torch.tensor(self.actions, dtype=torch.float32).to(device),
+            torch.tensor(self.log_probs, dtype=torch.float32).to(device),
+            torch.tensor(retornos, dtype=torch.float32).to(device),
+            torch.tensor(ventajas, dtype=torch.float32).to(device)
         )
         
 
