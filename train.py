@@ -1,9 +1,6 @@
 import os
-<<<<<<< HEAD
-import random
-=======
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
->>>>>>> c788ea711fe7ec79a8e8171569e7dc325a88cf02
+import random
 import numpy as np
 import torch
 from setup_entorno import crear_entorno_sumo, CARPETA_SUMO
@@ -22,7 +19,6 @@ def obtener_estado_global(obs_dict, agents):
     """
     return np.concatenate([obs_dict[agent] for agent in agents])
 
-<<<<<<< HEAD
 def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
     # Semilla: fija la inicialización de las redes (torch) y la demanda de trafico
     # (sumo_seed), para poder reproducir una corrida y comparar varias semillas.
@@ -39,9 +35,6 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
         sufijo_pesos = ''
     sumo_seed = seed if seed is not None else 'random'
 
-=======
-def train(episodios=10, pasos_por_episodio=720, use_gui=False): # CAMBIAR DESPUÉS (primera prueba) -> eps=100, pasos=720
->>>>>>> c788ea711fe7ec79a8e8171569e7dc325a88cf02
     # 1. Inicialización del Entorno con el escenario SUMO real (sector de Bogotá modelado)
     RED_XML = os.path.join(CARPETA_SUMO, 'Config_actualizado.net.xml')
     RUTAS_XML = ','.join([
@@ -169,7 +162,6 @@ def train(episodios=10, pasos_por_episodio=720, use_gui=False): # CAMBIAR DESPU�
     print("Entrenamiento completado y modelos guardados.")
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     import argparse
 
     parser = argparse.ArgumentParser(description='Entrena RND-MAPPO sobre el escenario SUMO de Bogotá.')
@@ -180,6 +172,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     train(episodios=args.episodios, pasos_por_episodio=args.pasos, use_gui=args.gui, seed=args.seed)
-=======
-    train()
->>>>>>> c788ea711fe7ec79a8e8171569e7dc325a88cf02
