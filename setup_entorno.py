@@ -64,14 +64,20 @@ def recompensa_delta_colas(traffic_signal):
     return _reward_calc.calculate_extrinsic_reward(delta_q, delta_w_veh, delta_w_ped, cambio_de_fase)
 
 # 2. Configuración del Entorno Multi-Agente
-def crear_entorno_sumo(net_file, route_file, use_gui=False):
+def crear_entorno_sumo(net_file, route_file, use_gui=False, sumo_seed='random',
+                        out_csv_name='resultados/mappo_rnd_train', fixed_ts=False):
     """
     Inicializa el entorno PettingZoo con la Selección Directa de Fase.
+
+    sumo_seed: fija la demanda de tráfico (útil para comparar corridas de forma justa
+    y para repetir un mismo escenario con distintas semillas de entrenamiento).
+    fixed_ts: si es True, ignora las acciones del agente y deja correr los programas
+    semafóricos originales del .net.xml (tiempo fijo) — sirve como baseline de comparación.
     """
     env = parallel_env(
         net_file=net_file,
         route_file=route_file,
-        out_csv_name='resultados/mappo_rnd_train',
+        out_csv_name=out_csv_name,
         use_gui=use_gui,
         num_seconds=3600,       # Duración de la simulación (1 hora en segundos de SUMO)
         delta_time=5,           # Δt: El agente toma decisiones cada 5 segundos
@@ -79,7 +85,9 @@ def crear_entorno_sumo(net_file, route_file, use_gui=False):
         min_green=15,           # Tiempo verde mínimo estricto
         max_green=60,           # Tiempo verde máximo antes de forzar rotación
         reward_fn=recompensa_delta_colas, # Inyección de nuestra R_ext
-        observation_class=DefaultObservationFunction # Vector de colas, densidad y fase one-hot
+        observation_class=DefaultObservationFunction, # Vector de colas, densidad y fase one-hot
+        sumo_seed=sumo_seed,
+        fixed_ts=fixed_ts,
     )
     return env
 

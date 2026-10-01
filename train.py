@@ -1,4 +1,5 @@
 import os
+import random
 import numpy as np
 import torch
 from setup_entorno import crear_entorno_sumo, CARPETA_SUMO
@@ -11,14 +12,29 @@ def obtener_estado_global(obs_dict, agents):
     """
     return np.concatenate([obs_dict[agent] for agent in agents])
 
-def train(episodios=100, pasos_por_episodio=720, use_gui=False):
+def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None):
+    # Semilla: fija la inicialización de las redes (torch) y la demanda de trafico
+    # (sumo_seed), para poder reproducir una corrida y comparar varias semillas.
+    # Si no se da semilla, se preserva el comportamiento original (todo aleatorio,
+    # rutas de salida sin sufijo) para no romper la corrida base ya guardada.
+    if seed is not None:
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        out_csv_name = f'resultados/seed{seed}/mappo_rnd_train'
+        sufijo_pesos = f'_seed{seed}'
+    else:
+        out_csv_name = 'resultados/mappo_rnd_train'
+        sufijo_pesos = ''
+    sumo_seed = seed if seed is not None else 'random'
+
     # 1. Inicialización del Entorno con el escenario SUMO real (sector de Bogotá modelado)
     RED_XML = os.path.join(CARPETA_SUMO, 'Config_actualizado.net.xml')
     RUTAS_XML = ','.join([
         os.path.join(CARPETA_SUMO, 'rutas_aleatorias.rou.xml'),
         os.path.join(CARPETA_SUMO, 'flujos_especificos.rou.xml'),
     ])
-    env = crear_entorno_sumo(RED_XML, RUTAS_XML, use_gui=use_gui)
+    env = crear_entorno_sumo(RED_XML, RUTAS_XML, use_gui=use_gui, sumo_seed=sumo_seed, out_csv_name=out_csv_name)
 
     obs_iniciales, _ = env.reset()
     agentes = env.agents
@@ -131,8 +147,8 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False):
     # Guardar los pesos entrenados: un Actor por agente (dimensiones heterogéneas)
     # y el Crítico centralizado compartido
     for agent in agentes:
-        torch.save(actores[agent].state_dict(), f'actor_mappo_{agent}.pth')
-    torch.save(critic.state_dict(), 'critic_mappo.pth')
+        torch.save(actores[agent].state_dict(), f'actor_mappo_{agent}{sufijo_pesos}.pth')
+    torch.save(critic.state_dict(), f'critic_mappo{sufijo_pesos}.pth')
     print("Entrenamiento completado y modelos guardados.")
 
 if __name__ == '__main__':
@@ -142,6 +158,7 @@ if __name__ == '__main__':
     parser.add_argument('--episodios', type=int, default=100)
     parser.add_argument('--pasos', type=int, default=720, help='Pasos por episodio (720 = episodio completo de 1h simulada)')
     parser.add_argument('--gui', action='store_true', help='Muestra la ventana de sumo-gui durante el entrenamiento')
+    parser.add_argument('--seed', type=int, default=None, help='Semilla para redes y demanda (reproducibilidad / comparar varias corridas)')
     args = parser.parse_args()
 
-    train(episodios=args.episodios, pasos_por_episodio=args.pasos, use_gui=args.gui)
+    train(episodios=args.episodios, pasos_por_episodio=args.pasos, use_gui=args.gui, seed=args.seed)
