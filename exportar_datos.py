@@ -58,8 +58,8 @@ CORRIDAS_HISTORICAS = {
     'seed2': {'episodios': 100, 'seed': 2, 'notas': 'Misma config que base, semilla 2'},
     'lr_conservador': {'episodios': 50, 'seed': None, 'lr_actor': 1e-4, 'lr_critic': 3e-4,
                        'notas': 'Learning rates 3x mas lentos'},
-    'penaliza_cambio': {'episodios': 50, 'seed': None, 'p_cambio': np.nan,
-                        'notas': 'Mayor penalizacion por cambio de fase; valor de p_cambio por confirmar'},
+    'penaliza_cambio': {'episodios': 50, 'seed': None, 'p_cambio': 2.0,
+                        'notas': 'Penalizacion por cambio de fase 4x mayor (2.0 vs 0.5)'},
 }
 
 

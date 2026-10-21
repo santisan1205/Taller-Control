@@ -50,7 +50,7 @@ Una fila por corrida × episodio de entrenamiento.
 | C1…C4_frac_accion_dominante | 0–1 | Fracción de decisiones que eligieron la fase más frecuente (1 = política colapsada en una fase) |
 
 ## `corridas.csv`: configuración de cada corrida
-Una fila por corrida: `episodios`, `seed`, `lr_actor`, `lr_critic`, `clip_ratio`, `entropy_coef`, `ppo_epochs`, `gamma`, `lam`, `rnd_lr`, `w1` (peso de Δcola), `w2` (peso de Δespera vehicular), `w3` (peso de Δespera peatonal, sin efecto: no hay peatones), `p_cambio` (penalización por cambio de fase) y `notas`. `p_cambio` de `penaliza_cambio` está vacío porque no quedó registrado.
+Una fila por corrida: `episodios`, `seed`, `lr_actor`, `lr_critic`, `clip_ratio`, `entropy_coef`, `ppo_epochs`, `gamma`, `lam`, `rnd_lr`, `w1` (peso de Δcola), `w2` (peso de Δespera vehicular), `w3` (peso de Δespera peatonal, sin efecto: no hay peatones), `p_cambio` (penalización por cambio de fase) y `notas`.
 
 ## `evaluacion_detalle.csv`: un episodio de evaluación por fila
 Clave: `politica, modo, semilla, escala`.
