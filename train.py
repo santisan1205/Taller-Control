@@ -1,9 +1,13 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+import json
 import random
+import time
+from collections import Counter
 import numpy as np
+import pandas as pd
 import torch
-from setup_entorno import crear_entorno_sumo, CARPETA_SUMO
+from setup_entorno import crear_entorno_sumo, CARPETA_SUMO, nombre_cruce
 from modelo_red_rl import MAPPOActor, MAPPOCritic, RolloutBuffer, MAPPOTrainer, RNDModule, RewardCalculator
 
 # 1. Define el dispositivo de cómputo: GPU si está disponible, de lo contrario CPU
@@ -46,6 +50,23 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
         out_csv_name = 'resultados/mappo_rnd_train'
         sufijo_pesos = ''
     sumo_seed = seed if seed is not None else 'random'
+
+    # Carpeta de la corrida: ahí sumo-rl deja los CSV por episodio y aquí se
+    # guardan también la configuración y el log de métricas de entrenamiento
+    carpeta_corrida = os.path.dirname(out_csv_name)
+    os.makedirs(carpeta_corrida, exist_ok=True)
+    ruta_log = os.path.join(carpeta_corrida, 'log_entrenamiento.csv')
+    if os.path.exists(ruta_log):
+        os.remove(ruta_log)  # una corrida nueva con la misma etiqueta reemplaza su log
+    with open(os.path.join(carpeta_corrida, 'config.json'), 'w') as f:
+        json.dump({
+            'episodios': episodios, 'pasos_por_episodio': pasos_por_episodio,
+            'seed': seed, 'tag': tag,
+            'lr_actor': lr_actor, 'lr_critic': lr_critic, 'clip_ratio': clip_ratio,
+            'entropy_coef': entropy_coef, 'ppo_epochs': ppo_epochs,
+            'gamma': gamma, 'lam': lam, 'rnd_lr': rnd_lr,
+            'w1': w1, 'w2': w2, 'w3': w3, 'p_cambio': p_cambio,
+        }, f, indent=2)
 
     # 1. Inicialización del Entorno con el escenario SUMO real (sector de Bogotá modelado)
     RED_XML = os.path.join(CARPETA_SUMO, 'Config_actualizado.net.xml')
@@ -91,9 +112,21 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
     for episodio in range(EPISODIOS):
         obs_dict, _ = env.reset()
         estado_global = obtener_estado_global(obs_dict, agentes)
-        
+        # sumo-rl recrea los objetos TrafficSignal en cada reset()
+        semaforos = env.unwrapped.env.traffic_signals
+
         recompensa_acumulada = 0
-        
+        r_ext_acumulada = 0.0
+        r_int_acumulada = 0.0
+        perdidas_rnd = []
+        inicio_episodio = time.time()
+        # Fase verde efectiva de cada semáforo (no la acción pedida: min_green
+        # puede impedir el cambio) para contar cambios de fase y detectar si la
+        # política colapsa en una sola fase
+        fase_previa = {agent: semaforos[agent].green_phase for agent in agentes}
+        cambios_fase = {agent: 0 for agent in agentes}
+        conteo_acciones = {agent: Counter() for agent in agentes}
+
         for paso in range(PASOS_POR_EPISODIO):
             # El Crítico evalúa el estado actual de toda la ciudad en la GPU
             estado_global_tensor = torch.tensor(estado_global, dtype=torch.float32).to(device)
@@ -118,14 +151,22 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
             # Calcular recompensas totales (Extrínseca + Intrínseca) y almacenar
             for agent in agentes:
                 r_ext = r_ext_dict[agent]
-                
+
                 # Recompensa intrínseca (curiosidad)
                 r_int = rnd_modules[agent].compute_intrinsic_reward(siguientes_obs[agent])
-                rnd_modules[agent].update_predictor(siguientes_obs[agent])
-                
+                perdidas_rnd.append(rnd_modules[agent].update_predictor(siguientes_obs[agent]))
+
                 # Recompensa total
                 r_total = reward_calc.calculate_total_reward(r_ext, r_int, lambda_t)
                 recompensa_acumulada += r_total
+                r_ext_acumulada += float(r_ext)
+                r_int_acumulada += float(r_int)
+
+                conteo_acciones[agent][acciones[agent]] += 1
+                fase = semaforos[agent].green_phase
+                if fase != fase_previa[agent]:
+                    cambios_fase[agent] += 1
+                fase_previa[agent] = fase
                 
                 # Guardar en la memoria del agente
                 done = terminations[agent] or truncations[agent]
@@ -147,18 +188,43 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
         estado_global_next = torch.tensor(estado_global, dtype=torch.float32).to(device)
         next_global_val = critic(estado_global_next).item()
         
+        diagnosticos = []
         for agent in agentes:
             # Calcular GAE y extraer tensores del buffer
-            
+
             buffer_tensors = buffers[agent].calcular_ventajas_gae(next_global_val, gamma=gamma, lam=lam)
 
             # Actualizar redes Actor y Crítico (cada agente actualiza su propio Actor;
             # el Crítico, al ser compartido, recibe una actualización por agente)
-            actor_loss, critic_loss = trainers[agent].update(buffer_tensors, ppo_epochs=ppo_epochs)
-            
+            diagnosticos.append(trainers[agent].update(buffer_tensors, ppo_epochs=ppo_epochs))
+
             # Vaciar el buffer para la siguiente política (On-Policy)
             buffers[agent].limpiar()
-            
+
+        # Registrar las métricas de entrenamiento del episodio. El número de
+        # episodio coincide con el de analizar_resultados (que renumera los CSV
+        # de sumo-rl, desfasados en uno por el reset() inicial).
+        fila_log = {
+            'episodio': episodio + 1,
+            'recompensa_total': float(recompensa_acumulada),
+            'recompensa_ext': r_ext_acumulada,
+            'recompensa_int': r_int_acumulada,
+            'lambda_rnd': lambda_t,
+            'rnd_loss': float(np.mean(perdidas_rnd)) if perdidas_rnd else float('nan'),
+            'duracion_s': time.time() - inicio_episodio,
+        }
+        for clave in diagnosticos[0]:
+            fila_log[clave] = float(np.mean([d[clave] for d in diagnosticos]))
+        for agent in agentes:
+            cruce = nombre_cruce(agent)
+            total_acciones = sum(conteo_acciones[agent].values())
+            fila_log[f'{cruce}_cambios_fase'] = cambios_fase[agent]
+            # Fracción de pasos en que se eligió la acción más frecuente (1.0 = política colapsada)
+            fila_log[f'{cruce}_frac_accion_dominante'] = (
+                max(conteo_acciones[agent].values()) / total_acciones if total_acciones else float('nan')
+            )
+        pd.DataFrame([fila_log]).to_csv(ruta_log, mode='a', index=False, header=not os.path.exists(ruta_log))
+
         # Decaimiento del coeficiente de exploración RND
         progreso = episodio / EPISODIOS
         lambda_t = max(0.01, 1.0 - progreso)

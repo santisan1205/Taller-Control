@@ -9,6 +9,19 @@ from modelo_red_rl import RewardCalculator
 # Carpeta con el escenario SUMO real (red y demanda del sector de Bogotá modelado)
 CARPETA_SUMO = os.path.join(os.path.dirname(os.path.abspath(__file__)), '2026-09-12-17-03-26')
 
+# Nombres cortos de los 4 cruces semaforizados (los IDs de SUMO son muy largos
+# para tablas y gráficos). Se usan en los logs de entrenamiento y en los datos
+# exportados para el dashboard.
+CRUCES = {
+    'cluster_10564135163_13571629282_5146149679': 'C1',
+    'cluster_10564135205_11749189839_3266988437_5129187741_#3more': 'C2',
+    'cluster_10564135211_11749189838_12136544949_12136544951_#7more': 'C3',
+    'cluster_10564135212_13571629279_13571629299': 'C4',
+}
+
+def nombre_cruce(agent):
+    return CRUCES.get(agent, agent)
+
 # Un único calculador de recompensa compartido; la fórmula (pesos w1/w2/w3 y
 # penalización por cambio de fase) vive en modelo_red_rl.RewardCalculator
 _reward_calc = RewardCalculator()
@@ -65,7 +78,8 @@ def recompensa_delta_colas(traffic_signal):
 
 # 2. Configuración del Entorno Multi-Agente
 def crear_entorno_sumo(net_file, route_file, use_gui=False, sumo_seed='random',
-                        out_csv_name='resultados/mappo_rnd_train', fixed_ts=False):
+                        out_csv_name='resultados/mappo_rnd_train', fixed_ts=False,
+                        additional_sumo_cmd=None):
     """
     Inicializa el entorno PettingZoo con la Selección Directa de Fase.
 
@@ -73,6 +87,8 @@ def crear_entorno_sumo(net_file, route_file, use_gui=False, sumo_seed='random',
     y para repetir un mismo escenario con distintas semillas de entrenamiento).
     fixed_ts: si es True, ignora las acciones del agente y deja correr los programas
     semafóricos originales del .net.xml (tiempo fijo) — sirve como baseline de comparación.
+    additional_sumo_cmd: opciones extra de línea de comandos para SUMO (p.ej.
+    --tripinfo-output o --scale), usadas por la evaluación para medir más métricas.
     """
     env = parallel_env(
         net_file=net_file,
@@ -88,6 +104,7 @@ def crear_entorno_sumo(net_file, route_file, use_gui=False, sumo_seed='random',
         observation_class=DefaultObservationFunction, # Vector de colas, densidad y fase one-hot
         sumo_seed=sumo_seed,
         fixed_ts=fixed_ts,
+        additional_sumo_cmd=additional_sumo_cmd,
     )
     return env
 

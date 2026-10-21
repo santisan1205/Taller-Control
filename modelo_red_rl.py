@@ -241,7 +241,10 @@ class MAPPOTrainer:
         
         # Normalizar las ventajas estabiliza drásticamente el entrenamiento de la red
         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
-        
+
+        # Diagnósticos promediados sobre las épocas PPO (se registran en el log de entrenamiento)
+        historial = {'actor_loss': [], 'critic_loss': [], 'entropia': [], 'kl_aprox': [], 'clip_frac': []}
+
         for _ in range(ppo_epochs):
             # 1. Evaluar las acciones pasadas con la política ACTUAL
             dist = self.actor(obs)
@@ -270,5 +273,15 @@ class MAPPOTrainer:
             self.critic_optimizer.zero_grad()
             critic_loss.backward()
             self.critic_optimizer.step()
-            
-        return actor_loss.item(), critic_loss.item()
+
+            # KL aproximada (pi_vieja || pi_nueva) y fracción de muestras recortadas por el clip:
+            # indican qué tanto se mueve la política en cada actualización
+            with torch.no_grad():
+                log_ratio = new_log_probs - old_log_probs
+                historial['kl_aprox'].append(((ratios - 1) - log_ratio).mean().item())
+                historial['clip_frac'].append(((ratios - 1.0).abs() > self.clip_ratio).float().mean().item())
+            historial['actor_loss'].append(actor_loss.item())
+            historial['critic_loss'].append(critic_loss.item())
+            historial['entropia'].append(entropy.item())
+
+        return {clave: float(np.mean(valores)) for clave, valores in historial.items()}

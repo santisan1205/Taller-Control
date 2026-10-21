@@ -3,18 +3,39 @@ import os
 import re
 
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+from setup_entorno import CRUCES
+
 CARPETA_RESULTADOS = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resultados')
+
+# Corridas de entrenamiento -> carpeta donde sumo-rl dejó sus CSV
+CORRIDAS = {
+    'base': CARPETA_RESULTADOS,
+    'seed1': os.path.join(CARPETA_RESULTADOS, 'seed1'),
+    'seed2': os.path.join(CARPETA_RESULTADOS, 'seed2'),
+    'lr_conservador': os.path.join(CARPETA_RESULTADOS, 'lr_conservador'),
+    'penaliza_cambio': os.path.join(CARPETA_RESULTADOS, 'penaliza_cambio'),
+}
+
+# Un episodio real tiene ~720 filas; el CSV del reset() inicial tiene solo 1
+MIN_FILAS_EPISODIO = 10
 
 
 def cargar_episodios(carpeta=CARPETA_RESULTADOS):
     """
     Carga todos los CSV que sumo-rl genera (uno por episodio) y arma un
-    resumen (promedio por episodio) mas un diccionario con el detalle
-    paso a paso de cada episodio.
+    resumen (promedio por episodio, de sistema y por cruce) mas un diccionario
+    con el detalle paso a paso de cada episodio.
+
+    sumo-rl guarda el CSV de un episodio en el reset() siguiente, y el reset()
+    inicial de train.py produce un _ep1 espurio (una sola fila en ceros). Por
+    eso se descartan los CSV casi vacios y el _epN se renumera como episodio
+    de entrenamiento N-1, que es el que imprime train.py y el de log_entrenamiento.csv.
     """
-    archivos = glob.glob(os.path.join(carpeta, '*.csv'))
+    archivos = glob.glob(os.path.join(carpeta, '*_ep*.csv'))
     if not archivos:
         raise FileNotFoundError(
             f"No hay CSVs en {carpeta}. Corre train.py primero (sumo-rl los genera automaticamente)."
@@ -23,21 +44,48 @@ def cargar_episodios(carpeta=CARPETA_RESULTADOS):
     detalle_por_episodio = {}
     for archivo in archivos:
         m = re.search(r'_ep(\d+)\.csv$', archivo)
-        episodio = int(m.group(1)) if m else -1
-        detalle_por_episodio[episodio] = pd.read_csv(archivo)
+        if not m:
+            continue
+        df = pd.read_csv(archivo)
+        if len(df) < MIN_FILAS_EPISODIO:
+            continue
+        detalle_por_episodio[int(m.group(1)) - 1] = df
 
     filas_resumen = []
     for episodio in sorted(detalle_por_episodio):
         df = detalle_por_episodio[episodio]
-        filas_resumen.append({
+        fila = {
             'episodio': episodio,
             'espera_media': df['system_mean_waiting_time'].mean(),
             'espera_total_media': df['system_total_waiting_time'].mean(),
             'vehiculos_detenidos_media': df['system_total_stopped'].mean(),
+            'vehiculos_detenidos_max': df['system_total_stopped'].max(),
             'velocidad_media': df['system_mean_speed'].mean(),
-        })
+        }
+        for ts, cruce in CRUCES.items():
+            fila[f'{cruce}_espera_acumulada_media'] = df[f'{ts}_accumulated_waiting_time'].mean()
+            fila[f'{cruce}_vehiculos_detenidos_media'] = df[f'{ts}_stopped'].mean()
+            fila[f'{cruce}_velocidad_media'] = df[f'{ts}_average_speed'].mean()
+        filas_resumen.append(fila)
     resumen = pd.DataFrame(filas_resumen).sort_values('episodio').reset_index(drop=True)
+
+    # Métricas de entrenamiento (pérdidas, entropía, R_int...) si la corrida las registró
+    ruta_log = os.path.join(carpeta, 'log_entrenamiento.csv')
+    if os.path.exists(ruta_log):
+        resumen = resumen.merge(pd.read_csv(ruta_log), on='episodio', how='left')
     return resumen, detalle_por_episodio
+
+
+def cargar_todas_las_corridas():
+    """Resumen por episodio de todas las corridas, en formato largo (columna 'corrida')."""
+    resumenes = []
+    for corrida, carpeta in CORRIDAS.items():
+        if not os.path.isdir(carpeta):
+            continue
+        resumen, _ = cargar_episodios(carpeta)
+        resumenes.append(resumen.assign(corrida=corrida))
+    todas = pd.concat(resumenes, ignore_index=True)
+    return todas[['corrida'] + [c for c in todas.columns if c != 'corrida']]
 
 
 def graficar_curvas_de_aprendizaje(resumen, salida='curvas_aprendizaje.png'):
@@ -61,10 +109,11 @@ def graficar_curvas_de_aprendizaje(resumen, salida='curvas_aprendizaje.png'):
     fig.suptitle('Curvas de aprendizaje - RND-MAPPO')
     fig.tight_layout()
     fig.savefig(salida, dpi=150)
+    plt.close(fig)
     print(f"Grafico guardado en {salida}")
 
 
 if __name__ == '__main__':
     resumen, _ = cargar_episodios()
-    print(resumen.to_string(index=False))
+    print(resumen[['episodio', 'espera_media', 'vehiculos_detenidos_media', 'velocidad_media']].to_string(index=False))
     graficar_curvas_de_aprendizaje(resumen)
