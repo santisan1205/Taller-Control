@@ -1,0 +1,41 @@
+<section id="equipo" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">Multi-agente (MAPPO)</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">Cuatro jugadores y un entrenador</h2>
+<div style="display:flex;gap:96px;align-items:center">
+<div style="width:700px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:44px;line-height:1.3">Cada semáforo es un agente con su propia red neuronal.</p>
+<p style="font-size:32px;line-height:1.4;color:#4A5263">Al entrenar, un crítico central ve toda la red y califica cada jugada. Al operar, cada semáforo decide solo con lo que ve en su cruce.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#161B26;border-radius:16px;padding:32px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#F5F3EE">Crítico central (el entrenador)</h3>
+<p style="font-size:24px;line-height:1.4;color:#B9C0CC">Ve los cuatro cruces a la vez. Solo existe durante el entrenamiento.</p>
+</div>
+<div style="display:flex;justify-content:space-around">
+<x-shape kind="arrow-down" style="width:28px;height:48px;background:#8A93A3"></x-shape>
+<x-shape kind="arrow-down" style="width:28px;height:48px;background:#8A93A3"></x-shape>
+<x-shape kind="arrow-down" style="width:28px;height:48px;background:#8A93A3"></x-shape>
+<x-shape kind="arrow-down" style="width:28px;height:48px;background:#8A93A3"></x-shape>
+</div>
+<div style="display:flex;gap:16px">
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#E3EAF8;border:1px solid #BCCBEB;border-radius:16px;padding:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">C1</h3>
+<p style="font-size:24px;line-height:1.3;color:#4A5263">ve su cruce</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#E3EAF8;border:1px solid #BCCBEB;border-radius:16px;padding:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">C2</h3>
+<p style="font-size:24px;line-height:1.3;color:#4A5263">ve su cruce</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#E3EAF8;border:1px solid #BCCBEB;border-radius:16px;padding:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">C3</h3>
+<p style="font-size:24px;line-height:1.3;color:#4A5263">ve su cruce</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#E3EAF8;border:1px solid #BCCBEB;border-radius:16px;padding:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">C4</h3>
+<p style="font-size:24px;line-height:1.3;color:#4A5263">ve su cruce</p>
+</div>
+</div>
+</div>
+</div>
+<aside>(1 min) Tenemos cuatro semáforos, no uno, y lo que hace uno afecta al de al lado. El método se llama MAPPO (PPO multi-agente). La analogía es un equipo de fútbol: cada jugador (cada semáforo, con su propia red neuronal llamada ‘actor’) decide con lo que ve desde su posición. Pero durante los entrenamientos hay un entrenador (el ‘crítico’) que ve toda la cancha, o sea los cuatro cruces a la vez, y le dice a cada uno qué tan buena fue su jugada para el equipo. Así aprenden a coordinarse. Cuando ya están entrenados, el entrenador se va y cada semáforo funciona solo con la información de su cruce, que es lo realista: no necesitas una central que lo controle todo.</aside>
+</section>

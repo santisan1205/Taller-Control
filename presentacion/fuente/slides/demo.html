@@ -1,0 +1,16 @@
+<section id="demo" data-transition="fade" style="background:#F2A93B;color:#161B26;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:56px">
+<p style="font-size:24px;font-weight:700;letter-spacing:4px;text-transform:uppercase">Demo en vivo</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.05">Mismo tráfico, dos cerebros</h2>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#161B26;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#FF9A62">Ventana izquierda</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:44px;font-weight:700;color:#F5F3EE">Semáforos de tiempo fijo</h3>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#161B26;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#7FB0FF">Ventana derecha</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:44px;font-weight:700;color:#F5F3EE">Agente RND-MAPPO</h3>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.4">Fíjense en las colas de los dos cruces grandes y en el marcador de la terminal.</p>
+<aside>(3–4 min) DEMO. Comando (en la terminal de VS Code, carpeta del proyecto): .\.venv\Scripts\python.exe demo_en_vivo.py --minutos 10 --delay 300 --escala 1.2 . Con --delay 300 se ve a velocidad cómoda (sube o baja el número para ir más lento o más rápido; también se cambia en vivo en el campo Delay de SUMO). --escala 1.2 pone 20 % más carros y la diferencia se nota más. Qué decir: “Las dos ventanas tienen exactamente los mismos carros, que salen a la misma hora hacia el mismo destino. Lo único distinto es quién controla los semáforos: a la izquierda el ciclo fijo, a la derecha nuestro agente.” Mientras corre: señalen cómo en la izquierda se arman colas que esperan aunque la otra calle esté vacía, y en la derecha el verde va hacia donde están los carros. Lean el marcador cada vez que aparece una línea: vehículos detenidos y espera, fijo vs. agente. Al final, lean la línea de resultado (% menos detenidos y menos espera). Si algo falla, pongan el video de respaldo.</aside>
+</section>

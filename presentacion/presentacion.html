@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semáforos que aprenden</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; background: #0E1118; overflow: hidden; }
+  #lienzo { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; }
+  section { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; }
+  @media screen { section:not(.activa) { display: none !important; } }
+  table { border-collapse: collapse; width: 100%; overflow: hidden; }
+  th, td { padding: 0.35em 0.6em; text-align: left; border-bottom: 1px solid #E2DFD6; }
+  th { font-weight: 700; }
+  .notas { display: none; }
+  body.ver-notas section.activa .notas { display: block; position: absolute; left: 0; right: 0; bottom: 0;
+    background: rgba(14,17,24,0.94); color: #F5F3EE; font: 26px/1.45 'Public Sans', Arial, sans-serif;
+    padding: 32px 64px; max-height: 50%; overflow: auto; }
+  #ayuda { position: fixed; right: 16px; bottom: 12px; font: 14px Arial, sans-serif; color: #8A93A3; }
+  @media print {
+    @page { size: 1920px 1080px; margin: 0; }
+    html, body { overflow: visible; background: none; }
+    #lienzo { position: static; transform: none !important; width: auto; height: auto; }
+    section { position: relative; page-break-after: always; break-after: page; }
+    .notas, #ayuda { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="lienzo">
+<section data-n="1" id="cover" data-transition="fade" style="background:#161B26;color:#F5F3EE;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="position:absolute;left:1420px;top:200px;width:240px;height:640px;background:#232A38;border:2px solid #2E3647;border-radius:120px"></div>
+<div style="position:absolute;left:1460px;top:240px;width:160px;height:160px;background:#4A2C2C;border-radius:50%"></div>
+<div style="position:absolute;left:1460px;top:440px;width:160px;height:160px;background:#4D3F24;border-radius:50%"></div>
+<div style="position:absolute;left:1460px;top:640px;width:160px;height:160px;background:#3FBF7F;box-shadow:0 0 80px rgba(63,191,127,0.55);border-radius:50%"></div>
+<div style="display:flex;flex-direction:column;gap:32px;width:1150px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#F2A93B">Taller de Control · RND-MAPPO</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.05">Semáforos que aprenden</h1>
+<p style="font-size:44px;line-height:1.3;color:#B9C0CC">Control de tráfico con aprendizaje por refuerzo multi-agente en cuatro cruces reales de Bogotá</p>
+</div>
+<p style="font-size:32px;color:#B9C0CC">[Nombres del equipo] · [Fecha]</p>
+<aside class="notas">Arranque (30 s). “Hoy les vamos a mostrar unos semáforos que aprenden solos a manejar el tráfico. No les programamos reglas: los pusimos a practicar en una ciudad simulada, miles de veces, hasta que descubrieron cómo mover mejor los carros. Lo probamos en cuatro cruces reales de Bogotá y al final les vamos a mostrar en vivo la diferencia contra los semáforos normales.” Presenten al equipo y quién habla en cada parte.</aside>
+</section>
+
+<section data-n="2" id="problema" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">El problema</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">Los semáforos de hoy no miran la calle</h2>
+<p style="font-size:44px;line-height:1.3;color:#4A5263;width:1400px">Un semáforo de tiempo fijo repite el mismo ciclo, haya dos carros esperando o cuarenta.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700">Ciclo ciego</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">Da verde por reloj, aunque la calle esté vacía y la otra llena.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700">Sin coordinación</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">Cada cruce funciona solo; no sabe lo que pasa en el de al lado.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700">Nuestra pregunta</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">¿Puede un semáforo aprender solo, mirando el tráfico, a hacerlo mejor?</p>
+</div>
+</div>
+<aside class="notas">(1 min) Empiecen con algo que todos han vivido: estar parado en un rojo con la otra calle vacía. Eso pasa porque casi todos los semáforos son de tiempo fijo: alguien programó un ciclo (tantos segundos de verde para cada calle) y el semáforo lo repite todo el día, sin mirar cuántos carros hay. Además cada cruce trabaja aislado. Nuestra pregunta fue: ¿y si el semáforo pudiera mirar la calle y aprender por sí mismo cuándo cambiar? No le damos reglas; le damos un objetivo (que la gente espere menos) y lo dejamos practicar.</aside>
+</section>
+
+<section data-n="3" id="escenario" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">El escenario</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">Nuestro laboratorio: cuatro cruces de Bogotá en SUMO</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">4</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">cruces semaforizados reales (C1 a C4), mapa de OpenStreetMap</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">1 hora</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">de tráfico simulado en cada episodio de práctica</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">≈1.400</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">vehículos completan su viaje en esa hora</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">5 s</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">cada cuánto decide cada semáforo qué calle tiene verde</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">15–60 s</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">verde mínimo y máximo: reglas de seguridad que el agente no puede romper</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">3 s</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">de amarillo obligatorio en cada cambio de fase</p>
+</div>
+</div>
+<aside class="notas">(1 min) No podemos experimentar con semáforos reales, así que usamos SUMO, un simulador de tráfico que se usa en investigación. Tomamos el mapa real de un sector de Bogotá (de OpenStreetMap) con cuatro cruces con semáforo, y le cargamos tráfico: cada carro tiene un origen, un destino y se comporta como un conductor (acelera, frena, cambia de carril). Cada ‘partida’ de práctica es una hora de tráfico. Cada 5 segundos, cada semáforo decide qué calle tiene verde. Ojo: le pusimos reglas de seguridad que no puede saltarse: mínimo 15 s de verde, máximo 60 s y siempre 3 s de amarillo. O sea, el agente decide CUÁNDO cambiar, pero dentro de límites seguros.</aside>
+</section>
+
+<section data-n="4" id="rl" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">La idea</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">Aprendizaje por refuerzo: aprender a prueba y error</h2>
+<div style="position:relative;width:1664px;height:380px">
+<div style="position:absolute;left:0px;top:70px;width:460px;height:240px;display:flex;flex-direction:column;justify-content:center;gap:8px;background:#2459C2;border-radius:24px;padding:40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:44px;font-weight:700;color:#F5F3EE">Agente</h3>
+<p style="font-size:24px;line-height:1.4;color:#DCE6FA">El semáforo: elige qué calle tiene verde</p>
+</div>
+<div style="position:absolute;left:1204px;top:70px;width:460px;height:240px;display:flex;flex-direction:column;justify-content:center;gap:8px;background:#161B26;border-radius:24px;padding:40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:44px;font-weight:700;color:#F5F3EE">Entorno</h3>
+<p style="font-size:24px;line-height:1.4;color:#B9C0CC">SUMO: la ciudad con sus carros</p>
+</div>
+<svg style="position:absolute;left:0;top:0;overflow:visible" width="1" height="1"><line x1="480.0" y1="130.0" x2="1160.0" y2="130.0" stroke="#2459C2" stroke-width="6.0"/><polygon points="1184.0,130.0 1160.0,144.4 1160.0,115.6" fill="#2459C2"/></svg>
+<svg style="position:absolute;left:0;top:0;overflow:visible" width="1" height="1"><line x1="1184.0" y1="250.0" x2="504.0" y2="250.0" stroke="#C2410C" stroke-width="6.0"/><polygon points="480.0,250.0 504.0,235.6 504.0,264.4" fill="#C2410C"/></svg>
+<p style="position:absolute;left:520px;top:60px;width:624px;font-size:32px;font-weight:600;text-align:center;color:#2459C2">Acción: cuál fase recibe verde</p>
+<p style="position:absolute;left:520px;top:270px;width:624px;font-size:24px;line-height:1.4;text-align:center;color:#C2410C"><b>Observa</b> colas y carros por carril · <b>Recompensa:</b> ¿bajó la espera?</p>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#4A5263">Como un videojuego: prueba, mira el puntaje y repite lo que lo sube. Jugó 100 partidas de una hora.</p>
+<aside class="notas">(1,5 min) Este es el corazón del proyecto. Aprendizaje por refuerzo es aprender como aprende un perro o como uno aprende un videojuego: nadie te dice qué botón oprimir, pruebas cosas y ves el puntaje. El ‘agente’ es el semáforo. Cada 5 segundos mira la calle (cuántos carros hay en cada carril, cuántos están parados, qué fase tiene) y elige una acción: a qué calle darle verde. El simulador avanza y le devuelve una recompensa: puntos positivos si la cola y la espera bajaron, negativos si subieron. Al principio decide casi al azar; con el tiempo una red neuronal va aprendiendo qué acciones dan más puntos en cada situación. Lo pusimos a jugar 100 partidas de una hora de tráfico cada una.</aside>
+</section>
+
+<section data-n="5" id="equipo" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">Multi-agente (MAPPO)</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">Cuatro jugadores y un entrenador</h2>
+<div style="display:flex;gap:96px;align-items:center">
+<div style="width:700px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:44px;line-height:1.3">Cada semáforo es un agente con su propia red neuronal.</p>
+<p style="font-size:32px;line-height:1.4;color:#4A5263">Al entrenar, un crítico central ve toda la red y califica cada jugada. Al operar, cada semáforo decide solo con lo que ve en su cruce.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#161B26;border-radius:16px;padding:32px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#F5F3EE">Crítico central (el entrenador)</h3>
+<p style="font-size:24px;line-height:1.4;color:#B9C0CC">Ve los cuatro cruces a la vez. Solo existe durante el entrenamiento.</p>
+</div>
+<div style="display:flex;justify-content:space-around">
+<svg width="28" height="48" viewBox="0 0 28 48"><polygon points="8.4,0 19.599999999999998,0 19.599999999999998,28.799999999999997 28,28.799999999999997 14.0,48 0,28.799999999999997 8.4,28.799999999999997" fill="#8A93A3"/></svg>
+<svg width="28" height="48" viewBox="0 0 28 48"><polygon points="8.4,0 19.599999999999998,0 19.599999999999998,28.799999999999997 28,28.799999999999997 14.0,48 0,28.799999999999997 8.4,28.799999999999997" fill="#8A93A3"/></svg>
+<svg width="28" height="48" viewBox="0 0 28 48"><polygon points="8.4,0 19.599999999999998,0 19.599999999999998,28.799999999999997 28,28.799999999999997 14.0,48 0,28.799999999999997 8.4,28.799999999999997" fill="#8A93A3"/></svg>
+<svg width="28" height="48" viewBox="0 0 28 48"><polygon points="8.4,0 19.599999999999998,0 19.599999999999998,28.799999999999997 28,28.799999999999997 14.0,48 0,28.799999999999997 8.4,28.799999999999997" fill="#8A93A3"/></svg>
+</div>
+<div style="display:flex;gap:16px">
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#E3EAF8;border:1px solid #BCCBEB;border-radius:16px;padding:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">C1</h3>
+<p style="font-size:24px;line-height:1.3;color:#4A5263">ve su cruce</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#E3EAF8;border:1px solid #BCCBEB;border-radius:16px;padding:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">C2</h3>
+<p style="font-size:24px;line-height:1.3;color:#4A5263">ve su cruce</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#E3EAF8;border:1px solid #BCCBEB;border-radius:16px;padding:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">C3</h3>
+<p style="font-size:24px;line-height:1.3;color:#4A5263">ve su cruce</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#E3EAF8;border:1px solid #BCCBEB;border-radius:16px;padding:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">C4</h3>
+<p style="font-size:24px;line-height:1.3;color:#4A5263">ve su cruce</p>
+</div>
+</div>
+</div>
+</div>
+<aside class="notas">(1 min) Tenemos cuatro semáforos, no uno, y lo que hace uno afecta al de al lado. El método se llama MAPPO (PPO multi-agente). La analogía es un equipo de fútbol: cada jugador (cada semáforo, con su propia red neuronal llamada ‘actor’) decide con lo que ve desde su posición. Pero durante los entrenamientos hay un entrenador (el ‘crítico’) que ve toda la cancha, o sea los cuatro cruces a la vez, y le dice a cada uno qué tan buena fue su jugada para el equipo. Así aprenden a coordinarse. Cuando ya están entrenados, el entrenador se va y cada semáforo funciona solo con la información de su cruce, que es lo realista: no necesitas una central que lo controle todo.</aside>
+</section>
+
+<section data-n="6" id="curiosidad" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">La recompensa</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">Qué premiamos: menos espera, y algo de curiosidad</h2>
+<div style="background:#161B26;border-radius:16px;padding:40px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:44px;font-weight:500;line-height:1.3;color:#F5F3EE">Puntos = −(Δ cola + Δ espera) − castigo por cambiar de fase <span style="color:#F2A93B">+ λ · curiosidad</span></p>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:36px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700">Lo que importa</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">Si la cola y la espera bajan frente al paso anterior, gana puntos; si suben, pierde. Cambiar de fase cuesta un poco para que no parpadee.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:36px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700">Curiosidad (RND)</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">Puntos extra cuando ve una situación nueva. Así explora en vez de quedarse con lo primero que medio funciona.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:36px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700">λ: de explorar a explotar</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">λ baja de 1 a 0 durante el entrenamiento: al inicio explora, al final solo optimiza el tráfico.</p>
+</div>
+</div>
+<aside class="notas">(1 min) ¿Cómo le decimos al semáforo qué es ‘hacerlo bien’? Con la recompensa. La parte principal es simple: en cada paso comparamos la cola y la espera con el paso anterior. Si bajaron, puntos; si subieron, castigo. Y le cobramos un poquito cada vez que cambia de fase, para que no esté cambiando a cada rato. El problema es que un agente así puede quedarse con la primera estrategia que medio sirve. Por eso agregamos curiosidad, que es la ‘R’ de RND (Random Network Distillation): una red trata de predecir lo que dice otra red aleatoria fija; si se equivoca mucho, es porque la situación es nueva, y eso da puntos extra. Ese bono de curiosidad pesa λ, que empieza en 1 y baja a 0: primero explora mucho y al final se dedica solo a mover el tráfico. Por eso el método se llama RND-MAPPO.</aside>
+</section>
+
+<section data-n="7" id="curva" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">El entrenamiento</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">Aprende en unas 60 partidas</h2>
+<div style="display:flex;gap:64px;align-items:center">
+<div style="position:relative;width:1100px;height:600px">
+<svg aria-label="Espera media por episodio de entrenamiento para tres semillas: baja de 12 a 16 segundos al inicio a cerca de 4 segundos al final, por debajo de la línea del tiempo fijo en 5,7 segundos" width="1100" height="560" viewBox="0 0 1100 560" xmlns="http://www.w3.org/2000/svg">
+<line x1="70" y1="100" x2="1070" y2="100" stroke="#E2DFD6" stroke-width="2"/>
+<line x1="70" y1="233" x2="1070" y2="233" stroke="#E2DFD6" stroke-width="2"/>
+<line x1="70" y1="367" x2="1070" y2="367" stroke="#E2DFD6" stroke-width="2"/>
+<line x1="70" y1="500" x2="1070" y2="500" stroke="#8A93A3" stroke-width="2"/>
+<line x1="70" y1="347" x2="1070" y2="347" stroke="#C2410C" stroke-width="4" stroke-dasharray="14 10"/>
+<polyline fill="none" stroke="#B4C8EE" stroke-width="5" stroke-linejoin="round" points="70,204 90,223 110,185 131,187 151,215 171,230 191,226 211,256 232,277 252,280 272,303 292,312 312,315 333,333 353,342 373,352 393,345 413,361 434,366 454,367 474,361 494,354 514,356 535,360 555,364 575,369 595,368 615,367 636,371 656,374 676,382 696,382 716,385 737,382 757,391 777,394 797,386 817,389 838,392 858,393 878,387 898,396 918,397 939,400 959,395 979,394 999,397 1019,384 1040,385 1060,400"/>
+<polyline fill="none" stroke="#7FA0E0" stroke-width="5" stroke-linejoin="round" points="70,61 90,103 110,154 131,174 151,213 171,226 191,268 211,226 232,224 252,243 272,286 292,308 312,311 333,308 353,313 373,327 393,324 413,328 434,357 454,351 474,355 494,364 514,372 535,378 555,369 575,363 595,362 615,376 636,373 656,375 676,369 696,359 716,371 737,375 757,373 777,375 797,377 817,392 838,389 858,391 878,388 898,385 918,392 939,398 959,395 979,389 999,399 1019,401 1040,400 1060,405"/>
+<polyline fill="none" stroke="#2459C2" stroke-width="6" stroke-linejoin="round" points="70,145 90,138 110,146 131,172 151,221 171,240 191,260 211,298 232,292 252,300 272,293 292,292 312,297 333,324 353,333 373,338 393,340 413,351 434,349 454,361 474,362 494,359 514,363 535,371 555,379 575,365 595,371 615,369 636,377 656,377 676,372 696,374 716,378 737,378 757,380 777,382 797,383 817,393 838,396 858,393 878,397 898,405 918,407 939,401 959,393 979,391 999,398 1019,401 1040,394 1060,394"/>
+</svg>
+<p style="position:absolute;left:0px;top:84px;width:56px;font-size:24px;text-align:right;color:#4A5263">15</p>
+<p style="position:absolute;left:0px;top:217px;width:56px;font-size:24px;text-align:right;color:#4A5263">10</p>
+<p style="position:absolute;left:0px;top:351px;width:56px;font-size:24px;text-align:right;color:#4A5263">5</p>
+<p style="position:absolute;left:0px;top:484px;width:56px;font-size:24px;text-align:right;color:#4A5263">0</p>
+<p style="position:absolute;left:40px;top:516px;width:60px;font-size:24px;text-align:center;color:#4A5263">1</p>
+<p style="position:absolute;left:522px;top:516px;width:80px;font-size:24px;text-align:center;color:#4A5263">50</p>
+<p style="position:absolute;left:1020px;top:516px;width:80px;font-size:24px;text-align:center;color:#4A5263">100</p>
+<p style="position:absolute;left:220px;top:556px;width:700px;font-size:24px;text-align:center;color:#4A5263">Episodio de entrenamiento (1 h simulada cada uno)</p>
+<p style="position:absolute;left:70px;top:0px;width:700px;font-size:24px;color:#4A5263">Espera media por vehículo (segundos)</p>
+<p style="position:absolute;left:760px;top:300px;width:300px;font-size:24px;font-weight:600;text-align:right;color:#C2410C">Tiempo fijo: 5,7 s</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:4px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">12 → 3,8 s</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">espera media, primeras vs. últimas 10 partidas</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;color:#1B2130"><span style="color:#2459C2"><b>━━</b></span>  base (semilla aleatoria)</p>
+<p style="font-size:24px;color:#1B2130"><span style="color:#7FA0E0"><b>━━</b></span>  semilla 1</p>
+<p style="font-size:24px;color:#1B2130"><span style="color:#B4C8EE"><b>━━</b></span>  semilla 2</p>
+<p style="font-size:24px;color:#1B2130"><span style="color:#C2410C"><b>╍╍</b></span>  tiempo fijo</p>
+</div>
+</div>
+</div>
+<aside class="notas">(1 min) Esta gráfica muestra el aprendizaje. Cada punto es una partida de una hora; en el eje vertical, cuánto espera en promedio cada carro. Al principio el agente no sabe nada y los carros esperan 12 a 16 segundos, peor que el semáforo normal (la línea naranja punteada, 5,7 s). Hacia la partida 35 ya lo iguala y alrededor de la 60 se estabiliza cerca de 4 segundos. Lo importante: lo entrenamos tres veces desde cero con semillas distintas (las tres líneas azules) y las tres aprenden lo mismo. O sea, no fue suerte. (La curva está suavizada con promedio móvil de 5 partidas.)</aside>
+</section>
+
+<section data-n="8" id="demo" data-transition="fade" style="background:#F2A93B;color:#161B26;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:56px">
+<p style="font-size:24px;font-weight:700;letter-spacing:4px;text-transform:uppercase">Demo en vivo</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.05">Mismo tráfico, dos cerebros</h2>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#161B26;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#FF9A62">Ventana izquierda</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:44px;font-weight:700;color:#F5F3EE">Semáforos de tiempo fijo</h3>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#161B26;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#7FB0FF">Ventana derecha</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:44px;font-weight:700;color:#F5F3EE">Agente RND-MAPPO</h3>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.4">Fíjense en las colas de los dos cruces grandes y en el marcador de la terminal.</p>
+<aside class="notas">(3–4 min) DEMO. Comando (en la terminal de VS Code, carpeta del proyecto): .\.venv\Scripts\python.exe demo_en_vivo.py --minutos 10 --delay 300 --escala 1.2 . Con --delay 300 se ve a velocidad cómoda (sube o baja el número para ir más lento o más rápido; también se cambia en vivo en el campo Delay de SUMO). --escala 1.2 pone 20 % más carros y la diferencia se nota más. Qué decir: “Las dos ventanas tienen exactamente los mismos carros, que salen a la misma hora hacia el mismo destino. Lo único distinto es quién controla los semáforos: a la izquierda el ciclo fijo, a la derecha nuestro agente.” Mientras corre: señalen cómo en la izquierda se arman colas que esperan aunque la otra calle esté vacía, y en la derecha el verde va hacia donde están los carros. Lean el marcador cada vez que aparece una línea: vehículos detenidos y espera, fijo vs. agente. Al final, lean la línea de resultado (% menos detenidos y menos espera). Si algo falla, pongan el video de respaldo.</aside>
+</section>
+
+<section data-n="9" id="resultados" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">Resultados</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">La espera se reduce a la mitad</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px">
+<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−49 %</p>
+<h3 style="font-size:32px;font-weight:600">Espera media</h3>
+<p style="font-size:24px;color:#4A5263">5,7 s → 2,9 s</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−52 %</p>
+<h3 style="font-size:32px;font-weight:600">Vehículos detenidos</h3>
+<p style="font-size:24px;color:#4A5263">14,0 → 6,7 en promedio</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−35 %</p>
+<h3 style="font-size:32px;font-weight:600">Tiempo perdido por viaje</h3>
+<p style="font-size:24px;color:#4A5263">54 s → 35 s</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−14 %</p>
+<h3 style="font-size:32px;font-weight:600">Tiempo de viaje</h3>
+<p style="font-size:24px;color:#4A5263">135 s → 116 s</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−12 %</p>
+<h3 style="font-size:32px;font-weight:600">CO₂ emitido</h3>
+<p style="font-size:24px;color:#4A5263">347 kg → 304 kg por hora</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−47 %</p>
+<h3 style="font-size:32px;font-weight:600">Cambios de fase</h3>
+<p style="font-size:24px;color:#4A5263">916 → 489 por hora</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5263">Agente base vs. tiempo fijo · demanda normal, 5 semillas · todas las diferencias p &lt; 0,01 (prueba t pareada)</p>
+<aside class="notas">(1,5 min) Después de la demo, los números oficiales. No es una sola corrida: evaluamos con 5 semillas distintas (5 variaciones del comportamiento de los conductores) y comparamos pareado: misma semilla, mismo tráfico, fijo vs. agente. Resultados del mejor modelo: la espera media baja a la mitad, hay la mitad de carros detenidos, cada viaje pierde 35 % menos tiempo y dura 14 % menos. Como los carros frenan y arrancan menos, también baja el CO₂ un 12 %. Y curiosamente el agente cambia de fase la mitad de veces: no es que cambie más rápido, es que cambia cuando toca. Además completan el viaje un poco más de carros (1.387 vs. 1.376). Todas estas diferencias son estadísticamente significativas (p menor a 0,01): no son ruido.</aside>
+</section>
+
+<section data-n="10" id="robustez" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">Robustez</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">También funciona con más o menos tráfico</h2>
+<table style="font-size:32px;color:#1B2130;background:#FFFFFF;border-radius:16px">
+<tr><th style="width:22%">Demanda</th><th style="width:16%;text-align:right">Espera fijo</th><th style="width:16%;text-align:right">Espera agente</th><th style="width:16%;text-align:right">Pérdida fijo</th><th style="width:16%;text-align:right">Pérdida agente</th><th style="width:14%;text-align:right">Mejora</th></tr>
+<tr><td>80 %</td><td style="text-align:right">5,7 s</td><td style="text-align:right">2,8 s</td><td style="text-align:right">49 s</td><td style="text-align:right">30 s</td><td style="text-align:right;color:#2459C2">−51 %</td></tr>
+<tr style="background:#EEF2FA"><td>100 % (normal)</td><td style="text-align:right">5,7 s</td><td style="text-align:right">2,9 s</td><td style="text-align:right">54 s</td><td style="text-align:right">35 s</td><td style="text-align:right;color:#2459C2">−49 %</td></tr>
+<tr><td>120 %</td><td style="text-align:right">5,9 s</td><td style="text-align:right">3,4 s</td><td style="text-align:right">61 s</td><td style="text-align:right">41 s</td><td style="text-align:right;color:#2459C2">−42 %</td></tr>
+</table>
+<p style="font-size:32px;line-height:1.4;color:#4A5263">El agente solo practicó con la demanda normal. Con 20 % más carros sigue ganando; “Mejora” es la reducción de la espera media. “Pérdida” es el tiempo perdido por viaje.</p>
+<aside class="notas">(1 min) Una pregunta lógica: ¿y si cambia el tráfico? El agente solo practicó con la demanda normal. Lo probamos con 20 % menos carros y con 20 % más, sin volver a entrenarlo. En los tres casos gana con claridad: la espera baja entre 42 % y 51 % y el tiempo perdido por viaje baja de 30 a 39 %. Con más tráfico la ventaja se achica un poco, que es lo esperable, pero no se cae. Eso indica que aprendió una estrategia general y no se memorizó un escenario.</aside>
+</section>
+
+<section data-n="11" id="trampa" data-transition="fade" style="background:#161B26;color:#F5F3EE;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#F2A93B">Una lección</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">El agente que hizo trampa</h2>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#212938;border:1px solid #333D50;border-radius:16px;padding:40px">
+<p style="font-size:24px;color:#B9C0CC">Si miramos solo los viajes que terminan</p>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.05;color:#7FB0FF">110 s</p>
+<p style="font-size:32px;line-height:1.3">de viaje: ¡el mejor de todos!</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#212938;border:1px solid #333D50;border-radius:16px;padding:40px">
+<p style="font-size:24px;color:#B9C0CC">Si miramos todos los carros en la calle</p>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.05;color:#FF9A62">165 s</p>
+<p style="font-size:32px;line-height:1.3">de espera media: 29 veces peor que el tiempo fijo</p>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#B9C0CC">Obligado a elegir siempre su opción favorita, deja calles casi sin verde. Esos carros no terminan el viaje y no entran al promedio. <span style="color:#F2A93B">Una sola métrica puede engañar: por eso medimos 26.</span></p>
+<aside class="notas">(1,5 min) Esta es nuestra historia favorita. Normalmente el agente decide ‘tirando un dado cargado’: elige la fase más probable casi siempre, pero no siempre. Probamos obligarlo a elegir SIEMPRE su opción favorita (modo greedy). Si solo miráramos el tiempo de viaje de los carros que llegan a su destino, parecería el mejor: 110 segundos, mejor que todo. Pero si miramos a todos los carros que están en la calle, la espera media se dispara a 165 segundos, 29 veces peor que el semáforo normal. ¿Qué pasó? Se ‘enamora’ de algunas fases y deja otras calles casi sin verde. Los carros atrapados ahí no terminan su viaje, entonces no aparecen en el promedio de viajes: el número se ve bonito justamente porque esconde a los que están sufriendo. Lección: si evalúas con una sola métrica, te pueden engañar. Por eso medimos 26 cosas distintas, incluida la cantidad de carros que no terminan.</aside>
+</section>
+
+<section data-n="12" id="experimentos" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">Experimentos</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">Probamos variantes: no todas funcionan</h2>
+<table style="font-size:28px;color:#1B2130;background:#FFFFFF;border-radius:16px">
+<tr><th style="width:20%">Variante</th><th style="width:27%">Qué cambia</th><th style="width:11%;text-align:right">Partidas</th><th style="width:18%;text-align:right">Espera</th><th style="width:24%">Veredicto</th></tr>
+<tr style="background:#EEF2FA"><td><b>base</b></td><td>Configuración original</td><td style="text-align:right">100</td><td style="text-align:right">2,9 s (−49 %)</td><td><b>Mejor modelo</b></td></tr>
+<tr><td>semilla 1</td><td>Igual, otra semilla</td><td style="text-align:right">100</td><td style="text-align:right">4,5 s (−21 %)</td><td>Gana, menos estable</td></tr>
+<tr><td>semilla 2</td><td>Igual, otra semilla</td><td style="text-align:right">100</td><td style="text-align:right">4,2 s (−26 %)</td><td>Gana, menos estable</td></tr>
+<tr><td>penaliza cambio</td><td>Castigo por cambio ×4</td><td style="text-align:right">50</td><td style="text-align:right">4,5 s (−21 %)</td><td>No mejora a base</td></tr>
+<tr><td>lr conservador</td><td>Aprende 3 veces más lento</td><td style="text-align:right">50</td><td style="text-align:right">8,1 s (+42 %)</td><td>Peor que tiempo fijo</td></tr>
+</table>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">Espera media en la evaluación (5 semillas, demanda normal). Entre paréntesis, el cambio frente al tiempo fijo (5,7 s).</p>
+<aside class="notas">(1 min) También queremos mostrar lo que no funcionó, porque es parte de hacer ciencia. Entrenamos el mismo modelo tres veces con semillas distintas: los tres le ganan al tiempo fijo (y los tres bajan el tiempo de viaje entre 12 y 14 %), pero el ‘base’ salió más estable; los otros dos a veces tienen un mal día con cierto tráfico. Luego cambiamos hiperparámetros: castigar 4 veces más cada cambio de fase no mejoró nada, y hacer que aprenda 3 veces más lento fue un desastre: en 50 partidas no alcanzó a aprender y queda peor que el semáforo normal. Ojo, estas dos variantes solo tuvieron 50 partidas, la mitad que las demás.</aside>
+</section>
+
+<section data-n="13" id="siguientes" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">Lo que sigue</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">Lo que falta por resolver</h2>
+<div style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;gap:32px;border-top:2px solid #E2DFD6;padding:20px 0px 0px 0px">
+<p style="width:340px;font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">Hora pico</p>
+<p style="flex:1;font-size:28px;line-height:1.4;color:#4A5263">El tráfico pico empieza a los 5.000 s y cada partida dura 3.600 s: falta probar el caso más exigente.</p>
+</div>
+<div style="display:flex;gap:32px;border-top:2px solid #E2DFD6;padding:20px 0px 0px 0px">
+<p style="width:340px;font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">Estabilidad</p>
+<p style="flex:1;font-size:28px;line-height:1.4;color:#4A5263">Dos de los tres entrenamientos fallan con cierto tráfico: más partidas o más exploración.</p>
+</div>
+<div style="display:flex;gap:32px;border-top:2px solid #E2DFD6;padding:20px 0px 0px 0px">
+<p style="width:340px;font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">Cruce C4</p>
+<p style="flex:1;font-size:28px;line-height:1.4;color:#4A5263">El agente casi nunca le cambia la fase: revisar si esa calle transversal tiene tráfico.</p>
+</div>
+<div style="display:flex;gap:32px;border-top:2px solid #E2DFD6;padding:20px 0px 0px 0px">
+<p style="width:340px;font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">Peatones</p>
+<p style="flex:1;font-size:28px;line-height:1.4;color:#4A5263">La recompensa ya tiene un término para peatones, pero el escenario todavía no los incluye.</p>
+</div>
+<div style="display:flex;gap:32px;border-top:2px solid #E2DFD6;padding:20px 0px 0px 0px">
+<p style="width:340px;font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700;color:#2459C2">Ver por dentro</p>
+<p style="flex:1;font-size:28px;line-height:1.4;color:#4A5263">Re-entrenar registrando pérdidas, entropía y curiosidad para el dashboard.</p>
+</div>
+</div>
+<aside class="notas">(1 min) Somos honestos con lo que falta. Primero, la hora pico: en el escenario hay tráfico pico definido, pero empieza a los 5.000 segundos y nuestras partidas duran 3.600, o sea que nunca lo hemos probado; es lo siguiente. Segundo, estabilidad: dos de los tres entrenamientos a veces fallan con cierto tráfico; hay que entrenar más o explorar más. Tercero, el cruce C4: el agente casi nunca le cambia la fase, y la espera ahí es casi cero, así que sospechamos que la calle transversal casi no tiene carros; hay que revisarlo. Cuarto, peatones: la fórmula ya los contempla, pero el escenario no los tiene cargados. Y quinto, ya dejamos el código listo para registrar cómo aprende por dentro (pérdidas, curiosidad), para mostrarlo en el dashboard.</aside>
+</section>
+
+<section data-n="14" id="cierre" data-transition="fade" style="background:#161B26;color:#F5F3EE;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#F2A93B">En resumen</p>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:500;line-height:1.2;width:1500px">Con 100 partidas de práctica, cuatro semáforos aprendieron a <span style="color:#F2A93B">reducir a la mitad la espera</span> en cruces reales de Bogotá.</p>
+<div style="display:flex;justify-content:space-between;align-items:end">
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.05">¿Preguntas?</h2>
+<p style="font-size:24px;color:#B9C0CC">github.com/santisan1205/Taller-Control</p>
+</div>
+<aside class="notas">(30 s) Cierre en una frase: “Sin programarle reglas, solo con práctica en un simulador, cuatro semáforos aprendieron a coordinarse y a reducir a la mitad la espera en cruces reales de Bogotá, y lo comprobamos con 26 métricas, varias semillas y distintos niveles de tráfico.” Abran preguntas. Preguntas probables: ¿Se puede usar en un semáforo real? (Faltaría hora pico, peatones y validar con datos de conteo reales; el agente solo necesita sensores de su cruce.) ¿Por qué no siempre la acción más probable? (Ver la diapositiva de la trampa.) ¿Cuánto tarda entrenar? (En nuestras pruebas, del orden de medio minuto de computador por cada hora simulada; las 100 partidas toman alrededor de una hora, según el equipo.) ¿Qué es una semilla? (El número que fija el azar del simulador, para poder repetir exactamente el mismo experimento.)</aside>
+</section>
+
+</div>
+<div id="ayuda">← → avanzar · N notas · F pantalla completa</div>
+<script>
+  const slides = [...document.querySelectorAll('section')];
+  let actual = 0;
+  function mostrar(i) {
+    actual = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, j) => s.classList.toggle('activa', j === actual));
+    history.replaceState(null, '', '#' + (actual + 1));
+  }
+  function ajustar() {
+    const e = Math.min(innerWidth / 1920, innerHeight / 1080);
+    document.getElementById('lienzo').style.transform = `translate(-50%, -50%) scale(${e})`;
+  }
+  addEventListener('resize', ajustar);
+  addEventListener('keydown', ev => {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(ev.key)) mostrar(actual + 1);
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(ev.key)) mostrar(actual - 1);
+    else if (ev.key === 'Home') mostrar(0);
+    else if (ev.key === 'End') mostrar(slides.length - 1);
+    else if (ev.key.toLowerCase() === 'n') document.body.classList.toggle('ver-notas');
+    else if (ev.key.toLowerCase() === 'f') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  });
+  addEventListener('click', ev => mostrar(actual + (ev.clientX > innerWidth / 3 ? 1 : -1)));
+  ajustar();
+  mostrar((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>

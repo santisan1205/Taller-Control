@@ -12,6 +12,7 @@ import argparse
 import ctypes
 import multiprocessing as mp
 import queue
+import warnings
 
 import torch
 
@@ -40,7 +41,9 @@ def _enfocar_cruces(sumo, margen=120):
 
 def _simular(modo, politica, semilla, escala, pasos, delay, ventana, cola, cada_pasos):
     x, y, ancho, alto = ventana
-    cmd = f'--window-pos {x},{y} --window-size {ancho},{alto} --delay {delay} --scale {escala:g}'
+    warnings.filterwarnings('ignore')  # avisos de PettingZoo que ensucian el marcador
+    cmd = (f'--window-pos {x},{y} --window-size {ancho},{alto} --delay {delay} --scale {escala:g} '
+           f'--no-step-log --no-warnings')
     fijo = modo == 'fijo'
     env = crear_entorno_sumo(RED_XML, RUTAS_XML, use_gui=True, sumo_seed=semilla, out_csv_name=None,
                              fixed_ts=fijo, additional_sumo_cmd=cmd)

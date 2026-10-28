@@ -1,0 +1,31 @@
+<section id="escenario" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">El escenario</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">Nuestro laboratorio: cuatro cruces de Bogotá en SUMO</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">4</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">cruces semaforizados reales (C1 a C4), mapa de OpenStreetMap</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">1 hora</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">de tráfico simulado en cada episodio de práctica</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">≈1.400</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">vehículos completan su viaje en esa hora</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">5 s</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">cada cuánto decide cada semáforo qué calle tiene verde</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">15–60 s</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">verde mínimo y máximo: reglas de seguridad que el agente no puede romper</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">3 s</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">de amarillo obligatorio en cada cambio de fase</p>
+</div>
+</div>
+<aside>(1 min) No podemos experimentar con semáforos reales, así que usamos SUMO, un simulador de tráfico que se usa en investigación. Tomamos el mapa real de un sector de Bogotá (de OpenStreetMap) con cuatro cruces con semáforo, y le cargamos tráfico: cada carro tiene un origen, un destino y se comporta como un conductor (acelera, frena, cambia de carril). Cada ‘partida’ de práctica es una hora de tráfico. Cada 5 segundos, cada semáforo decide qué calle tiene verde. Ojo: le pusimos reglas de seguridad que no puede saltarse: mínimo 15 s de verde, máximo 60 s y siempre 3 s de amarillo. O sea, el agente decide CUÁNDO cambiar, pero dentro de límites seguros.</aside>
+</section>

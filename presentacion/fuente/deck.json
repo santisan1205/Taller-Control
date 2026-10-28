@@ -1,0 +1,19 @@
+{
+  "v": 4,
+  "createdOnFiles": {"v": 1, "at": "2026-10-27T15:00:00Z"},
+  "lists": "css",
+  "title": "Semáforos que aprenden",
+  "cover": "cover",
+  "order": ["cover", "problema", "escenario", "rl", "equipo", "curiosidad", "curva", "demo", "resultados", "robustez", "trampa", "experimentos", "siguientes", "cierre"],
+  "sections": {
+    "s1": {"description": "Qué problema atacamos y en qué escenario lo probamos", "start": "cover"},
+    "s2": {"description": "Cómo funciona el agente: refuerzo, multi-agente y curiosidad", "start": "rl"},
+    "s3": {"description": "Qué tan bien funciona: aprendizaje, demo y resultados", "start": "curva"},
+    "s4": {"description": "Qué aprendimos y qué sigue", "start": "trampa"}
+  },
+  "faces": {
+    "space-grotesk": {"family": "Space Grotesk", "href": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap"},
+    "public-sans": {"family": "Public Sans", "href": "https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap"}
+  },
+  "designSystems": []
+}

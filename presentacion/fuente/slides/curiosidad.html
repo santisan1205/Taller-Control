@@ -1,0 +1,22 @@
+<section id="curiosidad" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">La recompensa</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">Qué premiamos: menos espera, y algo de curiosidad</h2>
+<div style="background:#161B26;border-radius:16px;padding:40px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:44px;font-weight:500;line-height:1.3;color:#F5F3EE">Puntos = −(Δ cola + Δ espera) − castigo por cambiar de fase <span style="color:#F2A93B">+ λ · curiosidad</span></p>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:36px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700">Lo que importa</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">Si la cola y la espera bajan frente al paso anterior, gana puntos; si suben, pierde. Cambiar de fase cuesta un poco para que no parpadee.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:36px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700">Curiosidad (RND)</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">Puntos extra cuando ve una situación nueva. Así explora en vez de quedarse con lo primero que medio funciona.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:36px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:700">λ: de explorar a explotar</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5263">λ baja de 1 a 0 durante el entrenamiento: al inicio explora, al final solo optimiza el tráfico.</p>
+</div>
+</div>
+<aside>(1 min) ¿Cómo le decimos al semáforo qué es ‘hacerlo bien’? Con la recompensa. La parte principal es simple: en cada paso comparamos la cola y la espera con el paso anterior. Si bajaron, puntos; si subieron, castigo. Y le cobramos un poquito cada vez que cambia de fase, para que no esté cambiando a cada rato. El problema es que un agente así puede quedarse con la primera estrategia que medio sirve. Por eso agregamos curiosidad, que es la ‘R’ de RND (Random Network Distillation): una red trata de predecir lo que dice otra red aleatoria fija; si se equivoca mucho, es porque la situación es nueva, y eso da puntos extra. Ese bono de curiosidad pesa λ, que empieza en 1 y baja a 0: primero explora mucho y al final se dedica solo a mover el tráfico. Por eso el método se llama RND-MAPPO.</aside>
+</section>
