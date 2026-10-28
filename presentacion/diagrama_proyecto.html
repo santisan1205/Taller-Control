@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Arquitectura y avance del proyecto</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1920px; height: 1080px; background: #FDFDFB; color: #0C1829; font-family: 'Plus Jakarta Sans', Arial, sans-serif; position: relative; overflow: hidden; }
+  .banda { position: absolute; left: 0; top: 0; width: 1920px; height: 112px; background: #FFD100; }
+  .logo { position: absolute; left: 128px; top: 24px; width: 288px; height: 64px; background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .logo img { width: 252px; height: 50px; object-fit: contain; }
+  .marca { position: absolute; right: 128px; top: 38px; font: 700 24px 'JetBrains Mono', monospace; }
+  .pie { position: absolute; left: 0; top: 1040px; width: 1920px; height: 40px; background: #CBD5E1; font-size: 22px; color: #334155; padding: 6px 128px; display: flex; justify-content: space-between; }
+  .cabecera { position: absolute; left: 128px; top: 128px; }
+  .eyebrow { display: flex; align-items: center; gap: 16px; font-size: 22px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #B45309; }
+  .eyebrow::before { content: ''; width: 40px; height: 5px; background: #B45309; }
+  h1 { font-size: 46px; font-weight: 800; letter-spacing: -0.5px; margin-top: 8px; }
+
+  .flujo { position: absolute; left: 128px; top: 244px; width: 1664px; height: 400px; display: flex; gap: 40px; }
+  .col { background: #F8FAFC; border: 1px solid #E2E8F0; border-top: 6px solid #FFD100; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; position: relative; }
+  .col h3 { font-size: 24px; font-weight: 800; }
+  .col h3 span { color: #B45309; }
+  .col p { font-size: 19px; line-height: 1.3; color: #334155; }
+  .col b { color: #0C1829; }
+  .flecha { position: absolute; right: -36px; top: 180px; width: 32px; height: 40px; }
+  .agentes { width: 440px; }
+  .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .chip { background: #E3EAF8; border: 1px solid #BCCBEB; border-radius: 10px; padding: 6px 10px; font-size: 18px; color: #334155; }
+  .chip strong { font-size: 20px; color: #1D4ED8; margin-right: 6px; }
+  .chip small { font-size: 18px; color: #334155; }
+  .oscuro { background: #0C1829; color: #E2E8F0; border-radius: 10px; padding: 8px 12px; font-size: 18px; line-height: 1.3; }
+  .oscuro strong { color: #FFD100; }
+  .ambar { background: #FEF3C7; border: 1px solid #F2C94C; border-radius: 10px; padding: 8px 12px; font-size: 18px; line-height: 1.3; color: #334155; }
+  .ambar strong { color: #9A4A00; }
+  .grande { font-size: 34px; font-weight: 800; line-height: 1.05; color: #0C1829; }
+  .grande.naranja { color: #B45309; }
+  .etq { font-size: 17px; color: #475569; margin-top: -6px; }
+
+  .ciclo { position: absolute; left: 128px; top: 662px; width: 1664px; height: 88px; background: #0C1829; border-radius: 12px; display: flex; align-items: center; gap: 10px; padding: 0 24px; }
+  .ciclo .t { font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #FFD100; width: 150px; line-height: 1.2; }
+  .paso { background: #17243A; border: 1px solid #2B3B57; border-radius: 8px; padding: 8px 12px; font-size: 18px; line-height: 1.25; color: #E2E8F0; flex: 1; }
+  .paso b { color: #FFD100; }
+  .sep { color: #FFD100; font-size: 22px; }
+
+  .etapas { position: absolute; left: 128px; top: 770px; width: 1664px; }
+  .etapas .titulo { font-size: 22px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #B45309; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; }
+  .etapas .titulo::before { content: ''; width: 40px; height: 5px; background: #B45309; }
+  .linea { position: relative; display: grid; grid-template-columns: repeat(8, 1fr); }
+  .linea::before { content: ''; position: absolute; left: 104px; right: 104px; top: 21px; height: 4px; background: #CBD5E1; }
+  .etapa { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 8px; }
+  .punto { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; z-index: 1; }
+  .hecho .punto { background: #0C1829; color: #FFD100; }
+  .curso .punto { background: #FFD100; color: #0C1829; border: 3px solid #0C1829; }
+  .pend .punto { background: #FDFDFB; color: #64748B; border: 3px dashed #94A3B8; }
+  .etapa h4 { font-size: 19px; font-weight: 800; margin-top: 8px; line-height: 1.2; }
+  .etapa p { font-size: 16px; color: #475569; line-height: 1.3; margin-top: 4px; }
+  .estado { font-size: 15px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 6px; padding: 2px 10px; border-radius: 99px; }
+  .hecho .estado { background: #E3EAF8; color: #1D4ED8; }
+  .curso .estado { background: #FEF3C7; color: #9A4A00; }
+  .pend .estado { background: #F1F5F9; color: #475569; }
+</style>
+</head>
+<body>
+<div class="banda"></div>
+<div class="logo"><img src="uniandes.png" alt="Universidad de los Andes"></div>
+<div class="marca">Control semafórico con RND-MAPPO</div>
+
+<div class="cabecera">
+  <div class="eyebrow">Visión general</div>
+  <h1>Arquitectura y avance del proyecto</h1>
+</div>
+
+<div class="flujo">
+  <div class="col" style="width:262px">
+    <h3><span>1</span> Escenario</h3>
+    <p><b>SUMO</b> + OpenStreetMap: sector real de Bogotá</p>
+    <p><b>4 intersecciones</b> semaforizadas (C1–C4)</p>
+    <p>Episodio de <b>3600 s</b>, decisión cada <b>Δt = 5 s</b></p>
+    <p>Verde mín. 15 s · máx. 60 s · amarillo 3 s</p>
+    <svg class="flecha" viewBox="0 0 32 40"><polygon points="0,10 18,10 18,0 32,20 18,40 18,30 0,30" fill="#B45309"/></svg>
+  </div>
+
+  <div class="col agentes">
+    <h3><span>2</span> Agentes RND-MAPPO</h3>
+    <p style="font-size:17px">Un <b>actor</b> por cruce: elige la fase verde</p>
+    <div class="chips">
+      <div class="chip"><strong>C1</strong>6 fases · 25 entradas</div>
+      <div class="chip"><strong>C2</strong>6 fases · 45 entradas</div>
+      <div class="chip"><strong>C3</strong>4 fases · 25 entradas</div>
+      <div class="chip"><strong>C4</strong>3 fases · 12 entradas</div>
+    </div>
+    <div class="oscuro"><strong>Crítico central</strong> · ve las 107 variables de la red y califica cada decisión; solo al entrenar</div>
+    <div class="ambar"><strong>RND</strong> · bono de curiosidad por estados nuevos; λ baja de 1 a 0</div>
+    <svg class="flecha" viewBox="0 0 32 40"><polygon points="0,10 18,10 18,0 32,20 18,40 18,30 0,30" fill="#B45309"/></svg>
+  </div>
+
+  <div class="col" style="width:262px">
+    <h3><span>3</span> Entrenamiento</h3>
+    <p><b>PPO</b> · ε = 0,2 · entropía 0,01</p>
+    <p>Tasa de aprendizaje: 3·10⁻⁴ actor, 10⁻³ crítico</p>
+    <p>γ = 0,99 · λ<sub>GAE</sub> = 0,95</p>
+    <p><b>100 episodios</b> × 3 corridas</p>
+    <p><b>6 variantes</b> probadas</p>
+    <svg class="flecha" viewBox="0 0 32 40"><polygon points="0,10 18,10 18,0 32,20 18,40 18,30 0,30" fill="#B45309"/></svg>
+  </div>
+
+  <div class="col" style="width:262px">
+    <h3><span>4</span> Evaluación</h3>
+    <p>Contra los semáforos de <b>tiempo fijo</b></p>
+    <p><b>5 semillas</b> pareadas (mismo tráfico)</p>
+    <p><b>3 demandas</b>: 80 %, 100 % y 120 %</p>
+    <p><b>26 métricas</b> y prueba t pareada</p>
+    <svg class="flecha" viewBox="0 0 32 40"><polygon points="0,10 18,10 18,0 32,20 18,40 18,30 0,30" fill="#B45309"/></svg>
+  </div>
+
+  <div class="col" style="width:278px">
+    <h3><span>5</span> Resultados</h3>
+    <div class="grande naranja">−49 %</div><div class="etq">espera media (5,7 → 2,9 s)</div>
+    <div class="grande">−35 %</div><div class="etq">tiempo perdido por viaje</div>
+    <div class="grande">−12 %</div><div class="etq">CO₂ emitido</div>
+    <p style="font-size:17px">p &lt; 0,001 · se mantiene con ±20 % de demanda y con verde máximo</p>
+  </div>
+</div>
+
+<div class="ciclo">
+  <div class="t">Ciclo cada 5 s</div>
+  <div class="paso"><b>Observa</b> fase, colas y densidad por carril</div><span class="sep">›</span>
+  <div class="paso"><b>Actor</b> elige la siguiente fase verde</div><span class="sep">›</span>
+  <div class="paso"><b>SUMO</b> simula 5 s de tráfico</div><span class="sep">›</span>
+  <div class="paso"><b>Recompensa</b> menos cola y espera, + curiosidad</div><span class="sep">›</span>
+  <div class="paso"><b>Crítico</b> calcula la ventaja</div><span class="sep">›</span>
+  <div class="paso"><b>PPO</b> ajusta al actor al final de cada hora</div>
+</div>
+
+<div class="etapas">
+  <div class="titulo">Etapas y avance</div>
+  <div class="linea">
+    <div class="etapa hecho"><div class="punto">1</div><h4>Modelado del escenario</h4><p>Red de Bogotá en SUMO</p><span class="estado">✓ Completo</span></div>
+    <div class="etapa hecho"><div class="punto">2</div><h4>Implementación RND-MAPPO</h4><p>Actores, crítico, RND</p><span class="estado">✓ Completo</span></div>
+    <div class="etapa hecho"><div class="punto">3</div><h4>Entrenamiento</h4><p>100 episodios, 3 corridas</p><span class="estado">✓ Completo</span></div>
+    <div class="etapa hecho"><div class="punto">4</div><h4>Variantes</h4><p>6 corridas de hiperparámetros</p><span class="estado">✓ Completo</span></div>
+    <div class="etapa hecho"><div class="punto">5</div><h4>Evaluación ampliada</h4><p>140 episodios, 26 métricas</p><span class="estado">✓ Completo</span></div>
+    <div class="etapa hecho"><div class="punto">6</div><h4>Corrección y verificación</h4><p>Verde máximo y pesos</p><span class="estado">✓ Completo</span></div>
+    <div class="etapa curso"><div class="punto">7</div><h4>Demo y dashboard</h4><p>Demo lista; dashboard en prototipo</p><span class="estado">En curso</span></div>
+    <div class="etapa pend"><div class="punto">8</div><h4>Siguiente fase</h4><p>Hora pico, peatones, repetir P = 2,0</p><span class="estado">Pendiente</span></div>
+  </div>
+</div>
+
+<div class="pie"><span>IELE · Taller de Control · Uniandes</span><span>Visión general</span></div>
+</body>
+</html>
