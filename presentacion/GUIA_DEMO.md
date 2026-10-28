@@ -24,7 +24,7 @@ Mientras corre, la terminal muestra un marcador con los vehículos detenidos, la
    ```
 5. Corre la versión para presentar:
    ```powershell
-   .\.venv\Scripts\python.exe demo_en_vivo.py --minutos 10 --delay 300 --escala 1.2
+   .\.venv\Scripts\python.exe demo_en_vivo.py
    ```
 
 ## Opción B: en otro computador (preparar el día anterior)
@@ -58,18 +58,20 @@ Hay que instalar tres cosas: SUMO, el código y las librerías de Python.
 
 | Parámetro | Qué hace | Recomendado para presentar |
 |---|---|---|
-| `--minutos` | Minutos de tráfico simulado (máximo 60) | `10` |
-| `--delay` | Pausa en milisegundos por segundo simulado. Más alto = más lento | `300` (prueba entre 200 y 500) |
-| `--escala` | Multiplica la cantidad de carros (1.2 = 20 % más) | `1.2`: la diferencia se nota más |
+| `--minutos` | Minutos de tráfico simulado (máximo 60) | `10` (por defecto) |
+| `--delay` | Pausa en milisegundos por segundo simulado. Más alto = más lento | `120` (por defecto); `80` si va lento, `200` si va rápido |
+| `--escala` | Multiplica la cantidad de carros (1.2 = 20 % más) | `1.2` (por defecto): la diferencia se nota más |
 | `--semilla` | Fija el azar del tráfico, para repetir la misma demo | `10` (por defecto) |
 | `--politica` | Qué modelo entrenado usar | `base` (por defecto, el mejor) |
-| `--reporte-cada` | Cada cuántos minutos simulados se imprime el marcador | `2` para una demo de 10 min |
+| `--reporte-cada` | Cada cuántos minutos simulados se imprime el marcador | `1` (por defecto) |
+| `--vista` | Qué cruces muestra la cámara: `c3` (C3 con C1 y C4), `c2`, `congestion` (C2 y C3) o `todos` | `c3` (por defecto) |
 | `--sin-max-green` | No fuerza el verde máximo de 60 s, como en los resultados de la presentación | Opcional. Sin esta opción el verde máximo sí se aplica, y C4 cambia de fase al menos cada ~60 s |
 
-Duración aproximada: `--minutos 10 --delay 300` dura unos 3 minutos reales. Con `--delay 100` va unas 3 veces más rápido. Confírmalo en el ensayo, porque depende del computador.
+Duración aproximada: con los valores por defecto (10 min, `--delay 120`) la demo dura unos 2 minutos reales. Confírmalo en el ensayo, porque depende del computador.
 
 ## Mientras corre
 
+- **Colores:** rojo = vehículo detenido, verde = en movimiento. Las colas rojas de la izquierda (tiempo fijo) frente a la derecha (agente) son la diferencia que hay que señalar.
 - **Rueda del mouse:** zoom. **Arrastrar:** mover la vista. La vista arranca centrada en los 4 cruces.
 - **Campo "Delay"** (barra superior de cada ventana): cambia la velocidad en vivo.
 - **Pasar el mouse sobre un carro:** SUMO muestra su información.

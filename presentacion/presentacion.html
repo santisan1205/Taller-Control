@@ -475,7 +475,7 @@ C4 es un caso particular: el agente prácticamente no cambia de fase en toda la 
 <div style="width:860px;display:flex;flex-direction:column;gap:24px">
 <div style="display:flex;flex-direction:column;gap:12px;background:#0C1829;border-radius:12px;padding:32px 40px">
 <p style="font-size:24px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#FFD100">Comando</p>
-<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E2E8F0">python demo_en_vivo.py --minutos 10 --delay 300 --escala 1.2</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E2E8F0">python demo_en_vivo.py</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:4px;border-top:4px solid #B45309;padding-top:12px">
 <p style="font-size:56px;font-weight:800;line-height:1.1;color:#B45309">−48 % · −57 %</p>
@@ -489,11 +489,11 @@ C4 es un caso particular: el agente prácticamente no cambia de fase en toda la 
 </div>
 <div style="display:flex;flex-direction:column;gap:4px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:20px 28px">
 <h3 style="font-size:28px;font-weight:700;line-height:1.2;color:#0C1829">2 · Dos instancias de sumo-gui</h3>
-<p style="font-size:24px;line-height:1.35;color:#475569">Procesos paralelos con la misma ruta y semilla</p>
+<p style="font-size:24px;line-height:1.35;color:#475569">Rojo = detenido, verde = en movimiento</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:4px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:20px 28px">
 <h3 style="font-size:28px;font-weight:700;line-height:1.2;color:#0C1829">3 · Marcador en terminal</h3>
-<p style="font-size:24px;line-height:1.35;color:#475569">Detenidos, espera media y vehículos llegados</p>
+<p style="font-size:24px;line-height:1.35;color:#475569">Barras de detenidos y espera cada minuto</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:4px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:20px 28px">
 <h3 style="font-size:28px;font-weight:700;line-height:1.2;color:#0C1829">4 · Resumen</h3>
@@ -502,12 +502,13 @@ C4 es un caso particular: el agente prácticamente no cambia de fase en toda la 
 </div>
 </div>
 <aside class="notas">[Expositor 3 · 3:00 · acumulado 13:15]
-DEMO. Cambiar a la terminal de VS Code en la carpeta del proyecto y correr:
-.\.venv\Scripts\python.exe demo_en_vivo.py --minutos 10 --delay 300 --escala 1.2
-Mientras abre: "Vamos a correr dos simulaciones en paralelo con exactamente la misma demanda y la misma semilla. La de la izquierda usa los programas de tiempo fijo y la de la derecha la política aprendida. Usamos 20 % más demanda que la nominal para que el efecto sea visible."
-Mientras corre: señalar las colas en C2 y C3. En el tiempo fijo, el verde alterna por reloj aunque una de las aproximaciones esté vacía; con el agente, el verde se sostiene en la aproximación con cola.
-Leer cada línea del marcador: detenidos y espera, fijo frente a agente.
-Al final, leer la línea de resumen. Como referencia, en la prueba de 15 minutos con demanda nominal obtuvimos 48 % menos detenidos y 57 % menos espera.
+DEMO. En la terminal de VS Code, en la carpeta del proyecto, correr:
+.\.venv\Scripts\python.exe demo_en_vivo.py
+(Por defecto: 10 minutos simulados, 20 % más demanda, cámara sobre C3 con C1 y C4. Si va lento, agregar --delay 80; si va rápido, --delay 200.)
+Mientras abre: "Vamos a correr dos simulaciones en paralelo con exactamente la misma demanda y la misma semilla. A la izquierda, los programas de tiempo fijo; a la derecha, la política aprendida. Cada vehículo detenido aparece en rojo y cada vehículo en movimiento en verde."
+Mientras corre: señalar las colas rojas que se forman a la izquierda en las entradas de los cruces, mientras a la derecha el verde se asigna a la aproximación con cola y los vehículos siguen en verde.
+Cada minuto la terminal muestra dos barras: naranja para el tiempo fijo y azul para el agente, con los vehículos detenidos, la espera y la reducción porcentual. Leer una o dos en voz alta.
+Al final, leer el bloque RESULTADO. Como referencia, en la prueba de 6 minutos obtuvimos 57 % menos vehículos detenidos y 68 % menos espera.
 Plan B: si falla, poner el video grabado.</aside>
 </section>
 
