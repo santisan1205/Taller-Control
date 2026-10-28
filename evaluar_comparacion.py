@@ -52,14 +52,15 @@ def prefijo_episodio(politica, modo, semilla, escala):
     return os.path.join(CARPETA_EPISODIOS, f'{politica}__{modo}__s{semilla}__x{escala:g}')
 
 
-def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False):
+def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False, al_paso=None):
     """
     Corre un episodio completo a partir de un env ya reseteado (obs_dict es el
     resultado de ese reset). Si actores es None, se pasan acciones dummy
     (fixed_ts=True hace que sumo-rl las ignore y deje correr los programas
     semaforicos originales). Si se da un dict de actores, se actua con la
-    politica entrenada. Devuelve las métricas paso a paso de sumo-rl y un
-    resumen del control semafórico por cruce.
+    politica entrenada. al_paso(env, paso), si se da, se llama después de cada
+    paso (lo usa la demo en vivo para su marcador). Devuelve las métricas paso
+    a paso de sumo-rl y un resumen del control semafórico por cruce.
     """
     sumo = env.unwrapped.env.sumo
     # Estado verde actual de cada semáforo (se ignoran los amarillos) para
@@ -69,7 +70,7 @@ def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False):
     pasos_en_verde = {}
     cambios = {}
 
-    for _ in range(pasos):
+    for paso in range(pasos):
         acciones = {}
         for agent in env.agents:
             if actores is None:
@@ -104,6 +105,8 @@ def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False):
                 verde_actual[ts] = estado
             pasos_en_verde[ts] = pasos_en_verde.get(ts, 0) + 1
 
+        if al_paso is not None:
+            al_paso(env, paso)
         if all(terminations.values()) or all(truncations.values()):
             break
 
