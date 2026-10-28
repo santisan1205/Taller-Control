@@ -1,0 +1,44 @@
+<section id="arquitectura" data-transition="fade" style="background:#FDFDFB;color:#0C1829;font-family:'Plus Jakarta Sans', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:40px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#FFD100"></div>
+<div style="position:absolute;left:128px;top:24px;width:288px;height:64px;background:#FFFFFF;border-radius:10px"></div>
+<img src="/_blob/a8cbe6915c6e9cf63613dcd8cbad16ce" alt="Universidad de los Andes" style="position:absolute;left:146px;top:31px;width:252px;height:50px;object-fit:contain">
+<p style="position:absolute;right:128px;top:38px;width:900px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#0C1829">Control semafórico con RND-MAPPO</p>
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#CBD5E1"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#334155">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#334155">5 / 16</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:#B45309"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#B45309">Arquitectura</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#0C1829">MAPPO: entrenamiento centralizado, ejecución descentralizada</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#0C1829;border-radius:12px;padding:32px 40px">
+<p style="font-size:44px;font-weight:800;line-height:1.1;color:#FFD100">Actor πi(ai | oi)</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.4;color:#E2E8F0">oi → 128 → 64 → |Ai| · ReLU · softmax</p>
+<p style="font-size:28px;line-height:1.4;color:#E2E8F0">Distribución categórica sobre las fases. Cuatro actores independientes, porque |oi| y |Ai| difieren entre intersecciones.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#0C1829;border-radius:12px;padding:32px 40px">
+<p style="font-size:44px;font-weight:800;line-height:1.1;color:#FFD100">Crítico V(s)</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.4;color:#E2E8F0">s → 256 → 128 → 1 · ReLU</p>
+<p style="font-size:28px;line-height:1.4;color:#E2E8F0">Valor del estado global (las cuatro observaciones). Compartido por los cuatro agentes y usado solo en el entrenamiento.</p>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:6px solid #FFD100;border-radius:12px;padding:28px 32px">
+<h3 style="font-size:32px;font-weight:700;line-height:1.2;color:#0C1829">Objetivo PPO</h3>
+<p style="font-size:26px;line-height:1.4;color:#334155">Pérdida recortada con ε = 0,2 y bono de entropía cH = 0,01.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:6px solid #FFD100;border-radius:12px;padding:28px 32px">
+<h3 style="font-size:32px;font-weight:700;line-height:1.2;color:#0C1829">Ventaja GAE</h3>
+<p style="font-size:26px;line-height:1.4;color:#334155">γ = 0,99 y λ = 0,95, con ventajas normalizadas por lote.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:6px solid #FFD100;border-radius:12px;padding:28px 32px">
+<h3 style="font-size:32px;font-weight:700;line-height:1.2;color:#0C1829">Ejecución</h3>
+<p style="font-size:26px;line-height:1.4;color:#334155">Cada controlador decide solo con oi: no requiere comunicación entre intersecciones.</p>
+</div>
+</div>
+<aside>[Expositor 2 · 1:15 · acumulado 4:15]
+El algoritmo es MAPPO, la versión multiagente de PPO, con el esquema de entrenamiento centralizado y ejecución descentralizada.
+Cada intersección tiene un actor: una red neuronal que recibe la observación local y devuelve una distribución de probabilidad sobre las fases; la acción se muestrea de esa distribución. Tiene dos capas ocultas de 128 y 64 neuronas. Como cada intersección tiene distinto número de carriles y de fases, usamos cuatro actores independientes.
+El crítico es una sola red, compartida, que recibe el estado global, es decir, las cuatro observaciones concatenadas, y estima el valor del estado. El crítico solo se usa para entrenar: le dice a cada actor qué tan buena fue su decisión para la red completa. En operación cada semáforo decide con su información local, sin comunicarse con los demás.
+La actualización es la de PPO: una función objetivo recortada con épsilon 0,2 para que la política no cambie demasiado en cada paso, más un bono de entropía para mantener exploración. La ventaja se estima con GAE, con gamma 0,99 y lambda 0,95.</aside>
+</section>

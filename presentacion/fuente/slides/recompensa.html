@@ -1,0 +1,37 @@
+<section id="recompensa" data-transition="fade" style="background:#FDFDFB;color:#0C1829;font-family:'Plus Jakarta Sans', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:40px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#FFD100"></div>
+<div style="position:absolute;left:128px;top:24px;width:288px;height:64px;background:#FFFFFF;border-radius:10px"></div>
+<img src="/_blob/a8cbe6915c6e9cf63613dcd8cbad16ce" alt="Universidad de los Andes" style="position:absolute;left:146px;top:31px;width:252px;height:50px;object-fit:contain">
+<p style="position:absolute;right:128px;top:38px;width:900px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#0C1829">Control semafórico con RND-MAPPO</p>
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#CBD5E1"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#334155">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#334155">6 / 16</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:#B45309"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#B45309">Recompensa</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#0C1829">Recompensa extrínseca y exploración por RND</h2>
+<p style="font-size:28px;line-height:1.4;color:#475569">Random Network Distillation como bono intrínseco con peso decreciente</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#0C1829;border-radius:12px;padding:36px 48px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:32px;line-height:1.4;color:#FDFDFB"><span style="color:#FFD100">R_ext</span>   = −(w1·ΔQ + w2·ΔW_veh + w3·ΔW_ped) − P·1[cambio de fase]</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:32px;line-height:1.4;color:#FDFDFB"><span style="color:#FFD100">R_int</span>   = ‖ fθ(s′) − g(s′) ‖²</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:32px;line-height:1.4;color:#FDFDFB"><span style="color:#FFD100">R_total</span> = R_ext + λe·R_int,   λe = max(0,01 ; 1 − e/E)</p>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:6px solid #FFD100;border-radius:12px;padding:28px 32px">
+<h3 style="font-size:32px;font-weight:700;line-height:1.2;color:#0C1829">Término extrínseco</h3>
+<p style="font-size:26px;line-height:1.4;color:#334155">ΔQ y ΔW: variación de cola y de espera acumulada entre pasos. w1 = w2 = 1, P = 0,5; w3 = 2 sin efecto (no hay peatones).</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:6px solid #FFD100;border-radius:12px;padding:28px 32px">
+<h3 style="font-size:32px;font-weight:700;line-height:1.2;color:#0C1829">Término intrínseco</h3>
+<p style="font-size:26px;line-height:1.4;color:#334155">g: red aleatoria fija; fθ: predictor entrenado para imitarla. El error es alto en estados poco visitados.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:6px solid #FFD100;border-radius:12px;padding:28px 32px">
+<h3 style="font-size:32px;font-weight:700;line-height:1.2;color:#0C1829">Decaimiento de λ</h3>
+<p style="font-size:26px;line-height:1.4;color:#334155">Lineal en el episodio e de E: exploración al inicio y optimización del tráfico al final.</p>
+</div>
+</div>
+<aside>[Expositor 2 · 1:15 · acumulado 5:30]
+La recompensa tiene dos términos. El extrínseco es el objetivo de control: en cada paso medimos cuánto cambió la cola y cuánto cambió la espera acumulada en la intersección. Si bajan, la recompensa es positiva; si suben, negativa. Es una recompensa diferencial, que es más estable que usar valores absolutos. Además restamos una penalización P de 0,5 cada vez que cambia la fase, para evitar oscilaciones. El término de peatones, w3, está en la formulación, pero no tiene efecto porque el escenario no tiene peatones cargados.
+El término intrínseco es RND, Random Network Distillation. Hay una red g con pesos aleatorios congelados y una red predictora f que se entrena para imitarla. En estados que el agente ya visitó mucho, f predice bien y el error es bajo; en estados nuevos el error es alto, y ese error es el bono de exploración.
+El peso λ de ese bono decae linealmente de 1 a 0,01 a lo largo del entrenamiento: al inicio el agente explora, y al final optimiza solo el tráfico.</aside>
+</section>

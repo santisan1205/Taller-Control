@@ -1,9 +1,19 @@
-<section id="cierre" data-transition="fade" style="background:#161B26;color:#F5F3EE;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
-<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#F2A93B">En resumen</p>
-<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:500;line-height:1.2;width:1500px">Con 100 partidas de práctica, cuatro semáforos aprendieron a <span style="color:#F2A93B">reducir a la mitad la espera</span> en cruces reales de Bogotá.</p>
-<div style="display:flex;justify-content:space-between;align-items:end">
-<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.05">¿Preguntas?</h2>
-<p style="font-size:24px;color:#B9C0CC">github.com/santisan1205/Taller-Control</p>
-</div>
-<aside>(30 s) Cierre en una frase: “Sin programarle reglas, solo con práctica en un simulador, cuatro semáforos aprendieron a coordinarse y a reducir a la mitad la espera en cruces reales de Bogotá, y lo comprobamos con 26 métricas, varias semillas y distintos niveles de tráfico.” Abran preguntas. Preguntas probables: ¿Se puede usar en un semáforo real? (Faltaría hora pico, peatones y validar con datos de conteo reales; el agente solo necesita sensores de su cruce.) ¿Por qué no siempre la acción más probable? (Ver la diapositiva de la trampa.) ¿Cuánto tarda entrenar? (En nuestras pruebas, del orden de medio minuto de computador por cada hora simulada; las 100 partidas toman alrededor de una hora, según el equipo.) ¿Qué es una semilla? (El número que fija el azar del simulador, para poder repetir exactamente el mismo experimento.)</aside>
+<section id="cierre" data-transition="fade" style="background:#FFD100;color:#0C1829;font-family:'Plus Jakarta Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:24px">
+<img src="/_blob/a8cbe6915c6e9cf63613dcd8cbad16ce" alt="Universidad de los Andes" style="position:absolute;left:128px;top:72px;width:300px;height:82px;object-fit:contain">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#0C1829"></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0C1829">Control semafórico multiagente con RND-MAPPO</p>
+<h1 style="font-size:88px;font-weight:800;line-height:1.05;letter-spacing:-1px;color:#0C1829">Gracias. ¿Preguntas?</h1>
+<div style="height:16px"></div>
+<p style="font-size:28px;line-height:1.4;color:#0C1829">Tomás Castro Roa · [Integrante] · [Integrante] · [Integrante]</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.4;color:#0C1829">github.com/santisan1205/Taller-Control</p>
+<aside>[Expositor 4 · 0:15 · acumulado 16:45]
+Muchas gracias. Quedamos atentos a sus preguntas.
+Preguntas probables y respuesta corta:
+¿Por qué MAPPO y no un solo agente para toda la red? Un agente central tendría un espacio de acciones combinatorio (el producto de las fases de las cuatro intersecciones) y requeriría comunicación en operación. Con CTDE cada controlador decide localmente y el crítico central solo se usa al entrenar.
+¿Por qué RND? Porque la recompensa diferencial es poco informativa al inicio; el bono de exploración evita converger temprano a una política subóptima. λ decae a 0 para que al final optimice solo el tráfico.
+¿Por qué muestrear y no usar argmax? Ver la diapositiva 13: con 100 episodios la distribución no es lo bastante concentrada y el argmax deja aproximaciones sin servicio.
+¿Qué tan significativo es con 5 semillas? Usamos prueba t pareada: el agente y el tiempo fijo ven el mismo tráfico, lo que reduce la varianza; los p-valores están por debajo de 0,001.
+¿Qué varía entre semillas de evaluación? La demanda está definida por archivos de rutas fijos; la semilla cambia el comportamiento estocástico de los conductores en SUMO. Por eso también evaluamos con tres niveles de demanda.
+¿Se podría implementar en campo? Faltaría aplicar el verde máximo, evaluar la hora pico y los peatones, y validar con conteos reales. Cada controlador solo necesita sensores de su propia intersección.
+¿Cuánto tarda entrenar? Del orden de medio minuto de cómputo por hora simulada; 100 episodios, alrededor de una hora en CPU.</aside>
 </section>

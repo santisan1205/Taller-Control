@@ -1,0 +1,34 @@
+<section id="politica" data-transition="fade" style="background:#FDFDFB;color:#0C1829;font-family:'Plus Jakarta Sans', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:40px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#FFD100"></div>
+<div style="position:absolute;left:128px;top:24px;width:288px;height:64px;background:#FFFFFF;border-radius:10px"></div>
+<img src="/_blob/a8cbe6915c6e9cf63613dcd8cbad16ce" alt="Universidad de los Andes" style="position:absolute;left:146px;top:31px;width:252px;height:50px;object-fit:contain">
+<p style="position:absolute;right:128px;top:38px;width:900px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#0C1829">Control semafórico con RND-MAPPO</p>
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#CBD5E1"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#334155">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#334155">13 / 16</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:#B45309"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#B45309">Análisis</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#0C1829">Política estocástica frente a política greedy</h2>
+<p style="font-size:28px;line-height:1.4;color:#475569">Muestreo de π(a | o) frente a argmax de π, demanda nominal, 5 semillas</p>
+</div>
+<div style="display:flex;gap:48px">
+<table style="font-size:26px;color:#334155;width:1000px">
+<tr style="background:#0C1829"><th style="width:37%;color:#FDFDFB">Métrica</th><th style="width:21%;text-align:right;color:#FDFDFB">Tiempo fijo</th><th style="width:21%;text-align:right;color:#FDFDFB">Estocástica</th><th style="width:21%;text-align:right;color:#FDFDFB">Greedy</th></tr>
+<tr style="background:#FEF3C7"><td>Espera media (s)</td><td style="text-align:right">5,7</td><td style="text-align:right">2,9</td><td style="text-align:right">165,3</td></tr>
+<tr style="background:#FEF3C7"><td>Tiempo de viaje (s)</td><td style="text-align:right">134,9</td><td style="text-align:right">115,9</td><td style="text-align:right">109,6</td></tr>
+<tr><td>Tiempo perdido (s)</td><td style="text-align:right">53,8</td><td style="text-align:right">34,8</td><td style="text-align:right">28,2</td></tr>
+<tr style="background:#F8FAFC"><td>Viajes completados</td><td style="text-align:right">1376</td><td style="text-align:right">1387</td><td style="text-align:right">1369</td></tr>
+<tr><td>Viajes sin terminar</td><td style="text-align:right">52,8</td><td style="text-align:right">41,6</td><td style="text-align:right">58,6</td></tr>
+<tr style="background:#F8FAFC"><td>Cambios de fase</td><td style="text-align:right">916</td><td style="text-align:right">489</td><td style="text-align:right">358</td></tr>
+</table>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:6px solid #FFD100;border-radius:12px;padding:32px 36px">
+<h3 style="font-size:36px;font-weight:700;line-height:1.2;color:#0C1829">Sesgo de supervivencia</h3>
+<p style="font-size:28px;line-height:1.4;color:#334155">Las métricas por viaje solo incluyen los vehículos que llegan. La política greedy concentra el verde en pocas fases: los vehículos retenidos no terminan el viaje y la espera media del sistema crece 29 veces.</p>
+</div>
+</div>
+<aside>[Expositor 4 · 1:15 · acumulado 14:30]
+Un resultado que vale la pena analizar. El actor entrega una distribución de probabilidad sobre las fases. En la evaluación muestreamos de esa distribución, igual que en el entrenamiento. La alternativa es la política greedy, que siempre elige la fase más probable.
+Si miramos solo las métricas por viaje, la greedy parece la mejor: el tiempo de viaje baja a 110 segundos y el tiempo perdido a 28. Pero la espera media del sistema sube a 165 segundos, 29 veces la del tiempo fijo.
+La explicación es un sesgo de supervivencia. Las métricas por viaje solo cuentan los vehículos que llegan a su destino. La política greedy concentra el verde en pocas fases y deja otras aproximaciones casi sin servicio; esos vehículos se acumulan, no terminan el viaje y quedan fuera del promedio. Por eso hay más viajes sin terminar y menos completados.
+Dos conclusiones: con 100 episodios la política todavía no es lo bastante determinista para usarse en modo greedy, y la evaluación debe combinar métricas de sistema y por viaje.</aside>
+</section>

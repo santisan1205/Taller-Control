@@ -1,16 +1,52 @@
-<section id="demo" data-transition="fade" style="background:#F2A93B;color:#161B26;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:56px">
-<p style="font-size:24px;font-weight:700;letter-spacing:4px;text-transform:uppercase">Demo en vivo</p>
-<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.05">Mismo tráfico, dos cerebros</h2>
-<div style="display:flex;gap:32px">
-<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#161B26;border-radius:16px;padding:40px">
-<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#FF9A62">Ventana izquierda</p>
-<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:44px;font-weight:700;color:#F5F3EE">Semáforos de tiempo fijo</h3>
+<section id="demo" data-transition="fade" style="background:#FDFDFB;color:#0C1829;font-family:'Plus Jakarta Sans', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:40px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#FFD100"></div>
+<div style="position:absolute;left:128px;top:24px;width:288px;height:64px;background:#FFFFFF;border-radius:10px"></div>
+<img src="/_blob/a8cbe6915c6e9cf63613dcd8cbad16ce" alt="Universidad de los Andes" style="position:absolute;left:146px;top:31px;width:252px;height:50px;object-fit:contain">
+<p style="position:absolute;right:128px;top:38px;width:900px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#0C1829">Control semafórico con RND-MAPPO</p>
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#CBD5E1"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#334155">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#334155">12 / 16</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:#B45309"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#B45309">Demostración</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#0C1829">Ejecución en tiempo real en sumo-gui</h2>
+<p style="font-size:28px;line-height:1.4;color:#475569">Misma demanda y semilla: tiempo fijo (izquierda) frente a RND-MAPPO (derecha)</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#161B26;border-radius:16px;padding:40px">
-<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#7FB0FF">Ventana derecha</p>
-<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:44px;font-weight:700;color:#F5F3EE">Agente RND-MAPPO</h3>
+<div style="display:flex;gap:48px">
+<div style="width:860px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#0C1829;border-radius:12px;padding:32px 40px">
+<p style="font-size:24px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#FFD100">Comando</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E2E8F0">python demo_en_vivo.py --minutos 10 --delay 300 --escala 1.2</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;border-top:4px solid #B45309;padding-top:12px">
+<p style="font-size:56px;font-weight:800;line-height:1.1;color:#B45309">−48 % · −57 %</p>
+<p style="font-size:24px;line-height:1.3;color:#475569">vehículos detenidos y espera media en la prueba de referencia (15 min, demanda nominal, semilla 10)</p>
 </div>
 </div>
-<p style="font-size:32px;line-height:1.4">Fíjense en las colas de los dos cruces grandes y en el marcador de la terminal.</p>
-<aside>(3–4 min) DEMO. Comando (en la terminal de VS Code, carpeta del proyecto): .\.venv\Scripts\python.exe demo_en_vivo.py --minutos 10 --delay 300 --escala 1.2 . Con --delay 300 se ve a velocidad cómoda (sube o baja el número para ir más lento o más rápido; también se cambia en vivo en el campo Delay de SUMO). --escala 1.2 pone 20 % más carros y la diferencia se nota más. Qué decir: “Las dos ventanas tienen exactamente los mismos carros, que salen a la misma hora hacia el mismo destino. Lo único distinto es quién controla los semáforos: a la izquierda el ciclo fijo, a la derecha nuestro agente.” Mientras corre: señalen cómo en la izquierda se arman colas que esperan aunque la otra calle esté vacía, y en la derecha el verde va hacia donde están los carros. Lean el marcador cada vez que aparece una línea: vehículos detenidos y espera, fijo vs. agente. Al final, lean la línea de resultado (% menos detenidos y menos espera). Si algo falla, pongan el video de respaldo.</aside>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;flex-direction:column;gap:4px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:20px 28px">
+<h3 style="font-size:28px;font-weight:700;line-height:1.2;color:#0C1829">1 · Escenario</h3>
+<p style="font-size:24px;line-height:1.35;color:#475569">Semilla 10, demanda ×1,2, 10 min simulados</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:20px 28px">
+<h3 style="font-size:28px;font-weight:700;line-height:1.2;color:#0C1829">2 · Dos instancias de sumo-gui</h3>
+<p style="font-size:24px;line-height:1.35;color:#475569">Procesos paralelos con la misma ruta y semilla</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:20px 28px">
+<h3 style="font-size:28px;font-weight:700;line-height:1.2;color:#0C1829">3 · Marcador en terminal</h3>
+<p style="font-size:24px;line-height:1.35;color:#475569">Detenidos, espera media y vehículos llegados</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:20px 28px">
+<h3 style="font-size:28px;font-weight:700;line-height:1.2;color:#0C1829">4 · Resumen</h3>
+<p style="font-size:24px;line-height:1.35;color:#475569">Variación porcentual promedio al final</p>
+</div>
+</div>
+</div>
+<aside>[Expositor 3 · 3:00 · acumulado 13:15]
+DEMO. Cambiar a la terminal de VS Code en la carpeta del proyecto y correr:
+.\.venv\Scripts\python.exe demo_en_vivo.py --minutos 10 --delay 300 --escala 1.2
+Mientras abre: "Vamos a correr dos simulaciones en paralelo con exactamente la misma demanda y la misma semilla. La de la izquierda usa los programas de tiempo fijo y la de la derecha la política aprendida. Usamos 20 % más demanda que la nominal para que el efecto sea visible."
+Mientras corre: señalar las colas en C2 y C3. En el tiempo fijo, el verde alterna por reloj aunque una de las aproximaciones esté vacía; con el agente, el verde se sostiene en la aproximación con cola.
+Leer cada línea del marcador: detenidos y espera, fijo frente a agente.
+Al final, leer la línea de resumen. Como referencia, en la prueba de 15 minutos con demanda nominal obtuvimos 48 % menos detenidos y 57 % menos espera.
+Plan B: si falla, poner el video grabado.</aside>
 </section>

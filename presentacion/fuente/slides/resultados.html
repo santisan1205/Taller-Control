@@ -1,38 +1,31 @@
-<section id="resultados" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
-<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">Resultados</p>
-<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">La espera se reduce a la mitad</h2>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px">
-<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
-<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−49 %</p>
-<h3 style="font-size:32px;font-weight:600">Espera media</h3>
-<p style="font-size:24px;color:#4A5263">5,7 s → 2,9 s</p>
+<section id="resultados" data-transition="fade" style="background:#FDFDFB;color:#0C1829;font-family:'Plus Jakarta Sans', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:40px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#FFD100"></div>
+<div style="position:absolute;left:128px;top:24px;width:288px;height:64px;background:#FFFFFF;border-radius:10px"></div>
+<img src="/_blob/a8cbe6915c6e9cf63613dcd8cbad16ce" alt="Universidad de los Andes" style="position:absolute;left:146px;top:31px;width:252px;height:50px;object-fit:contain">
+<p style="position:absolute;right:128px;top:38px;width:900px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#0C1829">Control semafórico con RND-MAPPO</p>
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#CBD5E1"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#334155">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#334155">9 / 16</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:#B45309"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#B45309">Resultados</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#0C1829">Desempeño frente al control de tiempo fijo</h2>
+<p style="font-size:28px;line-height:1.4;color:#475569">Política base, demanda nominal, 5 semillas pareadas</p>
 </div>
-<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
-<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−52 %</p>
-<h3 style="font-size:32px;font-weight:600">Vehículos detenidos</h3>
-<p style="font-size:24px;color:#4A5263">14,0 → 6,7 en promedio</p>
-</div>
-<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
-<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−35 %</p>
-<h3 style="font-size:32px;font-weight:600">Tiempo perdido por viaje</h3>
-<p style="font-size:24px;color:#4A5263">54 s → 35 s</p>
-</div>
-<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
-<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−14 %</p>
-<h3 style="font-size:32px;font-weight:600">Tiempo de viaje</h3>
-<p style="font-size:24px;color:#4A5263">135 s → 116 s</p>
-</div>
-<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
-<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−12 %</p>
-<h3 style="font-size:32px;font-weight:600">CO₂ emitido</h3>
-<p style="font-size:24px;color:#4A5263">347 kg → 304 kg por hora</p>
-</div>
-<div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #E2DFD6;border-radius:16px;padding:32px">
-<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#2459C2">−47 %</p>
-<h3 style="font-size:32px;font-weight:600">Cambios de fase</h3>
-<p style="font-size:24px;color:#4A5263">916 → 489 por hora</p>
-</div>
-</div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5263">Agente base vs. tiempo fijo · demanda normal, 5 semillas · todas las diferencias p &lt; 0,01 (prueba t pareada)</p>
-<aside>(1,5 min) Después de la demo, los números oficiales. No es una sola corrida: evaluamos con 5 semillas distintas (5 variaciones del comportamiento de los conductores) y comparamos pareado: misma semilla, mismo tráfico, fijo vs. agente. Resultados del mejor modelo: la espera media baja a la mitad, hay la mitad de carros detenidos, cada viaje pierde 35 % menos tiempo y dura 14 % menos. Como los carros frenan y arrancan menos, también baja el CO₂ un 12 %. Y curiosamente el agente cambia de fase la mitad de veces: no es que cambie más rápido, es que cambia cuando toca. Además completan el viaje un poco más de carros (1.387 vs. 1.376). Todas estas diferencias son estadísticamente significativas (p menor a 0,01): no son ruido.</aside>
+<table style="font-size:26px;color:#334155;width:1664px">
+<tr style="background:#0C1829"><th style="width:40%;color:#FDFDFB">Métrica</th><th style="width:15%;text-align:right;color:#FDFDFB">Tiempo fijo</th><th style="width:15%;text-align:right;color:#FDFDFB">RND-MAPPO</th><th style="width:15%;text-align:right;color:#FDFDFB">Variación</th><th style="width:15%;text-align:right;color:#FDFDFB">p</th></tr>
+<tr style="background:#FEF3C7"><td>Espera media (s)</td><td style="text-align:right">5,73</td><td style="text-align:right">2,91</td><td style="text-align:right">−49,3 %</td><td style="text-align:right">&lt; 0,001</td></tr>
+<tr><td>Vehículos detenidos (promedio)</td><td style="text-align:right">13,98</td><td style="text-align:right">6,71</td><td style="text-align:right">−52,0 %</td><td style="text-align:right">&lt; 0,001</td></tr>
+<tr style="background:#FEF3C7"><td>Tiempo perdido por viaje (s)</td><td style="text-align:right">53,8</td><td style="text-align:right">34,8</td><td style="text-align:right">−35,3 %</td><td style="text-align:right">&lt; 0,001</td></tr>
+<tr><td>Tiempo de viaje (s)</td><td style="text-align:right">134,9</td><td style="text-align:right">115,9</td><td style="text-align:right">−14,1 %</td><td style="text-align:right">&lt; 0,001</td></tr>
+<tr style="background:#F8FAFC"><td>Espera por viaje, percentil 95 (s)</td><td style="text-align:right">101,4</td><td style="text-align:right">61,5</td><td style="text-align:right">−39,4 %</td><td style="text-align:right">&lt; 0,001</td></tr>
+<tr><td>Velocidad media (m/s)</td><td style="text-align:right">6,23</td><td style="text-align:right">7,32</td><td style="text-align:right">+17,4 %</td><td style="text-align:right">&lt; 0,001</td></tr>
+<tr style="background:#F8FAFC"><td>CO₂ emitido (kg/h)</td><td style="text-align:right">346,9</td><td style="text-align:right">303,8</td><td style="text-align:right">−12,4 %</td><td style="text-align:right">&lt; 0,001</td></tr>
+<tr><td>Viajes completados (veh/h)</td><td style="text-align:right">1376</td><td style="text-align:right">1387</td><td style="text-align:right">+0,8 %</td><td style="text-align:right">0,001</td></tr>
+<tr style="background:#F8FAFC"><td>Cambios de fase (por hora)</td><td style="text-align:right">916</td><td style="text-align:right">489</td><td style="text-align:right">−46,6 %</td><td style="text-align:right">&lt; 0,001</td></tr>
+</table>
+<aside>[Expositor 3 · 1:30 · acumulado 8:45]
+Estos son los resultados de la política base frente al tiempo fijo, con la demanda nominal y 5 semillas pareadas.
+La espera media baja 49 %, de 5,7 a 2,9 segundos, y el número promedio de vehículos detenidos baja 52 %. Las métricas por viaje, que salen de tripinfo, confirman la mejora: el tiempo perdido por viaje, es decir, el tiempo adicional frente a circular a velocidad libre, baja 35 %, y el tiempo de viaje total 14 %. También baja 39 % el percentil 95 de la espera por viaje, o sea que la mejora no solo es en promedio sino también para los vehículos más afectados.
+Como hay menos detenciones, la velocidad media sube 17 % y el CO₂ baja 12 %. El throughput sube ligeramente, 0,8 %. Y el agente cambia de fase 47 % menos veces que el programa fijo.
+Todas las diferencias son significativas con prueba t pareada; los p-valores están por debajo de 0,001, salvo el de viajes completados, que es 0,001.</aside>
 </section>

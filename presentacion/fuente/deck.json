@@ -2,18 +2,18 @@
   "v": 4,
   "createdOnFiles": {"v": 1, "at": "2026-10-27T15:00:00Z"},
   "lists": "css",
-  "title": "Semáforos que aprenden",
+  "title": "Control semafórico multiagente con RND-MAPPO",
   "cover": "cover",
-  "order": ["cover", "problema", "escenario", "rl", "equipo", "curiosidad", "curva", "demo", "resultados", "robustez", "trampa", "experimentos", "siguientes", "cierre"],
+  "order": ["cover", "agenda", "escenario", "formulacion", "arquitectura", "recompensa", "entrenamiento", "curva", "resultados", "robustez", "intersecciones", "demo", "politica", "variantes", "conclusiones", "cierre"],
   "sections": {
-    "s1": {"description": "Qué problema atacamos y en qué escenario lo probamos", "start": "cover"},
-    "s2": {"description": "Cómo funciona el agente: refuerzo, multi-agente y curiosidad", "start": "rl"},
-    "s3": {"description": "Qué tan bien funciona: aprendizaje, demo y resultados", "start": "curva"},
-    "s4": {"description": "Qué aprendimos y qué sigue", "start": "trampa"}
+    "s1": {"description": "Portada, agenda y formulación del problema de control", "start": "cover"},
+    "s2": {"description": "Arquitectura RND-MAPPO y configuración del entrenamiento", "start": "arquitectura"},
+    "s3": {"description": "Resultados: aprendizaje, comparación con tiempo fijo, sensibilidad y demostración", "start": "curva"},
+    "s4": {"description": "Análisis de la política, variantes y conclusiones", "start": "politica"}
   },
   "faces": {
-    "space-grotesk": {"family": "Space Grotesk", "href": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap"},
-    "public-sans": {"family": "Public Sans", "href": "https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap"}
+    "plus-jakarta-sans": {"family": "Plus Jakarta Sans", "href": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
   },
   "designSystems": []
 }

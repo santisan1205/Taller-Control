@@ -1,12 +1,38 @@
-<section id="robustez" data-transition="fade" style="background:#F5F3EE;color:#1B2130;font-family:'Public Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
-<p style="font-size:24px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#C2410C">Robustez</p>
-<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1">También funciona con más o menos tráfico</h2>
-<table style="font-size:32px;color:#1B2130;background:#FFFFFF;border-radius:16px">
-<tr><th style="width:22%">Demanda</th><th style="width:16%;text-align:right">Espera fijo</th><th style="width:16%;text-align:right">Espera agente</th><th style="width:16%;text-align:right">Pérdida fijo</th><th style="width:16%;text-align:right">Pérdida agente</th><th style="width:14%;text-align:right">Mejora</th></tr>
-<tr><td>80 %</td><td style="text-align:right">5,7 s</td><td style="text-align:right">2,8 s</td><td style="text-align:right">49 s</td><td style="text-align:right">30 s</td><td style="text-align:right;color:#2459C2">−51 %</td></tr>
-<tr style="background:#EEF2FA"><td>100 % (normal)</td><td style="text-align:right">5,7 s</td><td style="text-align:right">2,9 s</td><td style="text-align:right">54 s</td><td style="text-align:right">35 s</td><td style="text-align:right;color:#2459C2">−49 %</td></tr>
-<tr><td>120 %</td><td style="text-align:right">5,9 s</td><td style="text-align:right">3,4 s</td><td style="text-align:right">61 s</td><td style="text-align:right">41 s</td><td style="text-align:right;color:#2459C2">−42 %</td></tr>
+<section id="robustez" data-transition="fade" style="background:#FDFDFB;color:#0C1829;font-family:'Plus Jakarta Sans', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:40px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#FFD100"></div>
+<div style="position:absolute;left:128px;top:24px;width:288px;height:64px;background:#FFFFFF;border-radius:10px"></div>
+<img src="/_blob/a8cbe6915c6e9cf63613dcd8cbad16ce" alt="Universidad de los Andes" style="position:absolute;left:146px;top:31px;width:252px;height:50px;object-fit:contain">
+<p style="position:absolute;right:128px;top:38px;width:900px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#0C1829">Control semafórico con RND-MAPPO</p>
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#CBD5E1"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#334155">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#334155">10 / 16</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:#B45309"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#B45309">Resultados</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#0C1829">Sensibilidad al nivel de demanda</h2>
+<p style="font-size:28px;line-height:1.4;color:#475569">Política entrenada con la demanda nominal y evaluada con ±20 % de vehículos, sin reentrenar</p>
+</div>
+<table style="font-size:26px;color:#334155;width:1664px">
+<tr style="background:#0C1829"><th style="width:16%;color:#FDFDFB">Demanda</th><th style="width:14%;text-align:right;color:#FDFDFB">Espera fijo (s)</th><th style="width:14%;text-align:right;color:#FDFDFB">Espera RL (s)</th><th style="width:14%;text-align:right;color:#FDFDFB">Pérdida fijo (s)</th><th style="width:14%;text-align:right;color:#FDFDFB">Pérdida RL (s)</th><th style="width:14%;text-align:right;color:#FDFDFB">Detenidos máx. fijo</th><th style="width:14%;text-align:right;color:#FDFDFB">Detenidos máx. RL</th></tr>
+<tr><td>80 %</td><td style="text-align:right">5,73</td><td style="text-align:right">2,79</td><td style="text-align:right">49,1</td><td style="text-align:right">30,1</td><td style="text-align:right">25,4</td><td style="text-align:right">14,8</td></tr>
+<tr style="background:#FEF3C7"><td>100 % (nominal)</td><td style="text-align:right">5,73</td><td style="text-align:right">2,91</td><td style="text-align:right">53,8</td><td style="text-align:right">34,8</td><td style="text-align:right">36,2</td><td style="text-align:right">22,0</td></tr>
+<tr><td>120 %</td><td style="text-align:right">5,87</td><td style="text-align:right">3,40</td><td style="text-align:right">61,5</td><td style="text-align:right">41,2</td><td style="text-align:right">46,0</td><td style="text-align:right">29,0</td></tr>
 </table>
-<p style="font-size:32px;line-height:1.4;color:#4A5263">El agente solo practicó con la demanda normal. Con 20 % más carros sigue ganando; “Mejora” es la reducción de la espera media. “Pérdida” es el tiempo perdido por viaje.</p>
-<aside>(1 min) Una pregunta lógica: ¿y si cambia el tráfico? El agente solo practicó con la demanda normal. Lo probamos con 20 % menos carros y con 20 % más, sin volver a entrenarlo. En los tres casos gana con claridad: la espera baja entre 42 % y 51 % y el tiempo perdido por viaje baja de 30 a 39 %. Con más tráfico la ventaja se achica un poco, que es lo esperable, pero no se cae. Eso indica que aprendió una estrategia general y no se memorizó un escenario.</aside>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:48px">
+<div style="display:flex;flex-direction:column;gap:4px;border-top:4px solid #0C1829;padding-top:12px">
+<p style="font-size:56px;font-weight:800;line-height:1.1;color:#0C1829">−42 a −51 %</p>
+<p style="font-size:24px;line-height:1.3;color:#475569">variación de la espera media en los tres niveles</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;border-top:4px solid #0C1829;padding-top:12px">
+<p style="font-size:56px;font-weight:800;line-height:1.1;color:#0C1829">−33 a −39 %</p>
+<p style="font-size:24px;line-height:1.3;color:#475569">variación del tiempo perdido por viaje</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;border-top:4px solid #B45309;padding-top:12px">
+<p style="font-size:56px;font-weight:800;line-height:1.1;color:#B45309">p &lt; 0,01</p>
+<p style="font-size:24px;line-height:1.3;color:#475569">en los tres niveles de demanda</p>
+</div>
+</div>
+<aside>[Expositor 3 · 0:45 · acumulado 9:30]
+Para medir la robustez, evaluamos la misma política, entrenada solo con la demanda nominal, con 20 % menos y 20 % más vehículos, sin reentrenar.
+En los tres niveles el agente mejora con significancia: la espera media baja entre 42 y 51 %, y el tiempo perdido por viaje entre 33 y 39 %. El pico de vehículos detenidos también baja: con 120 % de demanda pasa de 46 a 29.
+La ventaja se reduce un poco al aumentar la demanda, que es lo esperable porque la red se acerca a saturación, pero se mantiene. Eso indica que la política generaliza a condiciones distintas de las de entrenamiento.</aside>
 </section>

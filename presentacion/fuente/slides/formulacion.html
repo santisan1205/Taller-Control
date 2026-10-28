@@ -1,0 +1,27 @@
+<section id="formulacion" data-transition="fade" style="background:#FDFDFB;color:#0C1829;font-family:'Plus Jakarta Sans', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:40px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#FFD100"></div>
+<div style="position:absolute;left:128px;top:24px;width:288px;height:64px;background:#FFFFFF;border-radius:10px"></div>
+<img src="/_blob/a8cbe6915c6e9cf63613dcd8cbad16ce" alt="Universidad de los Andes" style="position:absolute;left:146px;top:31px;width:252px;height:50px;object-fit:contain">
+<p style="position:absolute;right:128px;top:38px;width:900px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#0C1829">Control semafórico con RND-MAPPO</p>
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#CBD5E1"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#334155">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#334155">4 / 16</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:#B45309"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#B45309">Formulación</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#0C1829">Formulación del problema de control</h2>
+<p style="font-size:28px;line-height:1.4;color:#475569">Juego estocástico parcialmente observable con un agente por intersección</p>
+</div>
+<table style="font-size:26px;color:#334155;width:1664px">
+<tr style="background:#0C1829"><th style="width:17%;color:#FDFDFB">Elemento</th><th style="width:50%;color:#FDFDFB">Definición</th><th style="width:33%;color:#FDFDFB">Implementación</th></tr>
+<tr><td>Agente i</td><td>Controlador de la intersección Ci, i = 1…4</td><td>Un actor por intersección</td></tr>
+<tr style="background:#F8FAFC"><td>Observación oi</td><td>Fase activa (one-hot), indicador de verde mínimo, densidad y cola por carril de entrada</td><td>DefaultObservationFunction</td></tr>
+<tr><td>Acción ai</td><td>Selección directa de la siguiente fase verde</td><td>Discreta; |Ai| = n.º de fases</td></tr>
+<tr style="background:#F8FAFC"><td>Recompensa ri</td><td>Reducción de cola y de espera acumulada, con penalización por cambio de fase</td><td>Por intersección, cada Δt</td></tr>
+<tr><td>Estado global s</td><td>Concatenación de las cuatro observaciones</td><td>Entrada del crítico</td></tr>
+<tr style="background:#F8FAFC"><td>Horizonte</td><td>720 pasos de 5 s; factor de descuento γ = 0,99</td><td>1 episodio = 1 h simulada</td></tr>
+</table>
+<aside>[Expositor 1 · 1:00 · acumulado 3:00]
+Formalmente, el problema es un juego estocástico parcialmente observable: hay cuatro agentes, uno por intersección, y ninguno ve el estado completo de la red.
+Cada agente observa su propia intersección: qué fase tiene activa, si ya cumplió el verde mínimo, y la densidad y la cola de cada carril de entrada. La acción es elegir directamente cuál es la siguiente fase verde; si elige la misma, el verde continúa. La recompensa, que detallamos más adelante, premia que bajen la cola y la espera, y penaliza los cambios de fase.
+Las intersecciones tienen distinto número de carriles y de fases, así que las observaciones y las acciones tienen dimensiones distintas: por eso cada agente tiene su propia red y no comparten pesos. El estado global, que solo usa el crítico, es la concatenación de las cuatro observaciones. El horizonte es de 720 pasos, con factor de descuento 0,99.</aside>
+</section>
