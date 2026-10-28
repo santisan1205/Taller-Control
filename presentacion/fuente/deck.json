@@ -4,12 +4,12 @@
   "lists": "css",
   "title": "Control semafórico multiagente con RND-MAPPO",
   "cover": "cover",
-  "order": ["cover", "agenda", "escenario", "formulacion", "arquitectura", "recompensa", "entrenamiento", "curva", "resultados", "robustez", "intersecciones", "demo", "politica", "variantes", "conclusiones", "cierre"],
+  "order": ["cover", "agenda", "escenario", "formulacion", "arquitectura", "recompensa", "entrenamiento", "curva", "resultados", "robustez", "intersecciones", "demo", "politica", "variantes", "dashboard", "conclusiones", "cierre"],
   "sections": {
     "s1": {"description": "Portada, agenda y formulación del problema de control", "start": "cover"},
     "s2": {"description": "Arquitectura RND-MAPPO y configuración del entrenamiento", "start": "arquitectura"},
     "s3": {"description": "Resultados: aprendizaje, comparación con tiempo fijo, sensibilidad y demostración", "start": "curva"},
-    "s4": {"description": "Análisis de la política, variantes y conclusiones", "start": "politica"}
+    "s4": {"description": "Análisis de la política, variantes, dashboard y conclusiones", "start": "politica"}
   },
   "faces": {
     "plus-jakarta-sans": {"family": "Plus Jakarta Sans", "href": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap"},

@@ -4,13 +4,14 @@
 <p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0C1829">Control semafórico multiagente con RND-MAPPO</p>
 <h1 style="font-size:88px;font-weight:800;line-height:1.05;letter-spacing:-1px;color:#0C1829">Gracias. ¿Preguntas?</h1>
 <div style="height:16px"></div>
-<p style="font-size:28px;line-height:1.4;color:#0C1829">Tomás Castro Roa · [Integrante] · [Integrante] · [Integrante]</p>
+<p style="font-size:28px;line-height:1.4;color:#0C1829">Tomás Castro · Andrés Felipe Barbosa · Mariana Vanoy · Santiago Sánchez</p>
 <p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.4;color:#0C1829">github.com/santisan1205/Taller-Control</p>
-<aside>[Expositor 4 · 0:15 · acumulado 16:45]
+<aside>[Expositor 4 · 0:15 · acumulado 17:45]
 Muchas gracias. Quedamos atentos a sus preguntas.
 Preguntas probables y respuesta corta:
 ¿Por qué MAPPO y no un solo agente para toda la red? Un agente central tendría un espacio de acciones combinatorio (el producto de las fases de las cuatro intersecciones) y requeriría comunicación en operación. Con CTDE cada controlador decide localmente y el crítico central solo se usa al entrenar.
 ¿Por qué RND? Porque la recompensa diferencial es poco informativa al inicio; el bono de exploración evita converger temprano a una política subóptima. λ decae a 0 para que al final optimice solo el tráfico.
+¿Para qué sirve el dashboard? Para seguir entrenamiento y evaluación sin abrir los CSV: lee los archivos que genera exportar_datos.py. Hoy es un prototipo con valores ilustrativos.
 ¿Por qué muestrear y no usar argmax? Ver la diapositiva 13: con 100 episodios la distribución no es lo bastante concentrada y el argmax deja aproximaciones sin servicio.
 ¿Qué tan significativo es con 5 semillas? Usamos prueba t pareada: el agente y el tiempo fijo ven el mismo tráfico, lo que reduce la varianza; los p-valores están por debajo de 0,001.
 ¿Qué varía entre semillas de evaluación? La demanda está definida por archivos de rutas fijos; la semilla cambia el comportamiento estocástico de los conductores en SUMO. Por eso también evaluamos con tres niveles de demanda.
