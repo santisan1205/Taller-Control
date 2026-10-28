@@ -64,6 +64,7 @@ Hay que instalar tres cosas: SUMO, el código y las librerías de Python.
 | `--semilla` | Fija el azar del tráfico, para repetir la misma demo | `10` (por defecto) |
 | `--politica` | Qué modelo entrenado usar | `base` (por defecto, el mejor) |
 | `--reporte-cada` | Cada cuántos minutos simulados se imprime el marcador | `2` para una demo de 10 min |
+| `--sin-max-green` | No fuerza el verde máximo de 60 s, como en los resultados de la presentación | Opcional. Sin esta opción el verde máximo sí se aplica, y C4 cambia de fase al menos cada ~60 s |
 
 Duración aproximada: `--minutos 10 --delay 300` dura unos 3 minutos reales. Con `--delay 100` va unas 3 veces más rápido. Confírmalo en el ensayo, porque depende del computador.
 

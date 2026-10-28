@@ -4,3 +4,6 @@ __pycache__/
 # Archivos crudos por episodio de evaluacion (~100 MB, sobre todo tripinfo).
 # Se regeneran con evaluar_comparacion.py; lo consolidado vive en datos_dashboard/
 resultados_eval/episodios/
+
+# Igual que episodios/, con el verde maximo aplicado
+resultados_eval/episodios_max_green/

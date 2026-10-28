@@ -26,11 +26,12 @@
 </div>
 <div style="display:flex;flex-direction:column;gap:12px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:6px solid #B45309;border-radius:12px;padding:24px 32px">
 <h3 style="font-size:32px;font-weight:700;line-height:1.2;color:#0C1829">Nota sobre P = 2,0</h3>
-<p style="font-size:26px;line-height:1.4;color:#334155">El parámetro no llegó a la función de recompensa del entorno: esa corrida usó P = 0,5. Debe repetirse.</p>
+<p style="font-size:26px;line-height:1.4;color:#334155">El parámetro no llegó a la función de recompensa del entorno: esa corrida usó P = 0,5. Ya está corregido; falta repetirla.</p>
 </div>
 </div>
 <aside>[Expositor 4 · 1:00 · acumulado 15:30]
 Además de la configuración base, entrenamos cuatro variantes. Las dos primeras repiten la configuración con otra semilla de entrenamiento. Las dos reducen el tiempo de viaje con significancia, 12 y 13 %, pero su espera media es más variable: con algunas semillas de evaluación se acercan al tiempo fijo, y por eso la reducción de espera no es significativa en esas corridas. La corrida base es la más estable.
 Con tasas de aprendizaje tres veces menores y solo 50 episodios, el agente no alcanza a converger y queda 42 % peor que el tiempo fijo.
-Sobre la variante de penalización: la intención era subir P de 0,5 a 2,0. Al revisar el código encontramos que el parámetro se pasa al calculador de la recompensa total, pero la recompensa extrínseca se calcula dentro del entorno con los valores por defecto. Esa corrida se entrenó en la práctica con P igual a 0,5, es decir, equivale a la base con 50 episodios. Hay que corregir el código y repetirla antes de sacar conclusiones sobre la penalización.</aside>
+Sobre la variante de penalización: la intención era subir P de 0,5 a 2,0. Al revisar el código encontramos que el parámetro se pasa al calculador de la recompensa total, pero la recompensa extrínseca se calcula dentro del entorno con los valores por defecto. Esa corrida se entrenó en la práctica con P igual a 0,5, es decir, equivale a la base con 50 episodios. Ya corregimos el código; falta repetir esa corrida antes de sacar conclusiones sobre la penalización.
+Si preguntan por otras corridas: el equipo entrenó dos más de 50 episodios. Con mayor coeficiente de entropía (más exploración), la espera baja 9 %, sin significancia, y el tiempo de viaje baja 7 %. La que buscaba priorizar la espera tuvo el mismo problema de los pesos, así que también equivale a la configuración por defecto.</aside>
 </section>

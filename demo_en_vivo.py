@@ -39,14 +39,14 @@ def _enfocar_cruces(sumo, margen=120):
         pass  # si el ID del cruce no es un junction, se deja la vista por defecto
 
 
-def _simular(modo, politica, semilla, escala, pasos, delay, ventana, cola, cada_pasos):
+def _simular(modo, politica, semilla, escala, pasos, delay, ventana, cola, cada_pasos, max_green=True):
     x, y, ancho, alto = ventana
     warnings.filterwarnings('ignore')  # avisos de PettingZoo que ensucian el marcador
     cmd = (f'--window-pos {x},{y} --window-size {ancho},{alto} --delay {delay} --scale {escala:g} '
            f'--no-step-log --no-warnings')
     fijo = modo == 'fijo'
     env = crear_entorno_sumo(RED_XML, RUTAS_XML, use_gui=True, sumo_seed=semilla, out_csv_name=None,
-                             fixed_ts=fijo, additional_sumo_cmd=cmd)
+                             fixed_ts=fijo, additional_sumo_cmd=cmd, aplicar_max_green=max_green)
     obs, _ = env.reset()
     _enfocar_cruces(env.unwrapped.env.sumo)
 
@@ -97,6 +97,8 @@ def main():
     parser.add_argument('--minutos', type=float, default=60, help='Minutos simulados (máx. 60)')
     parser.add_argument('--delay', type=int, default=20, help='ms de pausa por paso de SUMO en la GUI (0 = máxima velocidad)')
     parser.add_argument('--reporte-cada', type=float, default=5, help='Minutos simulados entre líneas del marcador')
+    parser.add_argument('--sin-max-green', action='store_true',
+                        help='No forzar el verde máximo (como en los resultados de la presentación)')
     args = parser.parse_args()
 
     pasos = int(min(args.minutos, 60) * 60 / DELTA_TIME)
@@ -107,7 +109,8 @@ def main():
 
     cola = mp.Queue()
     procesos = [mp.Process(target=_simular, args=(modo, args.politica, args.semilla, args.escala, pasos,
-                                                  args.delay, ventanas[modo], cola, cada_pasos))
+                                                  args.delay, ventanas[modo], cola, cada_pasos,
+                                                  not args.sin_max_green))
                 for modo in ('fijo', 'rl')]
     for p in procesos:
         p.start()

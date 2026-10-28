@@ -18,6 +18,8 @@ CORRIDAS = {
     'seed2': os.path.join(CARPETA_RESULTADOS, 'seed2'),
     'lr_conservador': os.path.join(CARPETA_RESULTADOS, 'lr_conservador'),
     'penaliza_cambio': os.path.join(CARPETA_RESULTADOS, 'penaliza_cambio'),
+    'mas_exploracion': os.path.join(CARPETA_RESULTADOS, 'mas_exploracion'),
+    'prioriza_espera': os.path.join(CARPETA_RESULTADOS, 'prioriza_espera'),
 }
 
 # Un episodio real tiene ~720 filas; el CSV del reset() inicial tiene solo 1

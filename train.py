@@ -26,7 +26,7 @@ def obtener_estado_global(obs_dict, agents):
 def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=None,
           lr_actor=3e-4, lr_critic=1e-3, clip_ratio=0.2, entropy_coef=0.01, ppo_epochs=4,
           gamma=0.99, lam=0.95, rnd_lr=1e-4,
-          w1=1.0, w2=1.0, w3=2.0, p_cambio=0.5):
+          w1=1.0, w2=1.0, w3=2.0, p_cambio=0.5, aplicar_max_green=True):
     # Semilla: fija la inicialización de las redes (torch) y la demanda de trafico
     # (sumo_seed), para poder reproducir una corrida y comparar varias semillas.
     # tag: etiqueta libre para distinguir en disco una corrida con hiperparámetros
@@ -66,6 +66,7 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
             'entropy_coef': entropy_coef, 'ppo_epochs': ppo_epochs,
             'gamma': gamma, 'lam': lam, 'rnd_lr': rnd_lr,
             'w1': w1, 'w2': w2, 'w3': w3, 'p_cambio': p_cambio,
+            'aplicar_max_green': aplicar_max_green,
         }, f, indent=2)
 
     # 1. Inicialización del Entorno con el escenario SUMO real (sector de Bogotá modelado)
@@ -74,7 +75,10 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
         os.path.join(CARPETA_SUMO, 'rutas_aleatorias.rou.xml'),
         os.path.join(CARPETA_SUMO, 'flujos_especificos.rou.xml'),
     ])
-    env = crear_entorno_sumo(RED_XML, RUTAS_XML, use_gui=use_gui, sumo_seed=sumo_seed, out_csv_name=out_csv_name)
+    # Los pesos de R_ext se pasan al entorno, que es donde sumo-rl calcula la recompensa
+    reward_calc = RewardCalculator(w1=w1, w2=w2, w3=w3, p_cambio=p_cambio)
+    env = crear_entorno_sumo(RED_XML, RUTAS_XML, use_gui=use_gui, sumo_seed=sumo_seed, out_csv_name=out_csv_name,
+                             reward_calc=reward_calc, aplicar_max_green=aplicar_max_green)
 
     obs_iniciales, _ = env.reset()
     agentes = env.agents
@@ -101,7 +105,6 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
     # Un buffer y un módulo RND por agente para rastrear la curiosidad local
     buffers = {agent: RolloutBuffer() for agent in agentes}
     rnd_modules = {agent: RNDModule(obs_dims[agent], lr=rnd_lr) for agent in agentes}
-    reward_calc = RewardCalculator(w1=w1, w2=w2, w3=w3, p_cambio=p_cambio)
     
     # Hiperparámetros de entrenamiento
     EPISODIOS = episodios
@@ -268,6 +271,8 @@ if __name__ == '__main__':
     parser.add_argument('--w2', type=float, default=1.0, help='Peso de Δespera vehicular')
     parser.add_argument('--w3', type=float, default=2.0, help='Peso de Δespera peatonal (inerte: sin peatones en el escenario)')
     parser.add_argument('--p-cambio', type=float, default=0.5, help='Penalizacion por cambiar de fase')
+    parser.add_argument('--sin-max-green', action='store_true',
+                        help='No forzar el verde maximo de 60 s (comportamiento de las corridas anteriores)')
     args = parser.parse_args()
 
     train(episodios=args.episodios, pasos_por_episodio=args.pasos, use_gui=args.gui,
@@ -275,4 +280,5 @@ if __name__ == '__main__':
           lr_actor=args.lr_actor, lr_critic=args.lr_critic, clip_ratio=args.clip_ratio,
           entropy_coef=args.entropy_coef, ppo_epochs=args.ppo_epochs,
           gamma=args.gamma, lam=args.lam, rnd_lr=args.rnd_lr,
-          w1=args.w1, w2=args.w2, w3=args.w3, p_cambio=args.p_cambio)
+          w1=args.w1, w2=args.w2, w3=args.w3, p_cambio=args.p_cambio,
+          aplicar_max_green=not args.sin_max_green)

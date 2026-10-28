@@ -16,7 +16,7 @@ import pandas as pd
 from scipy import stats
 
 from analizar_resultados import CORRIDAS, cargar_todas_las_corridas
-from evaluar_comparacion import CARPETA_EPISODIOS, resumir_episodio
+from evaluar_comparacion import carpeta_episodios, resumir_episodio
 from setup_entorno import CRUCES
 
 CARPETA_SALIDA = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datos_dashboard')
@@ -58,8 +58,15 @@ CORRIDAS_HISTORICAS = {
     'seed2': {'episodios': 100, 'seed': 2, 'notas': 'Misma config que base, semilla 2'},
     'lr_conservador': {'episodios': 50, 'seed': None, 'lr_actor': 1e-4, 'lr_critic': 3e-4,
                        'notas': 'Learning rates 3x mas lentos'},
-    'penaliza_cambio': {'episodios': 50, 'seed': None, 'p_cambio': 2.0,
-                        'notas': 'Penalizacion por cambio de fase 4x mayor (2.0 vs 0.5)'},
+    # train.py no pasaba w1/w2/w3/p_cambio al entorno: estas corridas se
+    # entrenaron con los pesos por defecto aunque se pidieran otros
+    'penaliza_cambio': {'episodios': 50, 'seed': None,
+                        'notas': 'Se pidio p_cambio = 2.0, pero no llego al entorno: entreno con 0.5'},
+    'mas_exploracion': {'episodios': 50, 'seed': None, 'entropy_coef': np.nan,
+                        'notas': 'Mayor coeficiente de entropia (valor por confirmar)'},
+    'prioriza_espera': {'episodios': 50, 'seed': None,
+                        'notas': 'Se pidieron otros pesos de recompensa (por confirmar), pero no llegaron '
+                                 'al entorno: entreno con los pesos por defecto'},
 }
 
 
@@ -76,10 +83,10 @@ def exportar_corridas():
     return pd.DataFrame(filas)
 
 
-def _episodios_evaluados():
+def _episodios_evaluados(carpeta):
     """(politica, modo, semilla, escala, prefijo) de cada episodio de evaluación en disco."""
     episodios = []
-    for ruta in sorted(glob.glob(os.path.join(CARPETA_EPISODIOS, '*.pasos.csv'))):
+    for ruta in sorted(glob.glob(os.path.join(carpeta, '*.pasos.csv'))):
         prefijo = ruta[:-len('.pasos.csv')]
         m = re.fullmatch(r'(.+)__(.+)__s(\d+)__x([\d.]+)', os.path.basename(prefijo))
         if m:
@@ -87,9 +94,9 @@ def _episodios_evaluados():
     return episodios
 
 
-def exportar_evaluacion():
+def exportar_evaluacion(carpeta):
     detalle, por_cruce, series = [], [], []
-    for politica, modo, semilla, escala, prefijo in _episodios_evaluados():
+    for politica, modo, semilla, escala, prefijo in _episodios_evaluados(carpeta):
         claves = {'politica': politica, 'modo': modo, 'semilla': semilla, 'escala': escala}
         fila, cruces = resumir_episodio(prefijo)
         detalle.append({**claves, **fila})
@@ -141,25 +148,28 @@ def resumir_contra_fijo(detalle):
     return pd.DataFrame(filas)
 
 
-def main():
-    os.makedirs(CARPETA_SALIDA, exist_ok=True)
+def main(max_green=False):
+    # Por defecto se exporta la evaluación reportada (sin verde máximo) a
+    # datos_dashboard/; con max_green, la evaluación corregida a datos_dashboard/max_green/
+    salida = os.path.join(CARPETA_SALIDA, 'max_green') if max_green else CARPETA_SALIDA
+    os.makedirs(salida, exist_ok=True)
 
     entrenamiento = cargar_todas_las_corridas()
-    entrenamiento.to_csv(os.path.join(CARPETA_SALIDA, 'entrenamiento_episodios.csv'), index=False)
-    exportar_corridas().to_csv(os.path.join(CARPETA_SALIDA, 'corridas.csv'), index=False)
+    entrenamiento.to_csv(os.path.join(salida, 'entrenamiento_episodios.csv'), index=False)
+    exportar_corridas().to_csv(os.path.join(salida, 'corridas.csv'), index=False)
 
-    detalle, por_cruce, series = exportar_evaluacion()
-    detalle.to_csv(os.path.join(CARPETA_SALIDA, 'evaluacion_detalle.csv'), index=False)
-    por_cruce.to_csv(os.path.join(CARPETA_SALIDA, 'evaluacion_por_cruce.csv'), index=False)
-    series.to_csv(os.path.join(CARPETA_SALIDA, 'evaluacion_series_tiempo.csv'), index=False)
+    detalle, por_cruce, series = exportar_evaluacion(carpeta_episodios(max_green))
+    detalle.to_csv(os.path.join(salida, 'evaluacion_detalle.csv'), index=False)
+    por_cruce.to_csv(os.path.join(salida, 'evaluacion_por_cruce.csv'), index=False)
+    series.to_csv(os.path.join(salida, 'evaluacion_series_tiempo.csv'), index=False)
     resumen = resumir_contra_fijo(detalle)
-    resumen.to_csv(os.path.join(CARPETA_SALIDA, 'evaluacion_resumen.csv'), index=False)
+    resumen.to_csv(os.path.join(salida, 'evaluacion_resumen.csv'), index=False)
 
     pd.DataFrame(
         [{'cruce': cruce, 'id_sumo': ts} for ts, cruce in CRUCES.items()]
-    ).to_csv(os.path.join(CARPETA_SALIDA, 'cruces.csv'), index=False)
+    ).to_csv(os.path.join(salida, 'cruces.csv'), index=False)
 
-    print(f'Datos exportados en {CARPETA_SALIDA}:')
+    print(f'Datos exportados en {salida}:')
     for nombre, df in [('entrenamiento_episodios', entrenamiento), ('evaluacion_detalle', detalle),
                        ('evaluacion_por_cruce', por_cruce), ('evaluacion_series_tiempo', series),
                        ('evaluacion_resumen', resumen)]:
@@ -167,4 +177,9 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Consolida los resultados en datos_dashboard/.')
+    parser.add_argument('--max-green', action='store_true',
+                        help='Exporta la evaluación con verde máximo aplicado (a datos_dashboard/max_green/)')
+    main(max_green=parser.parse_args().max_green)

@@ -24,6 +24,13 @@ CARPETA_EVAL = os.path.join(RAIZ, 'resultados_eval')
 # Un juego de archivos por episodio de evaluación (paso a paso, tripinfo,
 # estadísticas de SUMO y control semafórico); exportar_datos.py los consolida
 CARPETA_EPISODIOS = os.path.join(CARPETA_EVAL, 'episodios')
+# Los episodios con el verde máximo aplicado van aparte: los de 'episodios' son
+# los reportados hasta ahora, evaluados sin él (sumo-rl no lo aplicaba)
+CARPETA_EPISODIOS_MAX_GREEN = os.path.join(CARPETA_EVAL, 'episodios_max_green')
+
+
+def carpeta_episodios(max_green):
+    return CARPETA_EPISODIOS_MAX_GREEN if max_green else CARPETA_EPISODIOS
 
 # Políticas entrenadas disponibles -> sufijo de sus .pth
 POLITICAS = {
@@ -32,6 +39,8 @@ POLITICAS = {
     'seed2': '_seed2',
     'lr_conservador': '_lr_conservador',
     'penaliza_cambio': '_penaliza_cambio',
+    'mas_exploracion': '_mas_exploracion',
+    'prioriza_espera': '_prioriza_espera',
 }
 
 DELTA_TIME = 5  # segundos simulados por paso del agente (igual que en setup_entorno)
@@ -48,8 +57,8 @@ def _cargar_actores(sufijo_pesos, agentes, obs_dims, action_dims):
     return actores
 
 
-def prefijo_episodio(politica, modo, semilla, escala):
-    return os.path.join(CARPETA_EPISODIOS, f'{politica}__{modo}__s{semilla}__x{escala:g}')
+def prefijo_episodio(politica, modo, semilla, escala, max_green=False):
+    return os.path.join(carpeta_episodios(max_green), f'{politica}__{modo}__s{semilla}__x{escala:g}')
 
 
 def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False, al_paso=None):
@@ -125,19 +134,19 @@ def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False, al_
     return metricas, pd.DataFrame(control)
 
 
-def correr_trabajo(politica, modo, semilla, escala, pasos, forzar=False):
+def correr_trabajo(politica, modo, semilla, escala, pasos, forzar=False, max_green=True):
     """
     Corre un episodio de evaluación y deja sus archivos en CARPETA_EPISODIOS.
     Si ya existen (y no se pide forzar) no se vuelve a simular, para poder
     retomar una evaluación larga que se interrumpió.
     """
     torch.set_num_threads(1)  # varios episodios corren en paralelo
-    prefijo = prefijo_episodio(politica, modo, semilla, escala)
+    prefijo = prefijo_episodio(politica, modo, semilla, escala, max_green)
     archivos = [f'{prefijo}.pasos.csv', f'{prefijo}.tripinfo.xml', f'{prefijo}.stats.xml', f'{prefijo}.control.csv']
     if not forzar and all(os.path.exists(a) for a in archivos):
         return prefijo, 'cache'
 
-    os.makedirs(CARPETA_EPISODIOS, exist_ok=True)
+    os.makedirs(carpeta_episodios(max_green), exist_ok=True)
     if ' ' in prefijo:
         raise ValueError(f'sumo-rl separa additional_sumo_cmd por espacios; la ruta no puede tenerlos: {prefijo}')
     cmd = (f'--tripinfo-output {prefijo}.tripinfo.xml --tripinfo-output.write-unfinished '
@@ -146,7 +155,7 @@ def correr_trabajo(politica, modo, semilla, escala, pasos, forzar=False):
 
     fijo = modo == 'tiempo_fijo'
     env = crear_entorno_sumo(RED_XML, RUTAS_XML, use_gui=False, sumo_seed=semilla, out_csv_name=None,
-                             fixed_ts=fijo, additional_sumo_cmd=cmd)
+                             fixed_ts=fijo, additional_sumo_cmd=cmd, aplicar_max_green=max_green)
     obs, _ = env.reset()
     actores = None
     if not fijo:
@@ -249,18 +258,19 @@ def trabajos_evaluacion(politicas, semillas, escalas, determinista=False):
 
 
 def evaluar(politicas, semillas=(10, 20, 30, 40, 50), escalas=(0.8, 1.0, 1.2), pasos=720,
-            determinista=False, procesos=4, forzar=False):
+            determinista=False, procesos=4, forzar=False, max_green=True):
     trabajos = trabajos_evaluacion(politicas, semillas, escalas, determinista)
-    print(f'{len(trabajos)} episodios de evaluación, {procesos} en paralelo')
+    print(f'{len(trabajos)} episodios de evaluación, {procesos} en paralelo, '
+          f'verde máximo {"aplicado" if max_green else "sin aplicar"}')
     with ProcessPoolExecutor(max_workers=procesos) as pool:
-        futuros = {pool.submit(correr_trabajo, *t, pasos, forzar): t for t in trabajos}
+        futuros = {pool.submit(correr_trabajo, *t, pasos, forzar, max_green): t for t in trabajos}
         for i, futuro in enumerate(as_completed(futuros), 1):
             prefijo, estado = futuro.result()
             print(f'  [{i}/{len(trabajos)}] {os.path.basename(prefijo)} ({estado})')
 
     filas = []
     for politica, modo, semilla, escala in trabajos:
-        fila, _ = resumir_episodio(prefijo_episodio(politica, modo, semilla, escala))
+        fila, _ = resumir_episodio(prefijo_episodio(politica, modo, semilla, escala, max_green))
         filas.append({'politica': politica, 'modo': modo, 'semilla': semilla, 'escala': escala, **fila})
     # El detalle completo (todas las corridas de evaluación en disco) lo
     # consolida exportar_datos.py en datos_dashboard/
@@ -269,14 +279,15 @@ def evaluar(politicas, semillas=(10, 20, 30, 40, 50), escalas=(0.8, 1.0, 1.2), p
     # Resumen con el formato anterior (escala 1.0, 3 métricas) por política,
     # para no romper lo que ya consumía resumen_<etiqueta>.csv
     fijo = detalle[(detalle['modo'] == 'tiempo_fijo') & (detalle['escala'] == 1.0)].assign(modo='tiempo_fijo')
+    sufijo = '_max_green' if max_green else ''
     for politica in politicas:
         rl = detalle[(detalle['politica'] == politica) & (detalle['modo'] == 'rnd_mappo') & (detalle['escala'] == 1.0)]
         if rl.empty:
             continue
         resumen = pd.concat([fijo, rl])[['semilla', 'modo', 'espera_media', 'vehiculos_detenidos_media', 'velocidad_media']]
         resumen = resumen.sort_values(['semilla', 'modo'], ascending=[True, False])
-        resumen.to_csv(os.path.join(CARPETA_EVAL, f'resumen_{politica}.csv'), index=False)
-        graficar(resumen, salida=f'comparacion_fijo_vs_rl_{politica}.png')
+        resumen.to_csv(os.path.join(CARPETA_EVAL, f'resumen_{politica}{sufijo}.csv'), index=False)
+        graficar(resumen, salida=f'comparacion_fijo_vs_rl_{politica}{sufijo}.png')
     return detalle
 
 
@@ -312,10 +323,13 @@ if __name__ == '__main__':
     parser.add_argument('--determinista', action='store_true', help='Evalua tambien la politica greedy (argmax)')
     parser.add_argument('--procesos', type=int, default=4, help='Episodios de SUMO en paralelo')
     parser.add_argument('--forzar', action='store_true', help='Re-simula aunque ya existan los archivos del episodio')
+    parser.add_argument('--sin-max-green', action='store_true',
+                        help='No forzar el verde maximo (reproduce los resultados reportados antes de la correccion)')
     args = parser.parse_args()
 
     detalle = evaluar(args.politicas, semillas=args.semillas, escalas=args.escalas, pasos=args.pasos,
-                      determinista=args.determinista, procesos=args.procesos, forzar=args.forzar)
+                      determinista=args.determinista, procesos=args.procesos, forzar=args.forzar,
+                      max_green=not args.sin_max_green)
     print()
     print(detalle.groupby(['escala', 'politica', 'modo'])[
         ['espera_media', 'tiempo_viaje_medio', 'perdida_tiempo_media', 'viajes_completados', 'co2_total_kg']

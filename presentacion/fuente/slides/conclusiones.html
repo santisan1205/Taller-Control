@@ -29,7 +29,7 @@
 </div>
 </div>
 <div style="display:flex;background:#0C1829;border-radius:12px;padding:24px 32px">
-<p style="font-size:26px;line-height:1.4;color:#E2E8F0"><span style="color:#FFD100"><b>Trabajo futuro:</b></span> aplicar el verde máximo y repetir la variante P = 2,0; simular la hora pico (flujos desde 5000 s); estabilizar el entrenamiento entre semillas; incluir peatones.</p>
+<p style="font-size:26px;line-height:1.4;color:#E2E8F0"><span style="color:#FFD100"><b>Verificado:</b></span> con el verde máximo de 60 s aplicado, la espera sigue bajando 49 % (p &lt; 0,001). <span style="color:#FFD100"><b>Trabajo futuro:</b></span> repetir P = 2,0, hora pico, estabilidad entre semillas y peatones.</p>
 </div>
 <aside>[Expositor 4 · 1:00 · acumulado 17:30]
 Para cerrar, cuatro conclusiones.
@@ -37,5 +37,6 @@ Primera: con entrenamiento centralizado y ejecución descentralizada, los cuatro
 Segunda: frente al tiempo fijo, la espera baja 49 %, el tiempo perdido por viaje 35 % y el CO₂ 12 %, con la mitad de cambios de fase. Todo significativo.
 Tercera: la mejora se mantiene con 20 % más o menos demanda sin reentrenar.
 Cuarta: la evaluación necesita varias métricas; las métricas por viaje, solas, pueden ocultar vehículos retenidos, como vimos con la política greedy.
-Como trabajo futuro: aplicar el verde máximo en el entorno, que hoy sumo-rl no impone, y corregir el paso de los pesos de la recompensa para repetir la variante con P igual a 2; simular la hora pico, que en el escenario empieza a los 5.000 segundos y queda fuera de nuestro episodio de 3.600; estabilizar el entrenamiento entre semillas, y agregar peatones.</aside>
+Además, ya corregimos en el código el verde máximo, que sumo-rl no aplicaba, y reevaluamos la misma política con el límite de 60 segundos: la espera sigue bajando 49 %, el tiempo perdido 34 % y el CO₂ 12 %, todo con p menor a 0,001. Es decir, el resultado no dependía de violar esa restricción.
+Como trabajo futuro: repetir la variante con P igual a 2, ahora que los pesos de la recompensa sí llegan al entorno; simular la hora pico, que en el escenario empieza a los 5.000 segundos y queda fuera de nuestro episodio de 3.600; estabilizar el entrenamiento entre semillas, y agregar peatones.</aside>
 </section>

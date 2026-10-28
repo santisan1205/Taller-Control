@@ -25,10 +25,10 @@
 </div>
 <div style="display:flex;flex-direction:column;gap:12px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:6px solid #FFD100;border-radius:12px;padding:28px 36px">
 <h3 style="font-size:32px;font-weight:700;line-height:1.2;color:#0C1829">C4 mantiene una sola fase</h3>
-<p style="font-size:26px;line-height:1.4;color:#334155">Verde medio de 3120 s con espera nula: la demanda transversal es casi inexistente, y sumo-rl no aplica el verde máximo.</p>
+<p style="font-size:26px;line-height:1.4;color:#334155">Verde medio de 3120 s con espera nula: casi no hay demanda transversal. Con el verde máximo aplicado: 84 cambios/h.</p>
 </div>
 </div>
 <aside>[Expositor 3 · 0:45 · acumulado 10:15]
 Desagregando por intersección: la congestión está en C2 y C3. Ahí la espera acumulada en los carriles de entrada baja 51 y 66 %. El patrón de control cambia: el tiempo fijo cambia de fase cada 10 a 14 segundos en promedio, y el agente sostiene el verde unos 20 segundos, con la mitad de cambios. Es decir, aprende a servir más tiempo la dirección con cola, en lugar de alternar por reloj.
-C4 es un caso particular: el agente prácticamente no cambia de fase en toda la hora, con un verde medio de 3.120 segundos, y aun así la espera ahí es cero. Eso indica que la vía transversal de C4 casi no tiene demanda en este escenario. Hay que tener cuidado con esto: como mencionamos, sumo-rl no aplica el verde máximo, y en un semáforo real esta política sería inaceptable si llega un vehículo por la transversal. Lo dejamos como trabajo futuro.</aside>
+C4 es un caso particular: el agente prácticamente no cambia de fase en toda la hora, con un verde medio de 3.120 segundos, y aun así la espera ahí es cero. Eso indica que la vía transversal de C4 casi no tiene demanda en este escenario. Hay que tener cuidado con esto: como mencionamos, sumo-rl no aplica el verde máximo, y en un semáforo real esta política sería inaceptable si llega un vehículo por la transversal. Por eso corregimos el código para aplicar el verde máximo de 60 segundos: con esa corrección, C4 cambia de fase 84 veces por hora, con verdes de unos 42 segundos, y su espera sigue cerca de cero.</aside>
 </section>

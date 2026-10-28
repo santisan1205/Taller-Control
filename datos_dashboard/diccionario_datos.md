@@ -4,11 +4,17 @@ Todos los CSV se generan con `python exportar_datos.py` (después de `train.py` 
 
 Formato: separador `,`, decimales con `.`, UTF-8, una fila por observación (formato largo, listo para filtrar y agrupar).
 
+**Dos versiones de la evaluación:**
+- **`datos_dashboard/`** (`python exportar_datos.py`): los resultados de la presentación, evaluados **sin** verde máximo. sumo-rl 1.4.5 no aplicaba el límite de 60 s.
+- **`datos_dashboard/max_green/`** (`python exportar_datos.py --max-green`): los mismos archivos, con las mismas columnas, evaluados **con** el verde máximo de 60 s aplicado, que es el comportamiento corregido.
+
+Los archivos de entrenamiento (`entrenamiento_episodios.csv`, `corridas.csv`) son iguales en las dos carpetas.
+
 ## Conceptos
 
 | Término | Significado |
 |---|---|
-| **corrida** | Un entrenamiento completo con una configuración de hiperparámetros (`base`, `seed1`, `seed2`, `lr_conservador`, `penaliza_cambio`). Ver `corridas.csv`. |
+| **corrida** | Un entrenamiento completo con una configuración de hiperparámetros (`base`, `seed1`, `seed2`, `lr_conservador`, `penaliza_cambio`, `mas_exploracion`, `prioriza_espera`). Ver `corridas.csv`. Ojo: en `penaliza_cambio` y `prioriza_espera` los pesos de recompensa pedidos no llegaron al entorno (error ya corregido), así que entrenaron con los pesos por defecto. |
 | **politica** | El modelo entrenado que se evalúa (mismo nombre que la corrida que lo produjo). `fijo` = semáforos de tiempo fijo originales (la línea base). |
 | **modo** | `tiempo_fijo` (línea base), `rnd_mappo` (agente, acciones muestreadas de la política: es el modo oficial) o `rnd_mappo_greedy` (agente, siempre la acción más probable: solo como referencia). |
 | **semilla** | Semilla de SUMO de la evaluación (10, 20, 30, 40, 50). Cambia la aleatoriedad de los conductores; la demanda (rutas) es la misma. Agente y tiempo fijo con la misma semilla y escala ven exactamente el mismo tráfico, así que son comparaciones **pareadas**. |

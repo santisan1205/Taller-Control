@@ -3,4 +3,6 @@ base,0.0003,0.001,0.2,0.01,4,0.99,0.95,0.0001,1.0,1.0,2.0,0.5,100,,"Corrida orig
 seed1,0.0003,0.001,0.2,0.01,4,0.99,0.95,0.0001,1.0,1.0,2.0,0.5,100,1.0,"Misma config que base, semilla 1"
 seed2,0.0003,0.001,0.2,0.01,4,0.99,0.95,0.0001,1.0,1.0,2.0,0.5,100,2.0,"Misma config que base, semilla 2"
 lr_conservador,0.0001,0.0003,0.2,0.01,4,0.99,0.95,0.0001,1.0,1.0,2.0,0.5,50,,Learning rates 3x mas lentos
-penaliza_cambio,0.0003,0.001,0.2,0.01,4,0.99,0.95,0.0001,1.0,1.0,2.0,2.0,50,,Penalizacion por cambio de fase 4x mayor (2.0 vs 0.5)
+penaliza_cambio,0.0003,0.001,0.2,0.01,4,0.99,0.95,0.0001,1.0,1.0,2.0,0.5,50,,"Se pidio p_cambio = 2.0, pero no llego al entorno: entreno con 0.5"
+mas_exploracion,0.0003,0.001,0.2,,4,0.99,0.95,0.0001,1.0,1.0,2.0,0.5,50,,Mayor coeficiente de entropia (valor por confirmar)
+prioriza_espera,0.0003,0.001,0.2,0.01,4,0.99,0.95,0.0001,1.0,1.0,2.0,0.5,50,,"Se pidieron otros pesos de recompensa (por confirmar), pero no llegaron al entorno: entreno con los pesos por defecto"
