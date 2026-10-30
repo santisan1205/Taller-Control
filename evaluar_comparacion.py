@@ -10,14 +10,11 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from setup_entorno import crear_entorno_sumo, CARPETA_SUMO, CRUCES
+from setup_entorno import crear_entorno_sumo, CRUCES, RED_XML, rutas_demanda, VENTANAS
 from modelo_red_rl import MAPPOActor
+from lineas_base import MaxPresion, generar_programas_actuados
 
-RED_XML = os.path.join(CARPETA_SUMO, 'Config_actualizado.net.xml')
-RUTAS_XML = ','.join([
-    os.path.join(CARPETA_SUMO, 'rutas_aleatorias.rou.xml'),
-    os.path.join(CARPETA_SUMO, 'flujos_especificos.rou.xml'),
-])
+RUTAS_XML = rutas_demanda(peatones=False)  # demanda del entorno v1 (la usa demo_en_vivo.py)
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
 CARPETA_EVAL = os.path.join(RAIZ, 'resultados_eval')
@@ -27,13 +24,18 @@ CARPETA_EPISODIOS = os.path.join(CARPETA_EVAL, 'episodios')
 # Los episodios con el verde máximo aplicado van aparte: los de 'episodios' son
 # los reportados hasta ahora, evaluados sin él (sumo-rl no lo aplicaba)
 CARPETA_EPISODIOS_MAX_GREEN = os.path.join(CARPETA_EVAL, 'episodios_max_green')
+# Entorno v2 (peatones en C1/C4, ventanas valle y pico): siempre con verde máximo
+CARPETA_EPISODIOS_V2 = os.path.join(CARPETA_EVAL, 'episodios_v2')
+ARCHIVO_ACTUADO = os.path.join(CARPETA_EVAL, 'actuado.add.xml')
 
 
-def carpeta_episodios(max_green):
+def carpeta_episodios(max_green, entorno='v1'):
+    if entorno == 'v2':
+        return CARPETA_EPISODIOS_V2
     return CARPETA_EPISODIOS_MAX_GREEN if max_green else CARPETA_EPISODIOS
 
 # Políticas entrenadas disponibles -> sufijo de sus .pth
-POLITICAS = {
+POLITICAS_V1 = {
     'base': '',
     'seed1': '_seed1',
     'seed2': '_seed2',
@@ -42,6 +44,15 @@ POLITICAS = {
     'mas_exploracion': '_mas_exploracion',
     'prioriza_espera': '_prioriza_espera',
 }
+# Campaña v2: cada configuración con 3 semillas de entrenamiento (train.py --tag <config> --seed <s>)
+CONFIGS_V2 = ['v2_base', 'v2_penaliza_cambio', 'v2_prioriza_espera', 'v2_peatones_alto',
+              'v2_mas_exploracion', 'v2_sin_rnd']
+SEMILLAS_ENTRENAMIENTO_V2 = [0, 1, 2]
+POLITICAS_V2 = {f'{c}_seed{s}': f'_{c}_seed{s}' for c in CONFIGS_V2 for s in SEMILLAS_ENTRENAMIENTO_V2}
+POLITICAS = {**POLITICAS_V1, **POLITICAS_V2}
+
+# Controladores que no se entrenan: el modo coincide con el nombre de la "política"
+LINEAS_BASE = {'tiempo_fijo': 'fijo', 'actuado': 'actuado', 'max_pressure': 'max_pressure'}
 
 DELTA_TIME = 5  # segundos simulados por paso del agente (igual que en setup_entorno)
 
@@ -57,17 +68,21 @@ def _cargar_actores(sufijo_pesos, agentes, obs_dims, action_dims):
     return actores
 
 
-def prefijo_episodio(politica, modo, semilla, escala, max_green=False):
-    return os.path.join(carpeta_episodios(max_green), f'{politica}__{modo}__s{semilla}__x{escala:g}')
+def prefijo_episodio(politica, modo, semilla, escala, max_green=False, entorno='v1', ventana='valle'):
+    # En v1 solo existe la ventana valle y se conserva el nombre de siempre
+    # (así sirven los episodios ya simulados); en v2 la ventana va en el nombre
+    nombre = f'{politica}__{modo}__' + (f'{ventana}__' if entorno == 'v2' else '') + f's{semilla}__x{escala:g}'
+    return os.path.join(carpeta_episodios(max_green, entorno), nombre)
 
 
-def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False, al_paso=None):
+def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False, al_paso=None, politica_reglas=None):
     """
     Corre un episodio completo a partir de un env ya reseteado (obs_dict es el
     resultado de ese reset). Si actores es None, se pasan acciones dummy
     (fixed_ts=True hace que sumo-rl las ignore y deje correr los programas
     semaforicos originales). Si se da un dict de actores, se actua con la
-    politica entrenada. al_paso(env, paso), si se da, se llama después de cada
+    politica entrenada; si se da politica_reglas (p.ej. MaxPresion), se actua
+    con ella. al_paso(env, paso), si se da, se llama después de cada
     paso (lo usa la demo en vivo para su marcador). Devuelve las métricas paso
     a paso de sumo-rl y un resumen del control semafórico por cruce.
     """
@@ -82,6 +97,8 @@ def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False, al_
     for paso in range(pasos):
         acciones = {}
         for agent in env.agents:
+            if politica_reglas is not None:
+                continue  # decide todos los cruces a la vez, abajo
             if actores is None:
                 # fixed_ts=True hace que sumo-rl ignore este valor y deje correr
                 # el programa semaforico original; igual hay que mandar un valor
@@ -102,6 +119,8 @@ def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False, al_
                         # matar de inanicion a una direccion (waiting time se dispara).
                         accion, _ = actores[agent].get_action(obs_tensor)
                 acciones[agent] = accion
+        if politica_reglas is not None:
+            acciones = politica_reglas(obs_dict)
         obs_dict, _, terminations, truncations, _ = env.step(acciones)
 
         for ts in CRUCES:
@@ -134,38 +153,48 @@ def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False, al_
     return metricas, pd.DataFrame(control)
 
 
-def correr_trabajo(politica, modo, semilla, escala, pasos, forzar=False, max_green=True):
+def correr_trabajo(politica, modo, semilla, escala, ventana, pasos, forzar=False, max_green=True, entorno='v1'):
     """
-    Corre un episodio de evaluación y deja sus archivos en CARPETA_EPISODIOS.
-    Si ya existen (y no se pide forzar) no se vuelve a simular, para poder
-    retomar una evaluación larga que se interrumpió.
+    Corre un episodio de evaluación y deja sus archivos en la carpeta de
+    episodios del entorno. Si ya existen (y no se pide forzar) no se vuelve a
+    simular, para poder retomar una evaluación larga que se interrumpió.
     """
     torch.set_num_threads(1)  # varios episodios corren en paralelo
-    prefijo = prefijo_episodio(politica, modo, semilla, escala, max_green)
+    prefijo = prefijo_episodio(politica, modo, semilla, escala, max_green, entorno, ventana)
     archivos = [f'{prefijo}.pasos.csv', f'{prefijo}.tripinfo.xml', f'{prefijo}.stats.xml', f'{prefijo}.control.csv']
     if not forzar and all(os.path.exists(a) for a in archivos):
         return prefijo, 'cache'
 
-    os.makedirs(carpeta_episodios(max_green), exist_ok=True)
+    os.makedirs(carpeta_episodios(max_green, entorno), exist_ok=True)
     if ' ' in prefijo:
         raise ValueError(f'sumo-rl separa additional_sumo_cmd por espacios; la ruta no puede tenerlos: {prefijo}')
     cmd = (f'--tripinfo-output {prefijo}.tripinfo.xml --tripinfo-output.write-unfinished '
            f'--statistic-output {prefijo}.stats.xml --device.emissions.probability 1 '
            f'--scale {escala:g}')
+    if modo == 'actuado':
+        if not os.path.exists(ARCHIVO_ACTUADO):
+            generar_programas_actuados(ARCHIVO_ACTUADO)
+        cmd += f' --additional-files {ARCHIVO_ACTUADO}'
 
-    fijo = modo == 'tiempo_fijo'
-    env = crear_entorno_sumo(RED_XML, RUTAS_XML, use_gui=False, sumo_seed=semilla, out_csv_name=None,
-                             fixed_ts=fijo, additional_sumo_cmd=cmd, aplicar_max_green=max_green)
+    # Tiempo fijo y actuado: SUMO corre sus propios programas, sumo-rl no actúa
+    programa_sumo = modo in ('tiempo_fijo', 'actuado')
+    v2 = entorno == 'v2'
+    env = crear_entorno_sumo(RED_XML, rutas_demanda(peatones=v2), use_gui=False, sumo_seed=semilla,
+                             out_csv_name=None, fixed_ts=programa_sumo, additional_sumo_cmd=cmd,
+                             aplicar_max_green=max_green, peatones=v2, begin_time=VENTANAS[ventana])
     obs, _ = env.reset()
-    actores = None
-    if not fijo:
+    actores = politica_reglas = None
+    if modo == 'max_pressure':
+        politica_reglas = MaxPresion(env)
+    elif not programa_sumo:
         agentes = env.agents
         obs_dims = {a: env.observation_space(a).shape[0] for a in agentes}
         action_dims = {a: env.action_space(a).n for a in agentes}
         actores = _cargar_actores(POLITICAS[politica], agentes, obs_dims, action_dims)
         # Fija el muestreo de acciones para que la evaluación sea reproducible
         torch.manual_seed(semilla)
-    metricas, control = _correr_episodio(env, obs, pasos, actores=actores, determinista=(modo == 'rnd_mappo_greedy'))
+    metricas, control = _correr_episodio(env, obs, pasos, actores=actores, determinista=(modo == 'rnd_mappo_greedy'),
+                                         politica_reglas=politica_reglas)
     metricas.to_csv(f'{prefijo}.pasos.csv', index=False)
     control.to_csv(f'{prefijo}.control.csv', index=False)
     return prefijo, 'ok'
@@ -229,6 +258,27 @@ def resumir_episodio(prefijo, duracion_s=3600):
         'co2_g_por_km': (co2_mg / 1e3) / (distancia_m / 1e3) if distancia_m else np.nan,
     })
 
+    # Peatones (solo en el entorno v2): un personinfo por persona, con un único
+    # walk que cruza el paso peatonal de C1 o C4
+    peatones, peatones_sin_terminar = [], 0
+    for persona in ET.parse(f'{prefijo}.tripinfo.xml').getroot().iter('personinfo'):
+        caminata = persona.find('walk')
+        if caminata is None or float(caminata.get('arrival', -1)) < 0:
+            peatones_sin_terminar += 1
+            continue
+        peatones.append({k: float(caminata.get(k)) for k in ('duration', 'waitingTime', 'timeLoss')})
+    if peatones or peatones_sin_terminar:
+        caminatas = pd.DataFrame(peatones)
+        sin_datos = caminatas.empty
+        fila.update({
+            'peatones_completados': len(caminatas),
+            'peatones_sin_terminar': peatones_sin_terminar,
+            'peatones_tiempo_viaje_medio': np.nan if sin_datos else caminatas['duration'].mean(),
+            'peatones_espera_media': np.nan if sin_datos else caminatas['waitingTime'].mean(),
+            'peatones_espera_p95': np.nan if sin_datos else _percentil(caminatas['waitingTime'], 95),
+            'peatones_perdida_tiempo_media': np.nan if sin_datos else caminatas['timeLoss'].mean(),
+        })
+
     control = pd.read_csv(f'{prefijo}.control.csv')
     fila['cambios_fase_total'] = control['cambios_fase'].sum()
 
@@ -248,33 +298,47 @@ def resumir_episodio(prefijo, duracion_s=3600):
     return fila, por_cruce
 
 
-def trabajos_evaluacion(politicas, semillas, escalas, determinista=False):
-    """Lista de episodios a correr. El tiempo fijo se corre una sola vez por
-    semilla x escala y sirve de referencia para todas las políticas."""
-    trabajos = [('fijo', 'tiempo_fijo', s, e) for e in escalas for s in semillas]
+def trabajos_evaluacion(politicas, semillas, escalas, determinista=False, lineas_base=('tiempo_fijo',),
+                        ventanas=('valle',)):
+    """Lista de episodios a correr (politica, modo, semilla, escala, ventana).
+    Cada línea base se corre una sola vez por semilla x escala x ventana y
+    sirve de referencia para todas las políticas."""
+    combinaciones = [(s, e, v) for v in ventanas for e in escalas for s in semillas]
+    trabajos = [(LINEAS_BASE[m], m, s, e, v) for m in lineas_base for s, e, v in combinaciones]
     modos = ['rnd_mappo'] + (['rnd_mappo_greedy'] if determinista else [])
-    trabajos += [(p, m, s, e) for p in politicas for m in modos for e in escalas for s in semillas]
+    trabajos += [(p, m, s, e, v) for p in politicas for m in modos for s, e, v in combinaciones]
     return trabajos
 
 
 def evaluar(politicas, semillas=(10, 20, 30, 40, 50), escalas=(0.8, 1.0, 1.2), pasos=720,
-            determinista=False, procesos=4, forzar=False, max_green=True):
-    trabajos = trabajos_evaluacion(politicas, semillas, escalas, determinista)
-    print(f'{len(trabajos)} episodios de evaluación, {procesos} en paralelo, '
+            determinista=False, procesos=4, forzar=False, max_green=True, entorno='v1',
+            lineas_base=('tiempo_fijo',), ventanas=('valle',)):
+    validas = POLITICAS_V2 if entorno == 'v2' else POLITICAS_V1
+    invalidas = [p for p in politicas if p not in validas]
+    if invalidas:
+        # La observación de C1/C4 cambia de tamaño entre v1 y v2
+        raise ValueError(f'Estas políticas no son del entorno {entorno}: {invalidas}')
+    if entorno == 'v1' and set(ventanas) != {'valle'}:
+        raise ValueError('El entorno v1 solo tiene la ventana valle')
+    trabajos = trabajos_evaluacion(politicas, semillas, escalas, determinista, lineas_base, ventanas)
+    print(f'{len(trabajos)} episodios de evaluación (entorno {entorno}), {procesos} en paralelo, '
           f'verde máximo {"aplicado" if max_green else "sin aplicar"}')
     with ProcessPoolExecutor(max_workers=procesos) as pool:
-        futuros = {pool.submit(correr_trabajo, *t, pasos, forzar, max_green): t for t in trabajos}
+        futuros = {pool.submit(correr_trabajo, *t, pasos, forzar, max_green, entorno): t for t in trabajos}
         for i, futuro in enumerate(as_completed(futuros), 1):
             prefijo, estado = futuro.result()
             print(f'  [{i}/{len(trabajos)}] {os.path.basename(prefijo)} ({estado})')
 
     filas = []
-    for politica, modo, semilla, escala in trabajos:
-        fila, _ = resumir_episodio(prefijo_episodio(politica, modo, semilla, escala, max_green))
-        filas.append({'politica': politica, 'modo': modo, 'semilla': semilla, 'escala': escala, **fila})
+    for politica, modo, semilla, escala, ventana in trabajos:
+        fila, _ = resumir_episodio(prefijo_episodio(politica, modo, semilla, escala, max_green, entorno, ventana))
+        filas.append({'politica': politica, 'modo': modo, 'ventana': ventana, 'semilla': semilla,
+                      'escala': escala, **fila})
     # El detalle completo (todas las corridas de evaluación en disco) lo
     # consolida exportar_datos.py en datos_dashboard/
     detalle = pd.DataFrame(filas)
+    if entorno == 'v2' or 'tiempo_fijo' not in lineas_base:
+        return detalle
 
     # Resumen con el formato anterior (escala 1.0, 3 métricas) por política,
     # para no romper lo que ya consumía resumen_<etiqueta>.csv
@@ -314,8 +378,13 @@ def graficar(resumen, salida='comparacion_fijo_vs_rl.png'):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Compara los agentes entrenados contra semaforos de tiempo fijo.')
-    parser.add_argument('--politicas', nargs='+', default=list(POLITICAS), choices=list(POLITICAS))
+    parser = argparse.ArgumentParser(description='Compara los agentes entrenados contra las lineas base.')
+    parser.add_argument('--entorno', choices=['v1', 'v2'], default='v1',
+                        help='v1: sin peatones, solo valle (resultados presentados). v2: peatones en C1/C4 y hora pico')
+    parser.add_argument('--politicas', nargs='*', default=None, choices=list(POLITICAS),
+                        help='Por defecto, todas las del entorno. Sin valores (--politicas) = solo lineas base')
+    parser.add_argument('--lineas-base', nargs='+', default=['tiempo_fijo'], choices=list(LINEAS_BASE))
+    parser.add_argument('--ventanas', nargs='+', default=['valle'], choices=sorted(VENTANAS))
     parser.add_argument('--semillas', type=int, nargs='+', default=[10, 20, 30, 40, 50])
     parser.add_argument('--escalas', type=float, nargs='+', default=[0.8, 1.0, 1.2],
                         help='Multiplicador de la demanda de SUMO (--scale): prueba la política con menos/más tráfico')
@@ -327,10 +396,19 @@ if __name__ == '__main__':
                         help='No forzar el verde maximo (reproduce los resultados reportados antes de la correccion)')
     args = parser.parse_args()
 
-    detalle = evaluar(args.politicas, semillas=args.semillas, escalas=args.escalas, pasos=args.pasos,
+    if args.entorno == 'v2' and args.sin_max_green:
+        parser.error('El entorno v2 siempre aplica el verde maximo')
+    politicas = args.politicas
+    if politicas is None:
+        politicas = list(POLITICAS_V2 if args.entorno == 'v2' else POLITICAS_V1)
+        # Solo las que ya tienen sus pesos en disco (la campaña v2 se reparte entre PCs)
+        politicas = [p for p in politicas if os.path.exists(os.path.join(RAIZ, f'critic_mappo{POLITICAS[p]}.pth'))]
+
+    detalle = evaluar(politicas, semillas=args.semillas, escalas=args.escalas, pasos=args.pasos,
                       determinista=args.determinista, procesos=args.procesos, forzar=args.forzar,
-                      max_green=not args.sin_max_green)
+                      max_green=not args.sin_max_green, entorno=args.entorno,
+                      lineas_base=args.lineas_base, ventanas=args.ventanas)
     print()
-    print(detalle.groupby(['escala', 'politica', 'modo'])[
-        ['espera_media', 'tiempo_viaje_medio', 'perdida_tiempo_media', 'viajes_completados', 'co2_total_kg']
-    ].mean().round(2).to_string())
+    columnas = ['espera_media', 'tiempo_viaje_medio', 'perdida_tiempo_media', 'viajes_completados', 'co2_total_kg']
+    columnas += [c for c in ('peatones_espera_media', 'peatones_tiempo_viaje_medio') if c in detalle]
+    print(detalle.groupby(['ventana', 'escala', 'politica', 'modo'])[columnas].mean().round(2).to_string())

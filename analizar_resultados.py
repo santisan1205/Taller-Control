@@ -22,6 +22,12 @@ CORRIDAS = {
     'prioriza_espera': os.path.join(CARPETA_RESULTADOS, 'prioriza_espera'),
 }
 
+
+def corridas_v2():
+    """Corridas de la campaña v2 que hay en disco (train.py --tag v2_<config> --seed <s>)."""
+    carpetas = sorted(glob.glob(os.path.join(CARPETA_RESULTADOS, 'v2_*_seed*')))
+    return {os.path.basename(c): c for c in carpetas if os.path.isdir(c)}
+
 # Un episodio real tiene ~720 filas; el CSV del reset() inicial tiene solo 1
 MIN_FILAS_EPISODIO = 10
 
@@ -78,10 +84,10 @@ def cargar_episodios(carpeta=CARPETA_RESULTADOS):
     return resumen, detalle_por_episodio
 
 
-def cargar_todas_las_corridas():
+def cargar_todas_las_corridas(corridas=CORRIDAS):
     """Resumen por episodio de todas las corridas, en formato largo (columna 'corrida')."""
     resumenes = []
-    for corrida, carpeta in CORRIDAS.items():
+    for corrida, carpeta in corridas.items():
         if not os.path.isdir(carpeta):
             continue
         resumen, _ = cargar_episodios(carpeta)

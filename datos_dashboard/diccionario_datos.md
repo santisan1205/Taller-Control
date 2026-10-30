@@ -116,6 +116,28 @@ Una fila cada 5 s simulados por episodio de evaluación: `politica, modo, semill
 ## `cruces.csv`
 Mapeo `cruce` (C1–C4) → `id_sumo`.
 
+## `datos_dashboard/v2/`: campaña v2
+Se genera con `python exportar_datos.py --v2` (ver `GUIA_CAMPANA.md`). Usa los mismos archivos y columnas que arriba, con estas diferencias:
+
+- **`ventana`** (columna nueva en todas las tablas de evaluación): `valle` (0–3600 s de SUMO) o `pico` (4400–8000 s, incluye los flujos de hora pico de 5000–7000 s).
+- **`modo`** suma dos líneas base: `actuado` (semáforos actuados de SUMO, verde de 15–60 s) y `max_pressure` (en cada decisión, la fase con mayor cola de entrada menos cola de salida; no ve a los peatones). En ambas, `politica` es igual a `modo`.
+- **`politica`** de los agentes: `<config>_seed<s>`, por ejemplo `v2_base_seed0`. Hay 6 configuraciones × 3 semillas de entrenamiento.
+- **`evaluacion_resumen.csv`** trae una fila por cada línea base de referencia (columna `referencia`). En vez de `media_fijo` tiene `media_ref`.
+- **`entrenamiento_episodios.csv`** suma `config`, `semilla_entrenamiento`, `ventana` y `escala` (lo que sorteó ese episodio).
+
+Columnas peatonales nuevas en `evaluacion_detalle.csv`. Salen de `personinfo` del tripinfo; solo hay peatones en C1 y C4.
+
+| Columna | Unidad | Mejor si | Descripción |
+|---|---|---|---|
+| peatones_completados | personas | ↑ | Peatones que terminaron de cruzar en la hora |
+| peatones_sin_terminar | personas | ↓ | Peatones que seguían en la red al terminar |
+| peatones_tiempo_viaje_medio | s | ↓ | Duración media de la caminata (incluye la espera del verde) |
+| peatones_espera_media / _p95 | s | ↓ | Tiempo detenido esperando el verde peatonal: media y percentil 95 |
+| peatones_perdida_tiempo_media | s | ↓ | Tiempo perdido frente a caminar sin detenerse |
+
+### `evaluacion_configs.csv`: tabla principal del informe v2
+Una fila por `config × ventana × escala × metrica × referencia`. Cada semilla de entrenamiento se promedia primero sobre las 5 semillas de SUMO. La media, la desviación estándar y el IC95 se calculan **entre las 3 semillas de entrenamiento** (`n_semillas_entrenamiento`). `mejora_pct` sigue la misma convención que arriba (positivo = el agente es mejor). `p_valor` es una prueba t de una muestra de las medias por semilla de entrenamiento contra `media_ref`, la media de la línea base `referencia` en la misma ventana y escala.
+
 ## Advertencias para interpretar
 - La demanda de las rutas es fija; las semillas solo cambian el comportamiento de los conductores, por eso la variación entre semillas es pequeña. La robustez se mide mejor comparando escalas.
 - El episodio dura 3600 s, pero la demanda está definida hasta ~8000 s y los flujos de "hora pico" empiezan en 5000 s, así que **la hora pico no está en estos datos**.

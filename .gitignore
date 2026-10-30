@@ -7,3 +7,9 @@ resultados_eval/episodios/
 
 # Igual que episodios/, con el verde maximo aplicado
 resultados_eval/episodios_max_green/
+
+# Igual que episodios/, para el entorno v2 (peatones + hora pico)
+resultados_eval/episodios_v2/
+
+# Lo genera evaluar_comparacion.py (lineas_base.generar_programas_actuados)
+resultados_eval/actuado.add.xml
