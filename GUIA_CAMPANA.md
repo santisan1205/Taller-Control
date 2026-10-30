@@ -14,11 +14,12 @@ Los modelos v1 (los de la presentación) no cargan en v2 porque la observación 
 ## 0. Preparar cada PC (una sola vez)
 1. Mismo código en los 4 PCs: `git pull` del mismo commit. Nadie cambia el entorno durante la campaña.
 2. Mismas versiones: SUMO **1.27.1**, `sumo-rl==1.4.5` y `pip install -r requirements.txt`.
-3. La ruta del proyecto **no puede tener espacios** (SUMO recibe las rutas de salida separadas por espacios).
-4. Comprobación de que todos los PCs simulan igual: corran esto y comparen la tabla final. Debe dar exactamente lo mismo en los 4.
+3. Corran todos los comandos **desde la carpeta del proyecto** (`cd` a `Taller-Control`). Si la ruta tiene espacios (p.ej. `Octavo semestre`), esto es obligatorio: a SUMO se le pasan rutas relativas a esa carpeta.
+4. Comprobación de que todos los PCs simulan igual: corran **exactamente** este comando (con `--semillas 10 --escalas 1.0`; sin eso promedia 5 semillas y 3 escalas y no se puede comparar). La tabla debe dar exactamente lo mismo en los 4:
    ```
    python evaluar_comparacion.py --entorno v2 --politicas --lineas-base tiempo_fijo --semillas 10 --escalas 1.0
    ```
+   Resultado esperado (PC1): `valle 1.0 fijo tiempo_fijo 5.63 134.16 53.12 1375.0 345.03 11.87 32.27`
 
 ## 1. Prueba corta (la primera noche o una tarde)
 ```

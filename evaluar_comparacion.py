@@ -153,6 +153,25 @@ def _correr_episodio(env, obs_dict, pasos, actores=None, determinista=False, al_
     return metricas, pd.DataFrame(control)
 
 
+def _ruta_para_sumo(ruta):
+    """
+    sumo-rl separa additional_sumo_cmd por espacios, así que una ruta con
+    espacios (p.ej. 'Octavo semestre') se rompe. SUMO corre en la carpeta
+    actual, así que basta con pasarle la ruta relativa a ella, que dentro del
+    proyecto no tiene espacios.
+    """
+    if ' ' not in ruta:
+        return ruta
+    try:
+        relativa = os.path.relpath(ruta)
+    except ValueError:  # otra unidad de disco
+        relativa = ruta
+    if ' ' in relativa:
+        raise ValueError(f'La ruta tiene espacios y SUMO no la acepta: {ruta}. '
+                         f'Corre el comando desde la carpeta del proyecto ({RAIZ}).')
+    return relativa
+
+
 def correr_trabajo(politica, modo, semilla, escala, ventana, pasos, forzar=False, max_green=True, entorno='v1'):
     """
     Corre un episodio de evaluación y deja sus archivos en la carpeta de
@@ -166,15 +185,14 @@ def correr_trabajo(politica, modo, semilla, escala, ventana, pasos, forzar=False
         return prefijo, 'cache'
 
     os.makedirs(carpeta_episodios(max_green, entorno), exist_ok=True)
-    if ' ' in prefijo:
-        raise ValueError(f'sumo-rl separa additional_sumo_cmd por espacios; la ruta no puede tenerlos: {prefijo}')
-    cmd = (f'--tripinfo-output {prefijo}.tripinfo.xml --tripinfo-output.write-unfinished '
-           f'--statistic-output {prefijo}.stats.xml --device.emissions.probability 1 '
+    salida = _ruta_para_sumo(prefijo)
+    cmd = (f'--tripinfo-output {salida}.tripinfo.xml --tripinfo-output.write-unfinished '
+           f'--statistic-output {salida}.stats.xml --device.emissions.probability 1 '
            f'--scale {escala:g}')
     if modo == 'actuado':
         if not os.path.exists(ARCHIVO_ACTUADO):
             generar_programas_actuados(ARCHIVO_ACTUADO)
-        cmd += f' --additional-files {ARCHIVO_ACTUADO}'
+        cmd += f' --additional-files {_ruta_para_sumo(ARCHIVO_ACTUADO)}'
 
     # Tiempo fijo y actuado: SUMO corre sus propios programas, sumo-rl no actúa
     programa_sumo = modo in ('tiempo_fijo', 'actuado')
