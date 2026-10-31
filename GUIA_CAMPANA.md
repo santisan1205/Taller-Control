@@ -30,10 +30,12 @@ Entrena 20 episodios y estima cuánto dura una corrida de 150. En el PC donde se
 ## 2. Campaña
 | PC | Corridas (150 episodios c/u) |
 |---|---|
-| PC1 | v2_base ×3 semillas, v2_sin_rnd semilla 0 |
-| PC2 | v2_penaliza_cambio ×3 (P = 2,0), v2_sin_rnd semilla 1 |
-| PC3 | v2_prioriza_espera ×3 (w2 = 2,0), v2_sin_rnd semilla 2 |
-| PC4 | v2_peatones_alto ×3 (w3 = 5,0), v2_mas_exploracion ×3 (entropía 0,05) |
+| PC1 | v2_base ×3 semillas, v2_sin_rnd ×3, v2_prioriza_espera ×3 (w2 = 2,0) |
+| PC2 | v2_penaliza_cambio ×3 (P = 2,0) |
+| PC3 | v2_mas_exploracion ×3 (entropía 0,05) |
+| PC4 | v2_peatones_alto ×3 (w3 = 5,0) |
+
+El reparto sigue la velocidad medida con `--prueba` (horas por corrida, una a la vez): PC1 2,0, PC2 4,1, PC3 6,1 y PC4 3,8.
 
 ```
 python campana.py --pc N              # 3 corridas a la vez (ajustable con --paralelo)

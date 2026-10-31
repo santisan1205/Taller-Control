@@ -38,13 +38,19 @@ ARGS_CONFIG = {
 }
 assert set(ARGS_CONFIG) == set(CONFIGS_V2), 'ARGS_CONFIG y evaluar_comparacion.CONFIGS_V2 deben coincidir'
 
-# PC -> [(configuración, semilla)]. 18 corridas en total.
+# PC -> [(configuración, semilla)]. 18 corridas en total, repartidas según la
+# prueba de 20 episodios (h por corrida de 150, una a la vez): PC1 2,0 h,
+# PC2 4,1 h, PC3 6,1 h, PC4 3,8 h. El PC1 lleva 3 tandas de 3 y los demás una,
+# para que todos terminen en ~7-9 h. El PC3, el más lento, lleva
+# v2_mas_exploracion, que es la primera configuración que se recorta si no alcanza.
+def _tres_semillas(config):
+    return [(config, s) for s in SEMILLAS_ENTRENAMIENTO_V2]
+
 ASIGNACION = {
-    1: [('v2_base', s) for s in SEMILLAS_ENTRENAMIENTO_V2] + [('v2_sin_rnd', 0)],
-    2: [('v2_penaliza_cambio', s) for s in SEMILLAS_ENTRENAMIENTO_V2] + [('v2_sin_rnd', 1)],
-    3: [('v2_prioriza_espera', s) for s in SEMILLAS_ENTRENAMIENTO_V2] + [('v2_sin_rnd', 2)],
-    4: [('v2_peatones_alto', s) for s in SEMILLAS_ENTRENAMIENTO_V2]
-       + [('v2_mas_exploracion', s) for s in SEMILLAS_ENTRENAMIENTO_V2],
+    1: _tres_semillas('v2_base') + _tres_semillas('v2_sin_rnd') + _tres_semillas('v2_prioriza_espera'),
+    2: _tres_semillas('v2_penaliza_cambio'),
+    3: _tres_semillas('v2_mas_exploracion'),
+    4: _tres_semillas('v2_peatones_alto'),
 }
 
 
