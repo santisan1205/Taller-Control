@@ -138,7 +138,13 @@ Columnas peatonales nuevas en `evaluacion_detalle.csv`. Salen de `personinfo` de
 ### `evaluacion_configs.csv`: tabla principal del informe v2
 Una fila por `config × ventana × escala × metrica × referencia`. Cada semilla de entrenamiento se promedia primero sobre las 5 semillas de SUMO. La media, la desviación estándar y el IC95 se calculan **entre las 3 semillas de entrenamiento** (`n_semillas_entrenamiento`). `mejora_pct` sigue la misma convención que arriba (positivo = el agente es mejor). `p_valor` es una prueba t de una muestra de las medias por semilla de entrenamiento contra `media_ref`, la media de la línea base `referencia` en la misma ventana y escala.
 
-## Advertencias para interpretar
+### Advertencias de la campaña v2
+- **Cobertura completa:** 18 políticas (6 configuraciones × 3 semillas de entrenamiento) y 3 líneas base, cada una con 5 semillas de SUMO × 3 escalas × 2 ventanas = 30 episodios. En total son 630 episodios, todos simulados con SUMO 1.27.1.
+- **Reparto:** PC1 entrenó `v2_base`, `v2_sin_rnd` y `v2_prioriza_espera` y corrió las líneas base. PC2 entrenó `v2_penaliza_cambio`, PC3 `v2_mas_exploracion` y PC4 `v2_peatones_alto`.
+- **`v2_mas_exploracion` se entrenó con SUMO 1.28.0** en PC3. Con esa versión la hora pico simula distinto (el valle da idéntico), así que sus 90 episodios de evaluación se rehicieron en PC1 con 1.27.1. Sus curvas de entrenamiento sí vienen de 1.28.0.
+- **Un episodio colapsó:** `v2_peatones_alto_seed1`, ventana `pico`, escala 1.2, semilla 50 tiene `espera_media` ≈ 94 s; sus otros 4 episodios en ese escenario quedan entre 2 y 4 s. Es un resultado real (gridlock), no un error de datos: no se debe filtrar, pero conviene señalarlo en los gráficos porque arrastra la media de esa configuración en pico × 1.2.
+
+## Advertencias para interpretar (v1, carpeta raíz y `max_green/`)
 - La demanda de las rutas es fija; las semillas solo cambian el comportamiento de los conductores, por eso la variación entre semillas es pequeña. La robustez se mide mejor comparando escalas.
 - El episodio dura 3600 s, pero la demanda está definida hasta ~8000 s y los flujos de "hora pico" empiezan en 5000 s, así que **la hora pico no está en estos datos**.
 - No hay peatones en el escenario.

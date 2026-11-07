@@ -13,3 +13,14 @@ resultados_eval/episodios_v2/
 
 # Lo genera evaluar_comparacion.py (lineas_base.generar_programas_actuados)
 resultados_eval/actuado.add.xml
+
+# Corridas v2: los CSV por paso de cada episodio (~17 MB por corrida) y la
+# consola no se suben; las curvas ya estan en datos_dashboard/v2/entrenamiento_episodios.csv.
+# Si se suben config.json y log_entrenamiento.csv.
+resultados/v2_*/mappo_rnd_train_*.csv
+resultados/v2_*/consola.log
+resultados/prueba_*/
+
+# Logs de la campana y paquetes para pasar resultados entre PCs
+resultados/*.log
+*.zip
