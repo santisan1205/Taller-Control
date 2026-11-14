@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Póster C.I.T.A.D.E.L.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* Lienzo 70 x 100 cm (2646 x 3780 px CSS a 96 ppp), igual que la plantilla vertical */
+  @page { size: 700mm 1000mm; margin: 0; }
+  :root {
+    --verde: #5CB77C;        /* verde de la plantilla Uniandes */
+    --verde-osc: #17694A;
+    --verde-med: #1E9E63;
+    --tinte: #EEF7F1;
+    --tinte2: #E2F1E7;
+    --tinta: #434343;        /* gris de texto de la plantilla */
+    --tinta2: #5E6B63;
+    --morado: #6C5BD6;
+    --ambar: #C9821F;
+    --gris: #6B6B6B;
+    --rojo: #D9534F;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 2646px; height: 3780px; background: #fcfbfb; }
+  body {
+    position: relative; overflow: hidden;
+    font-family: Verdana, sans-serif; color: var(--tinta);
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .fondo { position: absolute; inset: 0; width: 2646px; height: 3780px; }
+  .h { font-family: Montserrat, Verdana, sans-serif; }
+
+  .lienzo {
+    position: absolute; left: 70px; right: 70px; top: 360px; bottom: 34px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .lienzo > * { flex: none; }
+
+  /* ---------- Título (banda tipo Canva) ---------- */
+  .titulo {
+    background: var(--verde-osc); border-radius: 36px; color: #fff;
+    display: flex; align-items: center; gap: 44px; padding: 22px 56px 22px 36px;
+    position: relative; overflow: hidden;
+  }
+  .titulo::after { /* calles de fondo */
+    content: ""; position: absolute; right: -60px; top: -60px; width: 760px; height: 520px;
+    background:
+      linear-gradient(90deg, transparent 46%, rgba(255,255,255,.07) 46% 54%, transparent 54%),
+      linear-gradient(0deg, transparent 46%, rgba(255,255,255,.07) 46% 54%, transparent 54%);
+    background-size: 260px 260px; transform: rotate(-8deg); pointer-events: none;
+  }
+  .titulo .insignia { flex: none; width: 184px; height: 184px; }
+  .titulo h1 {
+    font-family: Montserrat, sans-serif; font-weight: 900; font-size: 112px; line-height: .95;
+    letter-spacing: 6px;
+  }
+  .titulo .sub {
+    font-family: Montserrat, sans-serif; font-weight: 600; font-size: 46px; line-height: 1.2;
+    margin-top: 10px; color: #DDF3E5;
+  }
+  .titulo .sub b { color: #fff; font-weight: 800; }
+  .sello {
+    margin-left: auto; flex: none; position: relative; z-index: 1; text-align: center;
+    background: #fff; color: var(--verde-osc); border-radius: 30px; padding: 22px 34px;
+    font-family: Montserrat, sans-serif; box-shadow: 0 0 0 8px rgba(255,255,255,.18);
+  }
+  .sello .n { font-weight: 900; font-size: 82px; line-height: 1; letter-spacing: -1px; }
+  .sello .t { font-weight: 700; font-size: 30px; line-height: 1.2; color: var(--tinta2); margin-top: 6px; }
+
+  .autores {
+    background: var(--verde); color: #fff; border-radius: 22px;
+    padding: 16px 44px; display: flex; justify-content: space-between; align-items: center;
+    font-size: 34px; margin-top: -10px;
+  }
+  .autores b { font-family: Montserrat, sans-serif; font-weight: 800; letter-spacing: .5px; }
+
+  /* ---------- Tarjetas ---------- */
+  .fila { display: flex; gap: 34px; }
+  .card {
+    background: #fff; border: 5px solid var(--verde); border-radius: 34px;
+    padding: 20px 38px 26px; position: relative;
+  }
+  .card.tinte { background: var(--tinte); }
+  .enc { display: flex; align-items: center; gap: 18px; margin-bottom: 14px; }
+  .enc .num {
+    font-family: Montserrat, sans-serif; font-weight: 900; font-size: 90px; line-height: .8;
+    color: var(--verde-osc);
+  }
+  .enc .barra { width: 9px; align-self: stretch; background: var(--verde); border-radius: 5px; margin: 6px 0; }
+  .enc h2 {
+    font-family: Montserrat, sans-serif; font-weight: 800; font-size: 50px; line-height: 1.02;
+    color: var(--verde-osc); text-transform: uppercase; letter-spacing: 1px;
+  }
+  .enc h2 small { display: block; font-size: 31px; font-weight: 600; color: var(--tinta2); text-transform: none; letter-spacing: 0; margin-top: 6px; }
+
+  p, li { font-size: 34px; line-height: 1.36; }
+  .intro p + p { margin-top: 8px; }
+  .intro .q { font-family: Montserrat, sans-serif; font-weight: 800; color: var(--verde-osc); }
+  .nota { font-size: 24px; color: var(--tinta2); line-height: 1.4; }
+
+  /* ---------- Imagen del proyecto ---------- */
+  .logo-card { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .logo-card .fila-logo { display: flex; align-items: center; gap: 34px; text-align: left; }
+  .logo-card .marca { width: 250px; height: 250px; flex: none; }
+  .logo-card .nombre { font-family: Montserrat, sans-serif; font-weight: 900; font-size: 60px; color: var(--verde-osc); letter-spacing: 3px; }
+  .logo-card .exp { font-size: 30px; line-height: 1.38; color: var(--tinta2); margin-top: 8px; }
+  .logo-card .exp b { color: var(--verde-osc); font-family: Montserrat, sans-serif; font-weight: 800; }
+  .qr { display: flex; align-items: center; gap: 26px; margin-top: 18px; align-self: stretch; background: var(--tinte); border-radius: 22px; padding: 18px 26px; text-align: left; }
+  .qr img { width: 124px; height: 124px; }
+  .qr div { font-size: 28px; line-height: 1.38; }
+  .qr b { font-family: Montserrat, sans-serif; font-weight: 800; color: var(--verde-osc); font-size: 31px; }
+
+  /* ---------- Metodología (abstract gráfico) ---------- */
+  .flujo { display: grid; grid-template-columns: 1fr 70px 1fr 70px 1.25fr 70px 1fr; align-items: stretch; }
+  .paso {
+    background: var(--tinte); border-radius: 28px; padding: 20px 24px 22px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .paso .et {
+    font-family: Montserrat, sans-serif; font-weight: 800; font-size: 34px; color: #fff;
+    background: var(--verde-osc); border-radius: 40px; padding: 6px 26px; letter-spacing: 1px;
+  }
+  .paso svg { width: 100%; height: 276px; margin: 10px 0 6px; }
+  .paso p { font-size: 31px; line-height: 1.32; }
+  .paso p b { font-family: Montserrat, sans-serif; font-weight: 800; color: var(--verde-osc); }
+  .flecha { display: flex; align-items: center; justify-content: center; }
+  .flecha svg { width: 62px; height: 80px; }
+  .ciclo {
+    margin-top: 16px; display: flex; align-items: center; gap: 14px;
+    background: var(--verde-osc); border-radius: 26px; padding: 14px 24px; color: #fff;
+  }
+  .ciclo .t { font-family: Montserrat, sans-serif; font-weight: 900; font-size: 28px; line-height: 1.05; letter-spacing: 1px; flex: none; width: 110px; }
+  .ciclo .e { flex: 1; background: rgba(255,255,255,.1); border-radius: 18px; padding: 8px 14px; font-size: 22px; line-height: 1.28; }
+  .ciclo .e b { font-family: Montserrat, sans-serif; color: #B9F0CD; font-weight: 800; }
+  .ciclo .s { font-size: 34px; color: #9FD8B5; flex: none; }
+
+  /* ---------- Resultados ---------- */
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-content: stretch; }
+  .kpi { background: var(--tinte); border-radius: 26px; padding: 22px 26px; border-left: 14px solid var(--verde-med); display: flex; flex-direction: column; justify-content: center; }
+  .kpi .v { font-family: Montserrat, sans-serif; font-weight: 900; font-size: 86px; line-height: 1; color: var(--verde-osc); letter-spacing: -2px; }
+  .kpi .v small { font-size: 56px; letter-spacing: 0; }
+  .kpi .l { font-size: 33px; line-height: 1.25; margin-top: 8px; }
+  .kpi .d { font-size: 28px; color: var(--tinta2); margin-top: 6px; }
+  .contexto { font-size: 24px; color: var(--tinta2); margin: -8px 0 22px; }
+  .graf { display: grid; grid-template-columns: 1.6fr 1fr; gap: 22px; }
+  .panel { background: #fff; border: 3px solid var(--tinte2); border-radius: 26px; padding: 18px 24px 16px; }
+  .panel h3 { font-family: Montserrat, sans-serif; font-weight: 800; font-size: 40px; color: var(--verde-osc); line-height: 1.15; }
+  .panel .msg { font-size: 31px; line-height: 1.34; margin-top: 6px; }
+  .panel .msg b { color: var(--verde-osc); }
+  .panel .msg .mp { color: var(--morado); font-weight: bold; }
+  .panel img { width: 100%; display: block; margin-top: 6px; }
+  .abajo { display: grid; grid-template-columns: 1.6fr 1fr; gap: 22px; margin-top: 20px; }
+
+  /* ---------- Perspectiva ---------- */
+  .ruta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; margin-top: 4px; }
+  .ruta::before { content: ""; position: absolute; left: 6%; right: 6%; top: 36px; height: 8px; background: repeating-linear-gradient(90deg, var(--verde) 0 30px, transparent 30px 46px); border-radius: 4px; }
+  .hito { text-align: center; padding: 0 22px; position: relative; }
+  .hito .p { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 12px; display: grid; place-items: center; font-family: Montserrat, sans-serif; font-weight: 900; font-size: 34px; color: var(--verde-osc); background: #fff; border: 7px solid var(--verde); }
+  .hito.hecho .p { background: var(--verde-osc); border-color: var(--verde-osc); color: #fff; }
+  .hito h4 { font-family: Montserrat, sans-serif; font-weight: 800; font-size: 35px; color: var(--verde-osc); line-height: 1.15; }
+  .hito .trl { font-family: Montserrat, sans-serif; font-weight: 700; font-size: 26px; color: #fff; background: var(--verde); border-radius: 20px; display: inline-block; padding: 2px 16px; margin: 6px 0 6px; }
+  .hito.hecho .trl { background: var(--verde-osc); }
+  .hito p { font-size: 30px; line-height: 1.3; }
+  .remate { margin-top: 12px; background: #fff; border-radius: 24px; padding: 14px 28px; font-size: 32px; line-height: 1.4; }
+  .remate b { font-family: Montserrat, sans-serif; color: var(--verde-osc); font-weight: 800; }
+
+  .pie { display: flex; justify-content: space-between; align-items: center; font-size: 24px; color: var(--tinta2); padding: 0 12px; margin-top: auto; }
+  .pie .linea { flex: 1; height: 4px; background: var(--verde); margin: 0 30px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<img class="fondo" src="assets/fondo_uniandes_vertical.jpg" alt="">
+
+<!-- Logo del proyecto: ciudadela cuyas torres son semáforos; 4 nodos = 4 agentes -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="logo" viewBox="0 0 400 400">
+      <circle cx="200" cy="200" r="196" fill="#EEF7F1"/>
+      <circle cx="200" cy="200" r="196" fill="none" stroke="#5CB77C" stroke-width="8"/>
+      <!-- red de agentes -->
+      <g stroke="#5CB77C" stroke-width="5" stroke-dasharray="10 8" fill="none">
+        <path d="M70 120 L200 70 L330 120"/><path d="M70 120 L70 300"/><path d="M330 120 L330 300"/>
+      </g>
+      <g fill="#5CB77C"><circle cx="70" cy="120" r="16"/><circle cx="330" cy="120" r="16"/><circle cx="70" cy="300" r="16"/><circle cx="330" cy="300" r="16"/></g>
+      <!-- muralla de la ciudadela -->
+      <path d="M108 330 V170 h28 v-26 h26 v26 h22 v-26 h32 v26 h22 v-26 h26 v26 h28 V330 Z" fill="#17694A"/>
+      <!-- torre central = semáforo -->
+      <path d="M160 330 V112 h16 v-22 h18 v22 h12 v-22 h18 v22 h16 V330 Z" fill="#17694A"/>
+      <rect x="170" y="128" width="60" height="164" rx="22" fill="#203a2e"/>
+      <circle cx="200" cy="160" r="18" fill="#D9534F"/>
+      <circle cx="200" cy="210" r="18" fill="#F2B632"/>
+      <circle cx="200" cy="260" r="18" fill="#3FD18A"/>
+      <!-- puerta -->
+      <path d="M128 330 v-50 a14 14 0 0 1 28 0 v50 Z M244 330 v-50 a14 14 0 0 1 28 0 v50 Z" fill="#EEF7F1"/>
+      <rect x="90" y="326" width="220" height="12" rx="6" fill="#17694A"/>
+    </symbol>
+    <symbol id="semaforo" viewBox="0 0 40 90">
+      <rect x="2" y="2" width="36" height="86" rx="12" fill="#2a3a32"/>
+      <circle cx="20" cy="20" r="10" fill="#D9534F"/><circle cx="20" cy="45" r="10" fill="#F2B632"/><circle cx="20" cy="70" r="10" fill="#3FD18A"/>
+    </symbol>
+    <symbol id="carro" viewBox="0 0 60 34">
+      <path d="M6 22 l6 -12 a6 6 0 0 1 5 -3 h24 a6 6 0 0 1 5 3 l6 12 v6 a3 3 0 0 1 -3 3 h-45 a3 3 0 0 1 -3 -3 Z" fill="currentColor"/>
+      <circle cx="17" cy="30" r="5" fill="#2a3a32"/><circle cx="43" cy="30" r="5" fill="#2a3a32"/>
+      <path d="M16 11 h28 l4 9 h-36 Z" fill="#fff" opacity=".55"/>
+    </symbol>
+    <symbol id="peaton" viewBox="0 0 30 60">
+      <circle cx="15" cy="7" r="6" fill="currentColor"/>
+      <path d="M15 15 L15 36 M15 20 L5 30 M15 20 L25 28 M15 36 L6 56 M15 36 L24 56" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none"/>
+    </symbol>
+    <symbol id="flecha" viewBox="0 0 62 80"><path d="M6 10 L50 40 L6 70" fill="none" stroke="#5CB77C" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<main class="lienzo">
+
+  <!-- TÍTULO -->
+  <header class="titulo">
+    <svg class="insignia"><use href="#logo"/></svg>
+    <div>
+      <h1>C.I.T.A.D.E.L.</h1>
+      <div class="sub">Semáforos que <b>aprenden</b> a repartir el verde<br>entre <b>carros y peatones</b> en Bogotá</div>
+    </div>
+    <div class="sello"><div class="n">−20 % CO₂</div><div class="t">en hora pico, sin<br>construir una vía más</div></div>
+  </header>
+  <div class="autores">
+    <span><b>Tomás Castro · Andrés Felipe Barbosa · Mariana Vanoy · Santiago Sánchez</b></span>
+    <span>Prof. Jorge Alfredo López Jiménez · Taller de Control</span>
+  </div>
+
+  <!-- FILA 1: INTRODUCCIÓN + IMAGEN DEL PROYECTO -->
+  <section class="fila">
+    <article class="card intro" style="flex: 1.78">
+      <div class="enc"><span class="num">1</span><span class="barra"></span><h2>Introducción</h2></div>
+      <p><span class="q">El problema.</span> Los semáforos de tiempo fijo cambian de fase por reloj, aunque la cola esté del otro lado.</p>
+      <p><span class="q">Qué hicimos.</span> Cada semáforo es un agente que aprende por refuerzo cuándo dar verde, mirando solo su cruce. Simulamos cuatro intersecciones reales de Bogotá, con peatones, en SUMO y entrenamos los agentes con MAPPO.</p>
+      <p><span class="q">Por qué.</span> Repartir el verde según la demanda baja esperas y CO₂ sin construir vías. Y no basta mover carros: max-pressure, el control adaptativo clásico, es el mejor para los vehículos, pero hace esperar a los peatones casi el triple. Cuidamos a ambos.</p>
+      <p><span class="q">Qué no hicimos.</span> Es una prueba de concepto en simulación (TRL 3), sin validar aún con conteos reales.</p>
+    </article>
+
+    <article class="card logo-card tinte" style="flex: 1">
+      <div class="enc" style="align-self: flex-start"><span class="num">★</span><span class="barra"></span><h2>Imagen del proyecto<small>Nuestro logo</small></h2></div>
+      <div class="fila-logo">
+        <svg class="marca"><use href="#logo"/></svg>
+        <div>
+          <div class="nombre">C.I.T.A.D.E.L.</div>
+          <div class="exp"><b>C</b>ontrol <b>I</b>nteligente de <b>T</b>ráfico <b>A</b>daptativo con <b>D</b>istribución y <b>E</b>xploración <b>L</b>ocal</div>
+        </div>
+      </div>
+      <div class="qr">
+        <img src="assets/qr_repo.svg" alt="QR al repositorio">
+        <div><b>Código, datos y modelos</b><br>github.com/santisan1205/Taller-Control<br>Demo en vivo en el stand</div>
+      </div>
+    </article>
+  </section>
+
+  <!-- FILA 2: METODOLOGÍA (abstract gráfico) -->
+  <section class="card">
+    <div class="enc"><span class="num">2</span><span class="barra"></span><h2>Metodología</h2></div>
+    <div class="flujo">
+
+      <div class="paso">
+        <span class="et">EL PROBLEMA</span>
+        <svg viewBox="0 0 400 330">
+          <!-- cruce con cola; reloj sobre el semáforo -->
+          <rect x="0" y="150" width="400" height="90" fill="#cfd8d2"/>
+          <rect x="235" y="0" width="90" height="330" fill="#cfd8d2"/>
+          <g stroke="#fff" stroke-width="5" stroke-dasharray="20 14"><path d="M0 195 H235"/><path d="M280 240 V330"/></g>
+          <g style="color:#6B6B6B"><use href="#carro" x="10" y="158" width="62" height="35"/><use href="#carro" x="78" y="158" width="62" height="35"/><use href="#carro" x="146" y="158" width="62" height="35"/></g>
+          <g style="color:#8a948e"><use href="#carro" x="20" y="200" width="62" height="35"/><use href="#carro" x="90" y="200" width="62" height="35"/></g>
+          <use href="#semaforo" x="200" y="62" width="34" height="78"/>
+          <circle cx="110" cy="76" r="54" fill="#fff" stroke="#D9534F" stroke-width="8"/>
+          <path d="M110 76 V44 M110 76 L132 90" stroke="#434343" stroke-width="8" stroke-linecap="round"/>
+          <g style="color:#D9534F"><use href="#peaton" x="338" y="250" width="30" height="60"/><use href="#peaton" x="365" y="258" width="26" height="52"/></g>
+          <text x="345" y="235" font-family="Montserrat" font-weight="800" font-size="30" fill="#D9534F">?!</text>
+        </svg>
+        <p>Planes de <b>tiempo fijo</b>: cambian por reloj, no por demanda.</p>
+      </div>
+      <div class="flecha"><svg><use href="#flecha"/></svg></div>
+
+      <div class="paso">
+        <span class="et">EL ESCENARIO</span>
+        <svg viewBox="0 0 400 330">
+          <!-- esquema 2x2 de las 4 intersecciones -->
+          <g fill="#cfd8d2"><rect x="0" y="70" width="400" height="44"/><rect x="0" y="220" width="400" height="44"/><rect x="88" y="0" width="44" height="330"/><rect x="268" y="0" width="44" height="330"/></g>
+          <g fill="#17694A" font-family="Montserrat" font-weight="800" font-size="28" text-anchor="middle">
+            <circle cx="110" cy="92" r="36"/><circle cx="290" cy="92" r="36"/><circle cx="110" cy="242" r="36"/><circle cx="290" cy="242" r="36"/>
+          </g>
+          <g fill="#fff" font-family="Montserrat" font-weight="800" font-size="28" text-anchor="middle">
+            <text x="110" y="102">C1</text><text x="290" y="102">C2</text><text x="110" y="252">C3</text><text x="290" y="252">C4</text>
+          </g>
+          <g style="color:#1E9E63"><use href="#peaton" x="40" y="118" width="26" height="52"/><use href="#peaton" x="326" y="268" width="26" height="52"/></g>
+          <g style="color:#6B6B6B"><use href="#carro" x="170" y="76" width="54" height="31"/><use href="#carro" x="20" y="226" width="54" height="31"/><use href="#carro" x="330" y="76" width="54" height="31"/></g>
+          
+        </svg>
+        <p><b>4 cruces reales</b> de Bogotá en <b>SUMO</b>, peatones en C1 y C4, horas valle y pico.</p>
+      </div>
+      <div class="flecha"><svg><use href="#flecha"/></svg></div>
+
+      <div class="paso">
+        <span class="et">LA SOLUCIÓN: RND-MAPPO</span>
+        <svg viewBox="0 0 520 330">
+          <!-- crítico central -->
+          <rect x="185" y="118" width="150" height="96" rx="22" fill="#17694A"/>
+          <text x="260" y="162" text-anchor="middle" font-family="Montserrat" font-weight="800" font-size="30" fill="#fff">Crítico</text>
+          <text x="260" y="196" text-anchor="middle" font-family="Verdana" font-size="25" fill="#CFEFDB">al entrenar</text>
+          <g stroke="#5CB77C" stroke-width="5" stroke-dasharray="12 9" fill="none">
+            <path d="M185 145 L112 75"/><path d="M335 145 L408 75"/><path d="M185 188 L112 255"/><path d="M335 188 L408 255"/>
+          </g>
+          <!-- 4 actores (uno por cruce) -->
+          <g font-family="Montserrat" font-weight="800" font-size="30" fill="#17694A">
+            <rect x="30" y="18" width="118" height="110" rx="20" fill="#fff" stroke="#5CB77C" stroke-width="5"/><use href="#semaforo" x="46" y="32" width="34" height="80"/><text x="92" y="82">C1</text>
+            <rect x="372" y="18" width="118" height="110" rx="20" fill="#fff" stroke="#5CB77C" stroke-width="5"/><use href="#semaforo" x="388" y="32" width="34" height="80"/><text x="434" y="82">C2</text>
+            <rect x="30" y="204" width="118" height="110" rx="20" fill="#fff" stroke="#5CB77C" stroke-width="5"/><use href="#semaforo" x="46" y="218" width="34" height="80"/><text x="92" y="268">C3</text>
+            <rect x="372" y="204" width="118" height="110" rx="20" fill="#fff" stroke="#5CB77C" stroke-width="5"/><use href="#semaforo" x="388" y="218" width="34" height="80"/><text x="434" y="268">C4</text>
+          </g>
+          <!-- curiosidad RND -->
+          <circle cx="260" cy="44" r="34" fill="#F2B632"/>
+          <text x="260" y="59" text-anchor="middle" font-family="Montserrat" font-weight="900" font-size="44" fill="#fff">?</text>
+          <text x="260" y="106" text-anchor="middle" font-family="Montserrat" font-weight="700" font-size="30" fill="#5E6B63">curiosidad</text>
+        </svg>
+        <p>Un <b>actor por cruce</b> elige la fase verde cada 5 s; un <b>crítico central</b> los entrena juntos.</p>
+      </div>
+      <div class="flecha"><svg><use href="#flecha"/></svg></div>
+
+      <div class="paso">
+        <span class="et">LA PRUEBA</span>
+        <svg viewBox="0 0 400 330">
+          <!-- matriz de evaluación -->
+          <g font-family="Montserrat" font-weight="900" text-anchor="middle" fill="#17694A">
+            <text x="200" y="88" font-size="96">630</text>
+          </g>
+          <text x="200" y="130" text-anchor="middle" font-family="Montserrat" font-weight="700" font-size="32" fill="#5E6B63">episodios simulados</text>
+          <rect x="10" y="152" width="380" height="60" rx="18" fill="#1E9E63"/>
+          <text x="200" y="193" text-anchor="middle" font-family="Montserrat" font-weight="800" font-size="31" fill="#fff">18 políticas (RL)</text>
+          <rect x="10" y="222" width="380" height="60" rx="18" fill="#6B6B6B"/>
+          <text x="200" y="263" text-anchor="middle" font-family="Montserrat" font-weight="800" font-size="31" fill="#fff">vs 3 controles</text>
+          <text x="200" y="322" text-anchor="middle" font-family="Montserrat" font-weight="700" font-size="31" fill="#5E6B63">valle y pico · 80–120 %</text>
+        </svg>
+        <p>Contra <b>tiempo fijo, actuado y max-pressure</b>, con el mismo tráfico.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- FILA 3: RESULTADOS -->
+  <section class="card">
+    <div class="enc"><span class="num">3</span><span class="barra"></span><h2>Resultados<small>Hora pico frente al tiempo fijo actual · p &lt; 0,01</small></h2></div>
+    <div class="graf">
+      <div class="panel">
+        <h3>Hora pico: el único que baja las dos esperas</h3>
+        <p class="msg"><span class="mp">Max-pressure</span> gana en carros, pero los peatones esperan ~35 s: <b>4 veces más</b>.</p>
+        <img src="graficas/compromiso.svg" alt="Espera de vehículos contra espera de peatones por estrategia">
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="v">−73<small> %</small></div><div class="l">espera de los vehículos</div><div class="d">7,8 s → 2,1 s</div></div>
+        <div class="kpi"><div class="v">−37<small> %</small></div><div class="l">espera de los peatones</div><div class="d">12,9 s → 8,1 s</div></div>
+        <div class="kpi"><div class="v">−20<small> %</small></div><div class="l">CO₂ emitido en la hora</div><div class="d">799 → 643 kg</div></div>
+        <div class="kpi"><div class="v">+12<small> %</small></div><div class="l">viajes completados</div><div class="d">1.805 → 2.021 veh/h</div></div>
+      </div>
+    </div>
+    <div class="abajo">
+      <div class="panel">
+        <h3>Aguanta más tráfico sin reentrenar</h3>
+        <p class="msg">Con 20 % más carros sigue por debajo del tiempo fijo y del actuado.</p>
+        <img src="graficas/robustez.svg" alt="Espera por estrategia y nivel de demanda">
+      </div>
+      <div class="panel">
+        <h3>¿Sirvió la curiosidad (RND)?</h3>
+        <p class="msg">No: <b>con y sin RND</b> se llega al mismo punto.</p>
+        <img src="graficas/aprendizaje.svg" alt="Curva de aprendizaje con y sin RND">
+      </div>
+    </div>
+  </section>
+
+  <!-- FILA 4: PERSPECTIVA -->
+  <section class="card tinte">
+    <div class="enc"><span class="num">4</span><span class="barra"></span><h2>Conclusiones: hacia dónde apunta</h2></div>
+    <div class="ruta">
+      <div class="hito hecho"><div class="p">✓</div><h4>Prueba de concepto</h4><span class="trl">HOY · TRL 3</span><p>4 cruces en SUMO, mejor que el plan fijo.</p></div>
+      <div class="hito"><div class="p">2</div><h4>Datos reales</h4><span class="trl">SIGUIENTE</span><p>Calibrar con aforos reales del sector.</p></div>
+      <div class="hito"><div class="p">3</div><h4>Corredor completo</h4><span class="trl">ESCALAR</span><p>Cada agente usa solo sus sensores.</p></div>
+      <div class="hito"><div class="p">4</div><h4>Piloto en calle</h4><span class="trl">TRL 5–6</span><p>Reglas de seguridad: hubo 1 bloqueo en 540 episodios.</p></div>
+    </div>
+  </section>
+
+</main>
+<script>
+  // Solo para revisión: con ?medir anota en el <body> si el contenido se desborda del lienzo.
+  if (location.search.includes('medir')) window.addEventListener('load', () => {
+    const L = document.querySelector('.lienzo');
+    const partes = [...L.children].map(c => c.className + ':' + Math.round(c.getBoundingClientRect().height));
+    document.body.setAttribute('data-medida', `alto=${L.clientHeight} contenido=${L.scrollHeight} | ${partes.join(' ')}`);
+  });
+
+  // Exportación a PowerPoint (la usa poster/exportar_pptx.py):
+  //  ?ppt       todo el texto HTML en Verdana (la fuente de la plantilla), porque PowerPoint no trae Montserrat;
+  //             anota en <body data-ppt> la geometría, estilos y textos que se vuelven formas editables.
+  //  ?graficos  además deja visibles solo los dibujos (logo, esquemas, gráficas, QR) para recortarlos como PNG.
+  const q = location.search;
+  if (q.includes('ppt')) {
+    const st = document.createElement('style');
+    st.textContent = `
+      body :not(svg):not(svg *) { font-family: Verdana, sans-serif !important; }
+      .titulo h1 { font-size: 100px; letter-spacing: 3px; }
+      .titulo .sub { font-size: 41px; font-weight: 400; }
+      .sello .n { font-size: 66px; }  .sello .t { font-size: 27px; }
+      .enc .num { font-size: 84px; }  .enc h2 { font-size: 44px; letter-spacing: 0; }
+      .logo-card .nombre { font-size: 50px; letter-spacing: 1px; }
+      .paso .et { font-size: 29px; letter-spacing: 0; }
+      .kpi .v { font-size: 76px; letter-spacing: -1px; }  .kpi .v small { font-size: 46px; }
+      .panel h3 { font-size: 36px; }  .hito h4 { font-size: 31px; }  .hito .trl { font-size: 23px; }
+      .hito .p { font-size: 30px; }
+      .titulo::after { display: none; }`;
+    document.head.appendChild(st);
+  }
+  if (q.includes('graficos')) {
+    const st = document.createElement('style');
+    st.textContent = `
+      html, body { background: transparent !important; }
+      body * { visibility: hidden !important; }
+      .titulo .insignia, .titulo .insignia *, .logo-card .marca, .logo-card .marca *, .qr img,
+      .paso svg, .paso svg *, .flecha svg, .flecha svg *, .panel img { visibility: visible !important; }`;
+    document.head.appendChild(st);
+  }
+  if (q.includes('ppt')) window.addEventListener('load', async () => {
+    await document.fonts.ready;
+    const R = el => { const r = el.getBoundingClientRect(); return [r.left, r.top, r.width, r.height].map(v => +v.toFixed(2)); };
+    const cajas = [], textos = [], imagenes = [];
+    const SEL_CAJA = '.titulo, .sello, .autores, .card, .paso, .paso .et, .kpi, .panel, .qr, .remate, .hito .p, .hito .trl, .enc .barra';
+    document.querySelectorAll(SEL_CAJA).forEach(el => {
+      const cs = getComputedStyle(el);
+      cajas.push({ cls: el.className, r: R(el), fondo: cs.backgroundColor, radio: parseFloat(cs.borderTopLeftRadius),
+        borde: [cs.borderTopWidth, cs.borderLeftWidth].map(parseFloat), bordeColor: cs.borderTopColor, bordeIzqColor: cs.borderLeftColor });
+    });
+    const ruta = document.querySelector('.ruta');
+    if (ruta) { const [x, y, w] = R(ruta); cajas.push({ cls: 'linea-ruta', r: [x + w * .06, y + 36, w * .88, 8] }); }
+    const SEL_IMG = '.titulo .insignia, .logo-card .marca, .qr img, .paso svg, .flecha svg, .panel img';
+    document.querySelectorAll(SEL_IMG).forEach((el, i) => imagenes.push({ id: 'img' + i, cls: el.getAttribute('class') || el.tagName, r: R(el), alt: el.getAttribute('alt') || '' }));
+    const SEL_TXT = '.titulo h1, .titulo .sub, .sello .n, .sello .t, .autores > span, .enc .num, .enc h2, .card p, .logo-card .nombre, .logo-card .exp, .qr > div, .paso .et, .kpi .v, .kpi .l, .kpi .d, .panel h3, .hito .p, .hito h4, .hito .trl, .remate';
+    document.querySelectorAll(SEL_TXT).forEach(el => {
+      const cs = getComputedStyle(el), r = el.getBoundingClientRect();
+      const pl = parseFloat(cs.paddingLeft), pr = parseFloat(cs.paddingRight), pt = parseFloat(cs.paddingTop), pb = parseFloat(cs.paddingBottom);
+      const parrafos = [[]];
+      const nuevo = () => { if (parrafos[parrafos.length - 1].length) parrafos.push([]); };
+      const camina = (n) => {
+        if (n.nodeType === 3) {
+          const c = getComputedStyle(n.parentElement);
+          let t = n.textContent.replace(/\s+/g, ' ');
+          if (c.textTransform === 'uppercase') t = t.toUpperCase();
+          if (!t.trim() && !parrafos[parrafos.length - 1].length) return;
+          parrafos[parrafos.length - 1].push({ t, px: parseFloat(c.fontSize), b: parseInt(c.fontWeight) >= 600, i: c.fontStyle === 'italic', color: c.color, lh: parseFloat(c.lineHeight) || parseFloat(c.fontSize) * 1.2 });
+        } else if (n.nodeType === 1) {
+          if (n.tagName === 'BR') { nuevo(); return; }
+          const bloque = getComputedStyle(n).display === 'block' && n !== el;
+          if (bloque) nuevo();
+          n.childNodes.forEach(camina);
+          if (bloque) nuevo();
+        }
+      };
+      camina(el);
+      parrafos.forEach(p => { if (p.length) { p[0].t = p[0].t.replace(/^\s+/, ''); p[p.length - 1].t = p[p.length - 1].t.replace(/\s+$/, ''); } });
+      textos.push({ cls: el.className || el.tagName, r: [r.left + pl, r.top + pt, r.width - pl - pr, r.height - pt - pb].map(v => +v.toFixed(2)),
+        alinea: cs.textAlign, vcentro: ['grid', 'flex'].includes(cs.display) && (cs.alignItems === 'center' || cs.placeItems.startsWith('center')),
+        parrafos: parrafos.filter(p => p.length), antes: [], intro: el.tagName === 'P' && !!el.closest('.intro'),
+        espacio: parseFloat(cs.marginTop) || 0 });
+    });
+    // Los párrafos de la introducción van en un solo cuadro: si PowerPoint parte una línea distinto, no quedan huecos.
+    const intro = textos.filter(t => t.intro);
+    if (intro.length > 1) {
+      const a = intro[0], z = intro[intro.length - 1];
+      const unido = { cls: 'intro', alinea: a.alinea, vcentro: false, parrafos: [], antes: [],
+        r: [a.r[0], a.r[1], Math.max(...intro.map(t => t.r[2])), z.r[1] + z.r[3] - a.r[1]] };
+      intro.forEach((t, k) => t.parrafos.forEach((p, j) => { unido.parrafos.push(p); unido.antes.push(k && !j ? t.espacio : 0); }));
+      textos.splice(textos.indexOf(a), intro.length, unido);
+    }
+    const L = document.querySelector('.lienzo');
+    document.body.setAttribute('data-ppt', JSON.stringify({ desborde: L.scrollHeight - L.clientHeight, cajas, textos, imagenes }));
+  });
+</script>
+</body>
+</html>
