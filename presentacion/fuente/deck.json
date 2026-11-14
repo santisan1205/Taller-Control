@@ -2,7 +2,7 @@
   "v": 4,
   "createdOnFiles": {"v": 1, "at": "2026-10-27T15:00:00Z"},
   "lists": "css",
-  "title": "Control semafórico multiagente con RND-MAPPO",
+  "title": "C.I.T.A.D.E.L.: Control Inteligente de Tráfico Adaptativo con Distribución y Exploración Local",
   "cover": "cover",
   "order": ["cover", "agenda", "escenario", "formulacion", "arquitectura", "recompensa", "entrenamiento", "curva", "resultados", "robustez", "intersecciones", "demo", "politica", "variantes", "dashboard", "conclusiones", "cierre"],
   "sections": {
