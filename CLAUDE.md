@@ -5,6 +5,8 @@ Taller de Control (Ing. Eléctrica y Electrónica, Uniandes). Aprendizaje por re
 Equipo: Tomás Castro, Andrés Felipe Barbosa, Mariana Vanoy, Santiago Sánchez.
 Profesor: Jorge Alfredo López Jiménez. **Responder siempre en español.**
 
+**Tarea pendiente actual:** base de datos + dashboard HTML → ver `TAREA_DASHBOARD.md`.
+
 ## Entorno
 - Python con `pip install -r requirements.txt` (versiones fijadas; `sumo-rl==1.4.5`).
 - SUMO **1.27.1** instalado y `SUMO_HOME` definido.
