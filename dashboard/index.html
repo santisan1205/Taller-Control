@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard MAPPO - Diseño Oscuro</title>
+    <!-- SQLite en el navegador (lee dashboard/citadel.db, generada por construir_bd.py) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --app-bg: #141118;
+            --card-bg: #1C1924;
+            --card-border: rgba(255, 255, 255, 0.05);
+            --text-main: #FFFFFF;
+            --text-muted: #8E8B99;
+            --accent-pink: #E975A8;
+            --accent-purple: #9D50BB;
+            --glow-purple: rgba(157, 80, 187, 0.3);
+            --green-positive: #4ADE80;
+            --sidebar-width: 260px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2A1B38 0%, #0F0C14 100%);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* OVERLAY PARA LOGIN/NOMBRE */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-card {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            text-align: center;
+            width: 400px;
+            box-shadow: 0 0 50px rgba(157, 80, 187, 0.2);
+        }
+
+        .login-card h2 {
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .login-card h2 span {
+            color: var(--accent-pink);
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .login-input:focus {
+            border-color: var(--accent-purple);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple));
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .app-container {
+            background-color: var(--app-bg);
+            width: 100%;
+            max-width: 1400px;
+            height: 95vh;
+            border-radius: 24px;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--card-border);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: #17141E;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--card-border);
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--text-main);
+        }
+
+        .logo .icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .menu-item.active {
+            color: var(--text-main);
+            background: linear-gradient(90deg, rgba(157, 80, 187, 0.2) 0%, transparent 100%);
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        .bottom-menu {
+            margin-top: auto;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            position: relative;
+        }
+
+        /* SECCIONES (PÁGINAS) */
+        .page-section {
+            display: none;
+            flex-direction: column;
+            gap: 25px;
+            height: 100%;
+        }
+
+        .page-section.active-page {
+            display: flex;
+        }
+
+        /* PÁGINAS PLACEHOLDERS (Para las otras secciones) */
+        .placeholder-page {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            border: 1px dashed var(--card-border);
+            color: var(--text-muted);
+            text-align: center;
+            padding: 40px;
+        }
+
+        .placeholder-page h2 {
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .greeting h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .greeting h1 span {
+            color: var(--accent-pink);
+        }
+
+        .greeting p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-bar {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 250px;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-purple);
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .profile-role {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* TOGGLES */
+        .toggles {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* INDICADOR MODO GLOBAL */
+        .mode-indicator {
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--green-positive);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* GRID LAYOUT */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.2fr;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        /* BLOQUE 1: Recompensa */
+        .total-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        /* BLOQUE 2: AI Insights */
+        .ai-card {
+            background: linear-gradient(180deg, var(--card-bg) 0%, rgba(30, 20, 40, 1) 100%);
+            margin-top: 20px;
+        }
+
+        .ai-card p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .ai-btn {
+            background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple));
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--glow-purple);
+            transition: transform 0.2s;
+            align-self: flex-start;
+        }
+
+        .ai-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* BLOQUE 3: KPIs */
+        .kpi-container {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .kpi-container.active-kpi {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .kpi-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .kpi-item:last-child {
+            border-bottom: none;
+        }
+
+        .kpi-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .kpi-icon {
+            width: 35px;
+            height: 35px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .kpi-details h4 {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .kpi-details p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .kpi-stats {
+            text-align: right;
+        }
+
+        .kpi-stats h4 {
+            font-size: 0.95rem;
+        }
+
+        .kpi-stats p {
+            font-size: 0.75rem;
+            color: var(--green-positive);
+        }
+
+        /* BLOQUE 4: Agentes */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .agent-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 15px;
+            padding: 15px;
+        }
+
+        .agent-val {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 5px 0;
+        }
+
+        .agent-change {
+            font-size: 0.75rem;
+            color: var(--green-positive);
+            margin-bottom: 10px;
+        }
+
+        .agent-name {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* CHART AREA */
+        .chart-section {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--card-border);
+            margin-top: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .time-filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .time-btn {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 5px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .time-btn.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+        }
+
+        /* SVG Simulación Gráfico */
+        .chart-visual {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: center bottom;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .chart-line {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(180deg, var(--glow-purple) 0%, transparent 100%);
+            clip-path: polygon(0 60%, 10% 40%, 20% 50%, 30% 30%, 40% 45%, 50% 20%, 60% 35%, 70% 10%, 80% 25%, 90% 15%, 100% 5%, 100% 100%, 0% 100%);
+            border-top: 2px solid var(--accent-pink);
+        }
+
+        /* SVG PATH realístico */
+        svg.graph-svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            bottom: 0;
+        }
+
+        .tooltip {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            background-color: #2A2633;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: translateX(-50%);
+        }
+
+        .tooltip-dot {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            background-color: #FFF;
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-pink);
+            transform: translateX(-50%);
+        }
+
+        .tooltip-line {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            width: 1px;
+            height: 80%;
+            background: dashed 1px var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY DE LOGIN / INGRESO DE NOMBRE -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>Configuración del <span>Dashboard</span></h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Por favor, ingresa el nombre de la persona a cargo del monitoreo.</p>
+            <input type="text" id="user-name-input" class="login-input" placeholder="Ej. Mariana, Profesor, Evaluador..." required>
+            <button class="login-btn" onclick="startDashboard()">Iniciar Monitoreo</button>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="icon"></div>
+                <span>Optimizador MAPPO</span>
+            </div>
+
+            <nav class="menu">
+                <a class="menu-item active" data-page="dashboard-page" onclick="switchPage('dashboard-page', this)">
+                    <span>⊞</span> Dashboard
+                </a>
+                <a class="menu-item" data-page="red-trafico-page" onclick="switchPage('red-trafico-page', this)">
+                    <span>⌘</span> Red de Tráfico
+                </a>
+                <a class="menu-item" data-page="entrenamiento-page" onclick="switchPage('entrenamiento-page', this)">
+                    <span>◎</span> Entrenamiento
+                </a>
+                <a class="menu-item" data-page="comunidad-page" onclick="switchPage('comunidad-page', this)">
+                    <span>⌂</span> Comunidad
+                </a>
+            </nav>
+
+            <div class="menu bottom-menu">
+                <a class="menu-item" data-page="configuracion-page" onclick="switchPage('configuracion-page', this)">
+                    <span>⚙</span> Configuración
+                </a>
+                <a class="menu-item" data-page="soporte-page" onclick="switchPage('soporte-page', this)">
+                    <span>?</span> Soporte
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- HEADER GLOBAL (Se muestra en todas las páginas) -->
+            <header class="header">
+                <div class="greeting">
+                    <h1>Bienvenid@, <span id="display-name">Usuario</span></h1>
+                    <p>Aquí está el resumen del rendimiento de tu modelo de tráfico</p>
+                </div>
+                <div class="header-right">
+                    <div class="search-bar">
+                        <span>🔍</span> Pregúntale a SUMO.ai
+                    </div>
+                    <div class="profile">
+                        <div class="profile-info">
+                            <span class="profile-name" id="profile-name-display">Usuario</span>
+                            <span class="profile-role">Admin Proyecto</span>
+                        </div>
+                        <div class="profile-img"></div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- FILTROS GLOBALES (configuración, ventana, escala y línea base de referencia) -->
+            <div id="filtros" class="toggles" style="flex-wrap: wrap; align-items: center; gap: 5px;"></div>
+
+            <!-- CONTENEDOR DE PÁGINAS -->
+
+            <!-- 1. PÁGINA: DASHBOARD PRINCIPAL -->
+            <div id="dashboard-page" class="page-section active-page">
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="toggles">
+                        <button class="toggle-btn active" onclick="setMode('Evaluación', this)">Evaluación</button>
+                        <button class="toggle-btn" onclick="setMode('Entrenamiento', this)">Entrenamiento</button>
+                        <button class="toggle-btn" onclick="setMode('Simulación (SUMO)', this)">Simulación (SUMO)</button>
+                    </div>
+                    <div class="mode-indicator" id="current-mode-indicator">
+                        Modo actual: Evaluación
+                    </div>
+                </div>
+
+                <!-- GRID -->
+                <div class="dashboard-grid">
+
+                    <!-- COLUMNA 1 -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div class="card">
+                            <div class="card-header">
+                                <span>Recompensa Acumulada</span>
+                                <span id="recompensa-badge" style="border: 1px solid var(--card-border); padding: 2px 10px; border-radius: 10px; font-size: 0.8rem;">10k Ep</span>
+                            </div>
+                            <div class="total-value" id="recompensa-valor">12,304.11</div>
+                        </div>
+
+                        <div class="card ai-card">
+                            <div class="card-header">
+                                <span>Decisiones Guiadas por Datos</span>
+                            </div>
+                            <p id="insight-texto">Ve más allá de las conjeturas con estrategias de exploración impulsadas por RND y MAPPO para optimizar el flujo.</p>
+                            <button class="ai-btn" onclick="siguienteInsight()">Explorar Insights IA</button>
+                        </div>
+                    </div>
+
+                    <!-- COLUMNA 2: KPIs -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span>Métricas de Tráfico</span>
+                            <div class="toggles" style="gap: 5px;">
+                                <button class="toggle-btn active" style="padding: 4px 10px; font-size: 0.75rem;" onclick="switchKpiTab('tiempo', this)">Tiempo</button>
+                                <button class="toggle-btn" style="padding: 4px 10px; font-size: 0.75rem;" onclick="switchKpiTab('flujo', this)">Flujo</button>
+                            </div>
+                        </div>
+
+                        <!-- LISTA DE KPIs: TIEMPO (Default) -->
+                        <div id="kpi-tiempo" class="kpi-container active-kpi"></div>
+
+                        <!-- LISTA DE KPIs: FLUJO (Oculta por defecto) -->
+                        <div id="kpi-flujo" class="kpi-container"></div>
+                    </div>
+
+                    <!-- COLUMNA 3: Agentes -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span>Estado de Agentes (MAPPO)</span>
+                            <span onclick="irAPagina('red-trafico-page')" title="Ver los carros en cada cruce" style="border: 1px solid var(--card-border); padding: 2px 10px; border-radius: 10px; font-size: 0.8rem; cursor: pointer;">Ver todos ↗</span>
+                        </div>
+
+                        <div class="agents-grid" id="agentes-grid"></div>
+                    </div>
+                </div>
+
+                <!-- GRAFICO BOTTOM -->
+                <div class="chart-section">
+                    <div class="chart-header">
+                        <span id="grafico-titulo">Rendimiento del Entrenamiento (Recompensa)</span>
+                        <div class="time-filters" id="grafico-filtros"></div>
+                    </div>
+
+                    <div class="chart-visual" id="grafico-principal" style="min-height: 200px;"></div>
+                    <div id="grafico-principal-x"></div>
+                </div>
+            </div> <!-- Fin Dashboard Page -->
+
+            <!-- 2. PÁGINA: RED DE TRÁFICO -->
+            <div id="red-trafico-page" class="page-section">
+                <!-- Visor: el mismo tráfico simulado en SUMO, con y sin inteligencia artificial -->
+                <div class="chart-section" style="margin-top: 0; flex: none;">
+                    <div class="chart-header">
+                        <span>Mira los carros: mismo tráfico, dos formas de manejar los semáforos</span>
+                        <div class="time-filters" id="sim-vistas"></div>
+                    </div>
+                    <p id="sim-explicacion" style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 15px;">
+                        Cargando la simulación…
+                    </p>
+                    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                        <div class="agent-card">
+                            <div class="agent-name" style="margin-bottom: 10px;"><span style="color: var(--text-main); font-size: 0.9rem;">Semáforos actuales</span><span>tiempo fijo</span></div>
+                            <canvas id="sim-fijo" style="width: 100%; height: 340px; display: block; border-radius: 10px; background: #17141E;"></canvas>
+                            <div class="agent-val" id="sim-fijo-detenidos">—</div>
+                            <div class="agent-name"><span>carros detenidos ahora en toda la zona</span><span id="sim-fijo-promedio"></span></div>
+                        </div>
+                        <div class="agent-card">
+                            <div class="agent-name" style="margin-bottom: 10px;"><span style="color: var(--text-main); font-size: 0.9rem;">Semáforos con inteligencia artificial</span><span>RND-MAPPO</span></div>
+                            <canvas id="sim-rl" style="width: 100%; height: 340px; display: block; border-radius: 10px; background: #17141E;"></canvas>
+                            <div class="agent-val" id="sim-rl-detenidos">—</div>
+                            <div class="agent-name"><span>carros detenidos ahora en toda la zona</span><span id="sim-rl-promedio"></span></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px; margin-top: 20px;">
+                        <button class="ai-btn" id="sim-play" onclick="alternarReproduccion()">▶ Reproducir</button>
+                        <div class="time-filters" id="sim-velocidades"></div>
+                        <div id="sim-barra" onclick="buscarEnSimulacion(event)" style="flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); cursor: pointer; position: relative;">
+                            <div id="sim-progreso" style="height: 100%; width: 0; border-radius: 3px; background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));"></div>
+                        </div>
+                        <span id="sim-reloj" style="color: var(--text-muted); font-size: 0.8rem; white-space: nowrap;">0:00 / 10:00</span>
+                    </div>
+                    <div id="sim-leyenda" style="display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.75rem; color: var(--text-muted); margin-top: 15px;"></div>
+                </div>
+            </div>
+
+            <!-- 3. PÁGINA: ENTRENAMIENTO -->
+            <div id="entrenamiento-page" class="page-section">
+                <div class="chart-section" style="margin-top: 0; flex: none;">
+                    <div class="chart-header">
+                        <span id="ent-titulo">Curvas de aprendizaje de las 6 configuraciones</span>
+                        <div class="time-filters" id="ent-filtros"></div>
+                    </div>
+                    <div class="chart-visual" id="ent-grafico" style="min-height: 220px;"></div>
+                    <div id="ent-grafico-x"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <span>Las 6 versiones de la IA que se entrenaron</span>
+                        <span style="border: 1px solid var(--card-border); padding: 2px 10px; border-radius: 10px; font-size: 0.8rem;">150 h de práctica · 3 intentos c/u</span>
+                    </div>
+                    <div class="kpi-container active-kpi" id="ent-corridas"></div>
+                </div>
+            </div>
+
+            <!-- 4. PÁGINA: COMUNIDAD (Placeholder) -->
+            <div id="comunidad-page" class="page-section">
+                <div class="placeholder-page">
+                    <h2>⌂ Repositorio y Comunidad</h2>
+                    <p>Acceso a commits de GitHub, documentación técnica y notas de los desarrolladores.</p>
+                </div>
+            </div>
+
+            <!-- 6. PÁGINA: CONFIGURACION -->
+            <div id="configuracion-page" class="page-section">
+                <div class="placeholder-page">
+                    <h2>⚙ Configuración del Sistema</h2>
+                    <p id="config-texto">Ajustes de la plataforma, conexión con el backend de Python y exportación de datos.</p>
+                </div>
+            </div>
+
+            <!-- 7. PÁGINA: SOPORTE -->
+            <div id="soporte-page" class="page-section">
+                <div class="placeholder-page">
+                    <h2>? Soporte y Documentación</h2>
+                    <p id="soporte-texto">Manual de usuario para operar el dashboard y entender las métricas de evaluación.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // FUNCIÓN 1: Ocultar el overlay de inicio e ingresar el nombre
+        function startDashboard() {
+            const nameInput = document.getElementById('user-name-input').value.trim();
+            if (nameInput === "") {
+                alert("Por favor, ingresa un nombre para continuar.");
+                return;
+            }
+
+            // Actualizar los textos con el nombre ingresado
+            document.getElementById('display-name').innerText = nameInput;
+            document.getElementById('profile-name-display').innerText = nameInput;
+
+            // Ocultar el overlay con una transición
+            const overlay = document.getElementById('login-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 300); // Esperar a que termine la transición de opacidad (si se añadiera CSS transition)
+        }
+
+        // FUNCIÓN 2: Navegación entre páginas desde el Sidebar
+        function switchPage(pageId, element) {
+            // 1. Quitar 'active' a todos los botones del menú
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            // 2. Añadir 'active' al botón seleccionado
+            element.classList.add('active');
+
+            // 3. Ocultar todas las secciones de página
+            document.querySelectorAll('.page-section').forEach(page => {
+                page.classList.remove('active-page');
+            });
+            // 4. Mostrar solo la página deseada
+            document.getElementById(pageId).classList.add('active-page');
+            // 5. Redibujar con los datos (los gráficos necesitan la página visible para medirse)
+            renderPagina();
+        }
+
+        function irAPagina(pageId) {
+            switchPage(pageId, document.querySelector(`.menu-item[data-page="${pageId}"]`));
+        }
+
+        // FUNCIÓN 3: Cambiar entre las pestañas de Tiempo y Flujo en el KPI Card
+        function switchKpiTab(tabName, element) {
+            // Botones de KPI
+            const buttons = element.parentElement.querySelectorAll('.toggle-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            // Contenedores de KPI
+            document.querySelectorAll('.kpi-container[id^="kpi-"]').forEach(container => {
+                container.classList.remove('active-kpi');
+            });
+
+            // Mostrar el contenedor correspondiente
+            document.getElementById(`kpi-${tabName}`).classList.add('active-kpi');
+        }
+
+        // FUNCIÓN 4: Cambiar el modo de operación (Evaluación, Entrenamiento, Simulación)
+        function setMode(modeName, element) {
+            // Cambiar botón activo
+            const buttons = element.parentElement.querySelectorAll('.toggle-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            ESTADO.modo = modeName;
+            actualizarIndicador();
+
+            // Cambiar color del indicador según el modo para dar feedback visual
+            const indicator = document.getElementById('current-mode-indicator');
+            if (modeName === 'Entrenamiento') {
+                indicator.style.color = '#F39C12'; // Naranja
+                indicator.style.background = 'rgba(243, 156, 18, 0.1)';
+                indicator.style.borderColor = 'rgba(243, 156, 18, 0.2)';
+            } else if (modeName === 'Simulación (SUMO)') {
+                indicator.style.color = '#3498DB'; // Azul
+                indicator.style.background = 'rgba(52, 152, 219, 0.1)';
+                indicator.style.borderColor = 'rgba(52, 152, 219, 0.2)';
+            } else {
+                // Evaluación (Verde)
+                indicator.style.color = 'var(--green-positive)';
+                indicator.style.background = 'rgba(74, 222, 128, 0.1)';
+                indicator.style.borderColor = 'rgba(74, 222, 128, 0.2)';
+            }
+            renderPagina();
+        }
+
+        // =====================================================================
+        // CONEXIÓN CON LOS DATOS (citadel.db, campaña v2)
+        // =====================================================================
+        // Las configuraciones existen para cada versión del algoritmo de entrenamiento:
+        // v2_* (algoritmo 1, la campaña consolidada) y v2a2_* (algoritmo 2: crítico por
+        // agente + ValueNorm, RND con normalización acumulada). Ver CLAUDE.md.
+        const PREFIJO_ALG = {1: 'v2_', 2: 'v2a2_'};
+        const CONFIGS_BASE = ['base', 'sin_rnd', 'mas_exploracion', 'prioriza_espera', 'penaliza_cambio', 'peatones_alto'];
+        // Nombres en lenguaje sencillo (el dashboard es para alguien que no conoce el proyecto);
+        // el nombre técnico de cada uno está en la página de Soporte
+        const NOMBRE_BASE = {
+            base: 'IA estándar', sin_rnd: 'IA sin curiosidad', mas_exploracion: 'IA más exploradora',
+            prioriza_espera: 'IA prioriza espera', penaliza_cambio: 'IA cambia menos', peatones_alto: 'IA prioriza peatones',
+        };
+        const NOMBRE = {tiempo_fijo: 'Semáforo fijo', actuado: 'Semáforo con sensores', max_pressure: 'Regla de colas'};
+        Object.values(PREFIJO_ALG).forEach(p => CONFIGS_BASE.forEach(c => NOMBRE[p + c] = NOMBRE_BASE[c]));
+        const BASES = ['tiempo_fijo', 'actuado', 'max_pressure'];
+        const ROJO = '#F87171';
+        const T_975 = {2: 4.303, 4: 2.776};  // t de Student para IC95 con n = 3 y n = 5
+
+        const ESTADO = {
+            modo: 'Evaluación', alg: 1, config: 'v2_base', ventana: 'pico', escala: 1.0, ref: 'tiempo_fijo',
+            metEval: 'espera_media', metEnt: 'recompensa_ext', metSim: 'espera_media', semillas: false,
+            cruce: 'C2', entMet: 'espera_media',
+        };
+        let DB = null, METRICAS = {}, ALERTAS = [], insightIdx = 0;
+        let CONFIGS = CONFIGS_BASE.map(c => PREFIJO_ALG[1] + c);  // las del algoritmo elegido
+        let ALGS_DISPONIBLES = [1];                               // versiones con datos en la base
+        const sinPrefijo = c => c.slice(PREFIJO_ALG[ESTADO.alg].length);
+        const configDe = base => PREFIJO_ALG[ESTADO.alg] + base;
+        const listaSQL = lista => lista.map(c => `'${c}'`).join(', ');
+
+        function q(sql, params = []) {
+            const st = DB.prepare(sql);
+            st.bind(params);
+            const filas = [];
+            while (st.step()) filas.push(st.getAsObject());
+            st.free();
+            return filas;
+        }
+        const uno = (sql, params) => q(sql, params)[0] || {};
+
+        // ---------- Formato ----------
+        function fmt(v, dec = null) {
+            if (v === null || v === undefined || Number.isNaN(v)) return '—';
+            const a = Math.abs(v);
+            const d = dec !== null ? dec : (a >= 1000 ? 0 : a >= 100 ? 1 : 2);
+            return v.toLocaleString('en-US', {minimumFractionDigits: d, maximumFractionDigits: d});
+        }
+        function fmtP(p) { return p === null || p === undefined ? '—' : (p < 0.001 ? '< 0.001' : fmt(p, 3)); }
+        function unidad(m) { return (METRICAS[m] && METRICAS[m].unidad) || ''; }
+        function etiqueta(m) { return (METRICAS[m] && METRICAS[m].etiqueta) || m; }
+        function conUnidad(v, m) {
+            const u = unidad(m);
+            return u && u !== '#' ? `${fmt(v)} ${u}` : fmt(v);
+        }
+        // Mejora en %: positiva = mejor, según si la métrica es mejor cuando baja o cuando sube
+        function mejora(v, ref, sentido) {
+            if (!ref) return null;
+            return (sentido === 'mayor' ? (v - ref) : (ref - v)) / Math.abs(ref) * 100;
+        }
+        // Flecha según la dirección del cambio y color según si es mejor o peor
+        function cambioHTML(v, ref, sentido, sufijo = '') {
+            const m = mejora(v, ref, sentido);
+            if (m === null || Number.isNaN(m)) return '<p style="color: var(--text-muted);">—</p>';
+            const flecha = v < ref ? '↓' : '↑';
+            const pct = Math.abs((v - ref) / ref * 100);
+            const color = sentido === 'neutro' ? 'var(--text-muted)' : (m >= 0 ? 'var(--green-positive)' : ROJO);
+            return `<p style="color: ${color};">${flecha} ${fmt(pct, 1)}%${sufijo}</p>`;
+        }
+        const sentidoDe = m => (METRICAS[m] && METRICAS[m].mejor_si) || 'menor';
+
+        // ---------- Consultas ----------
+        // Agente (config) en evaluación: media entre las 3 semillas de entrenamiento + IC95
+        function evalConfig(config, metrica, ventana = ESTADO.ventana, escala = ESTADO.escala, ref = ESTADO.ref) {
+            return uno(`SELECT media, std, ic95_inf, ic95_sup, media_ref, mejora_pct, p_valor
+                        FROM evaluacion_configs WHERE config = ? AND metrica = ? AND ventana = ? AND escala = ?
+                        AND referencia = ?`, [config, metrica, ventana, escala, ref]);
+        }
+        // Línea base: media e IC95 entre las 5 semillas de SUMO
+        function evalBase(modo, metrica, ventana = ESTADO.ventana, escala = ESTADO.escala) {
+            const v = q(`SELECT ${metrica} AS v FROM evaluacion_detalle WHERE modo = ? AND ventana = ? AND escala = ?`,
+                        [modo, ventana, escala]).map(f => f.v).filter(x => x !== null);
+            return estadistica(v);
+        }
+        function estadistica(v) {
+            const n = v.length;
+            if (!n) return {media: null};
+            const media = v.reduce((a, b) => a + b, 0) / n;
+            const std = n > 1 ? Math.sqrt(v.reduce((a, b) => a + (b - media) ** 2, 0) / (n - 1)) : 0;
+            const margen = n > 1 ? (T_975[n - 1] || 2) * std / Math.sqrt(n) : 0;
+            return {media, std, ic95_inf: media - margen, ic95_sup: media + margen, n};
+        }
+        function alertaDe(config, ventana = ESTADO.ventana, escala = ESTADO.escala) {
+            return ALERTAS.filter(a => a.politica.startsWith(config + '_seed') && a.ventana === ventana &&
+                                       Math.abs(a.escala - escala) < 1e-9);
+        }
+        function escalaSim() { return 1.0; }  // las series de tiempo solo existen con demanda nominal
+
+        // ---------- Filtros globales ----------
+        function renderFiltros() {
+            const grupo = (titulo, clave, opciones) =>
+                `<span style="color: var(--text-muted); font-size: 0.75rem; margin: 0 4px 0 10px;">${titulo}</span>` +
+                opciones.map(([valor, texto]) =>
+                    `<button class="toggle-btn ${ESTADO[clave] === valor ? 'active' : ''}"
+                        style="padding: 4px 10px; font-size: 0.75rem;"
+                        onclick='cambiarFiltro(${JSON.stringify(clave)}, ${JSON.stringify(valor)})'>${texto}</button>`
+                ).join('');
+            document.getElementById('filtros').innerHTML =
+                (ALGS_DISPONIBLES.length > 1
+                    ? grupo('Algoritmo', 'alg', ALGS_DISPONIBLES.map(a => [a, `v${a}`])) : '') +
+                grupo('Versión de la IA', 'config', CONFIGS.map(c => [c, NOMBRE[c]])) +
+                grupo('Hora', 'ventana', [['valle', 'Valle'], ['pico', 'Pico']]) +
+                grupo('Tráfico', 'escala', [[0.8, '−20%'], [1.0, 'Normal'], [1.2, '+20%']]) +
+                grupo('Comparar con', 'ref', BASES.map(b => [b, NOMBRE[b]]));
+        }
+        function cambiarFiltro(clave, valor) {
+            if (clave === 'alg') {
+                // Misma configuración, con el prefijo del otro algoritmo
+                const base = sinPrefijo(ESTADO.config);
+                ESTADO.alg = valor;
+                CONFIGS = CONFIGS_BASE.map(configDe);
+                ESTADO.config = configDe(base);
+                valor = ESTADO.alg;
+            }
+            ESTADO[clave] = valor;
+            insightIdx = 0;
+            renderFiltros();
+            actualizarIndicador();
+            renderPagina();
+        }
+        // "hora pico, tráfico normal": el escenario en palabras
+        function escenarioTexto(ventana = ESTADO.ventana, escala = ESTADO.escala) {
+            const trafico = Math.abs(escala - 1) < 1e-9 ? 'tráfico normal' : (escala > 1 ? '20% más tráfico' : '20% menos tráfico');
+            return `hora ${ventana}, ${trafico}`;
+        }
+        function actualizarIndicador() {
+            const esc = ESTADO.modo === 'Simulación (SUMO)' ? escalaSim() : ESTADO.escala;
+            const alg = ALGS_DISPONIBLES.length > 1 ? ` (alg. v${ESTADO.alg})` : '';
+            const contexto = ESTADO.modo === 'Entrenamiento' ? `${NOMBRE[ESTADO.config]}${alg}`
+                : `${NOMBRE[ESTADO.config]}${alg} · ${escenarioTexto(ESTADO.ventana, esc)}`;
+            document.getElementById('current-mode-indicator').innerText = `Modo actual: ${ESTADO.modo} · ${contexto}`;
+        }
+
+        // ---------- Tarjeta de recompensa ----------
+        function renderRecompensa() {
+            const r = uno(`SELECT AVG(recompensa_ext) AS r, MAX(episodio) AS n FROM v_entrenamiento_config
+                           WHERE config = ? AND episodio > (SELECT MAX(episodio) - 10 FROM v_entrenamiento_config)`,
+                          [ESTADO.config]);
+            const total = uno('SELECT MAX(episodio) AS n FROM entrenamiento_episodios').n;
+            document.getElementById('recompensa-valor').innerText = fmt(r.r, 2);
+            document.getElementById('recompensa-valor').title =
+                'Puntaje que recibe la IA por reducir colas y esperas en cada hora simulada (más alto = mejor). ' +
+                'Promedio de los últimos 10 episodios de entrenamiento.';
+            document.getElementById('recompensa-badge').innerText = `${total} Ep`;
+        }
+
+        // ---------- KPIs ----------
+        function kpiItem(icono, titulo, sub, valor, cambio, atributos = '') {
+            return `<div class="kpi-item" ${atributos}>
+                        <div class="kpi-info">
+                            <div class="kpi-icon">${icono}</div>
+                            <div class="kpi-details"><h4>${titulo}</h4><p>${sub}</p></div>
+                        </div>
+                        <div class="kpi-stats"><h4 style="white-space: nowrap;">${valor}</h4>${cambio}</div>
+                    </div>`;
+        }
+        function renderKPIs() {
+            const ref = NOMBRE[ESTADO.ref];
+            let tiempo = [], flujo = [];
+            if (ESTADO.modo === 'Evaluación') {
+                const k = (icono, titulo, metrica) => {
+                    const e = evalConfig(ESTADO.config, metrica);
+                    return kpiItem(icono, titulo, `frente a ${ref}`,
+                                   conUnidad(e.media, metrica), cambioHTML(e.media, e.media_ref, sentidoDe(metrica)));
+                };
+                tiempo = [k('⏱', 'Tiempo de Espera', 'espera_media'),
+                          k('🚥', 'Longitud de Cola', 'vehiculos_detenidos_media'),
+                          k('🛑', 'Espera Peatonal', 'peatones_espera_media')];
+                flujo = [k('🚗', 'Flujo Vehicular Total', 'vehiculos_por_hora'),
+                         k('☁️', 'Emisiones CO2', 'co2_total_kg'),
+                         k('⛽', 'Consumo Combustible', 'combustible_total_kg')];
+            } else if (ESTADO.modo === 'Entrenamiento') {
+                // Últimos 10 episodios frente a los primeros 10 (promedio de las 3 semillas)
+                const fin = col => `AVG(CASE WHEN episodio > 140 THEN ${col} END)`;
+                const ini = col => `AVG(CASE WHEN episodio <= 10 THEN ${col} END)`;
+                const cambios = 'C1_cambios_fase + C2_cambios_fase + C3_cambios_fase + C4_cambios_fase';
+                const r = uno(`SELECT ${fin('espera_media')} AS esp_f, ${ini('espera_media')} AS esp_i,
+                    ${fin('vehiculos_detenidos_media')} AS det_f, ${ini('vehiculos_detenidos_media')} AS det_i,
+                    ${fin(cambios)} AS cf_f, ${ini(cambios)} AS cf_i,
+                    ${fin('recompensa_ext')} AS rext_f, ${ini('recompensa_ext')} AS rext_i,
+                    ${fin('velocidad_media')} AS vel_f, ${ini('velocidad_media')} AS vel_i,
+                    SUM(duracion_s) / 3600.0 / COUNT(DISTINCT corrida) AS horas
+                    FROM entrenamiento_episodios WHERE config = ?`, [ESTADO.config]);
+                const sub = 'Al final vs al inicio';
+                tiempo = [kpiItem('⏱', 'Tiempo de Espera', sub, `${fmt(r.esp_f)} s`, cambioHTML(r.esp_f, r.esp_i, 'menor')),
+                          kpiItem('🚥', 'Longitud de Cola', sub, `${fmt(r.det_f)} veh`, cambioHTML(r.det_f, r.det_i, 'menor')),
+                          kpiItem('🛑', 'Cambios de Luz', `${sub} · por hora`, fmt(r.cf_f, 0), cambioHTML(r.cf_f, r.cf_i, 'neutro'))];
+                flujo = [kpiItem('🚗', 'Puntaje de la IA', `${sub} · más alto es mejor`, fmt(r.rext_f, 0), cambioHTML(r.rext_f, r.rext_i, 'mayor')),
+                         kpiItem('☁️', 'Velocidad Media', sub, `${fmt(r.vel_f)} m/s`, cambioHTML(r.vel_f, r.vel_i, 'mayor')),
+                         kpiItem('⛽', 'Tiempo de Práctica', '150 horas simuladas', `${fmt(r.horas, 1)} h`,
+                                 '<p style="color: var(--text-muted);">de cómputo</p>')];
+            } else {
+                const s = c => uno(`SELECT AVG(espera_media) AS esp, AVG(vehiculos_detenidos) AS det,
+                                    MAX(vehiculos_detenidos) AS det_max, AVG(velocidad_media) AS vel,
+                                    AVG(C2_detenidos) AS c2, AVG(C3_detenidos) AS c3
+                                    FROM v_series_config WHERE config = ? AND ventana = ? AND escala = ?`,
+                                   [c, ESTADO.ventana, escalaSim()]);
+                const a = s(ESTADO.config), b = s(ESTADO.ref);
+                const sub = t => `${t} · frente a ${ref}`;
+                tiempo = [kpiItem('⏱', 'Tiempo de Espera', sub('Hora simulada'), `${fmt(a.esp)} s`, cambioHTML(a.esp, b.esp, 'menor')),
+                          kpiItem('🚥', 'Longitud de Cola', sub('Detenidos prom.'), `${fmt(a.det)} veh`, cambioHTML(a.det, b.det, 'menor')),
+                          kpiItem('🛑', 'Pico de Detenidos', sub('Máx. de la serie'), `${fmt(a.det_max)} veh`, cambioHTML(a.det_max, b.det_max, 'menor'))];
+                flujo = [kpiItem('🚗', 'Velocidad Media', sub('Red'), `${fmt(a.vel)} m/s`, cambioHTML(a.vel, b.vel, 'mayor')),
+                         kpiItem('☁️', 'Detenidos en C2', sub('Cruce'), `${fmt(a.c2)} veh`, cambioHTML(a.c2, b.c2, 'menor')),
+                         kpiItem('⛽', 'Detenidos en C3', sub('Cruce'), `${fmt(a.c3)} veh`, cambioHTML(a.c3, b.c3, 'menor'))];
+            }
+            document.getElementById('kpi-tiempo').innerHTML = tiempo.join('');
+            document.getElementById('kpi-flujo').innerHTML = flujo.join('');
+        }
+
+        // ---------- Agentes (un actor por cruce) ----------
+        // explicacion va al title (se ve al pasar el mouse) para no cambiar el tamaño de la tarjeta
+        function agenteCard(i, valor, v, ref, sentido, explicacion) {
+            const m = mejora(v, ref, sentido);
+            const delta = v - ref;
+            const color = sentido === 'neutro' || m === null ? 'var(--text-muted)' : (m >= 0 ? 'var(--green-positive)' : ROJO);
+            const cambio = m === null || Number.isNaN(m) ? '—'
+                : `${delta >= 0 ? '+' : ''}${fmt(delta)} (${fmt(Math.abs(delta / ref * 100), 1)}%)`;
+            return `<div class="agent-card" title="${explicacion}">
+                        <div class="agent-val">${valor}</div>
+                        <div class="agent-change" style="color: ${color};">${cambio}</div>
+                        <div class="agent-name"><span>Agente ${i}</span><span>C${i}</span></div>
+                    </div>`;
+        }
+        function renderAgentes() {
+            let html = '';
+            if (ESTADO.modo === 'Evaluación') {
+                const sql = `SELECT cruce, AVG(espera_acumulada_media) AS v FROM v_por_cruce
+                             WHERE config = ? AND ventana = ? AND escala = ? GROUP BY cruce ORDER BY cruce`;
+                const a = q(sql, [ESTADO.config, ESTADO.ventana, ESTADO.escala]);
+                const b = q(sql, [ESTADO.ref, ESTADO.ventana, ESTADO.escala]);
+                a.forEach((f, i) => html += agenteCard(i + 1, `${fmt(f.v)} s`, f.v, b[i].v, 'menor',
+                    `Espera acumulada media en los carriles de entrada de C${i + 1}, frente a ${NOMBRE[ESTADO.ref]} (${fmt(b[i].v)} s)`));
+            } else if (ESTADO.modo === 'Entrenamiento') {
+                // Cuántas veces cambia la luz en cada cruce por hora: al final del entrenamiento frente al inicio
+                for (let i = 1; i <= 4; i++) {
+                    const r = uno(`SELECT AVG(CASE WHEN episodio > 140 THEN C${i}_cambios_fase END) AS f,
+                                          AVG(CASE WHEN episodio <= 10 THEN C${i}_cambios_fase END) AS i
+                                   FROM entrenamiento_episodios WHERE config = ?`, [ESTADO.config]);
+                    html += agenteCard(i, `${fmt(r.f, 0)} cambios`, r.f, r.i, 'neutro',
+                        `Veces que cambió la luz en C${i} por hora simulada, al final del entrenamiento (al inicio: ${fmt(r.i, 0)})`);
+                }
+            } else {
+                for (let i = 1; i <= 4; i++) {
+                    const sql = `SELECT AVG(C${i}_detenidos) AS v FROM v_series_config WHERE config = ? AND ventana = ? AND escala = ?`;
+                    const a = uno(sql, [ESTADO.config, ESTADO.ventana, escalaSim()]).v;
+                    const b = uno(sql, [ESTADO.ref, ESTADO.ventana, escalaSim()]).v;
+                    html += agenteCard(i, `${fmt(a)} veh`, a, b, 'menor',
+                        `Vehículos detenidos en C${i}, promedio de la hora simulada, frente a ${NOMBRE[ESTADO.ref]} (${fmt(b)} veh)`);
+                }
+            }
+            document.getElementById('agentes-grid').innerHTML = html;
+        }
+
+        // Episodio atípico explicado en palabras
+        function textoAlerta(a) {
+            const config = a.politica.replace(/_seed\d+$/, '');
+            return `⚠ En una de las pruebas de la ${NOMBRE[config] || config} (${escenarioTexto(a.ventana, a.escala)}) el tráfico ` +
+                   `se trancó por completo: los carros esperaron ${fmt(a.valor, 0)} s en promedio, cuando lo normal en ese escenario ` +
+                   `es ${fmt(a.mediana_escenario, 1)} s. Es un resultado real y sube el promedio de esa versión.`;
+        }
+
+        // ---------- Insights (generados a partir de los datos) ----------
+        function insights() {
+            const v = ESTADO.ventana, e = ESTADO.escala, c = ESTADO.config;
+            const lista = [];
+            const veh = evalConfig(c, 'espera_media', v, e, 'max_pressure');
+            const pea = evalConfig(c, 'peatones_espera_media', v, e, 'max_pressure');
+            const esc = escenarioTexto(v, e);
+            lista.push(`Carros y peatones (${esc}): la "regla de colas" logra que los carros esperen ${fmt(veh.media_ref)} s ` +
+                `frente a ${fmt(veh.media)} s con la ${NOMBRE[c]}, pero no ve a los peatones: ellos esperan ${fmt(pea.media_ref)} s ` +
+                `frente a ${fmt(pea.media)} s con la IA. La IA logra un mejor equilibrio entre los dos.`);
+            const base = evalConfig(configDe('base'), 'espera_media', v, e), sin = evalConfig(configDe('sin_rnd'), 'espera_media', v, e);
+            lista.push(`¿Sirve la "curiosidad" (RND)? Casi no cambia el resultado: los carros esperan ${fmt(base.media)} s con ella ` +
+                `y ${fmt(sin.media)} s sin ella (${esc}).`);
+            const rob = [0.8, 1.0, 1.2].map(x => fmt(evalConfig(c, 'espera_media', v, x).media)).join(' → ');
+            const robRef = [0.8, 1.0, 1.2].map(x => fmt(evalConfig(c, 'espera_media', v, x).media_ref)).join(' → ');
+            lista.push(`¿Qué pasa si hay más carros? En hora ${v}, con 20% menos, normal y 20% más tráfico, la espera con la ` +
+                `${NOMBRE[c]} es ${rob} s. ${NOMBRE[ESTADO.ref]}: ${robRef} s.`);
+            const mejor = q(`SELECT config, media FROM evaluacion_configs WHERE metrica = 'espera_media' AND ventana = ?
+                             AND escala = ? AND referencia = ? AND config IN (${listaSQL(CONFIGS)})
+                             ORDER BY media LIMIT 1`, [v, e, ESTADO.ref])[0];
+            if (mejor) lista.push(`La versión de la IA con menos espera para los carros (${esc}) es la ${NOMBRE[mejor.config]}: ` +
+                `${fmt(mejor.media)} s.`);
+            // Con las dos versiones del algoritmo: la misma configuración en v1 y en v2
+            if (ALGS_DISPONIBLES.length > 1) {
+                const b = sinPrefijo(c);
+                const [a1, a2] = [1, 2].map(a => evalConfig(PREFIJO_ALG[a] + b, 'espera_media', v, e));
+                const [p1, p2] = [1, 2].map(a => evalConfig(PREFIJO_ALG[a] + b, 'peatones_espera_media', v, e));
+                if (a1.media !== undefined && a2.media !== undefined) {
+                    lista.push(`Algoritmo v2 frente a v1 (${NOMBRE_BASE[b]}, ${v} ×${e.toFixed(1)}): espera vehicular ` +
+                        `${fmt(a2.media)} s frente a ${fmt(a1.media)} s; espera peatonal ${fmt(p2.media)} s frente a ${fmt(p1.media)} s.`);
+                }
+            }
+            ALERTAS.forEach(a => lista.push(textoAlerta(a)));
+            return lista;
+        }
+        function siguienteInsight() {
+            const lista = insights();
+            insightIdx = (insightIdx + 1) % lista.length;
+            document.getElementById('insight-texto').innerText = lista[insightIdx];
+        }
+        function renderInsight() {
+            const lista = insights();
+            document.getElementById('insight-texto').innerText = lista[insightIdx % lista.length];
+        }
+
+        // =====================================================================
+        // GRÁFICOS: mismo estilo SVG del prototipo (línea rosada con relleno
+        // degradado morado y tooltip), ahora dibujados con los datos.
+        // =====================================================================
+        const ALTO = 200, ANCHO = 1000, MARGEN_SUP = 12, MARGEN_INF = 8;
+        let contadorGrad = 0;
+
+        function escalaY(min, max) {
+            return y => MARGEN_SUP + (1 - (y - min) / ((max - min) || 1)) * (ALTO - MARGEN_SUP - MARGEN_INF);
+        }
+        function rango(valores, desdeCero) {
+            let min = Math.min(...valores), max = Math.max(...valores);
+            if (desdeCero) min = Math.min(0, min);
+            const pad = (max - min) * 0.08 || 1;
+            return [desdeCero && min === 0 ? 0 : min - pad, max + pad];
+        }
+        function etiquetasEjes(el, min, max, formato) {
+            return `<div style="position: absolute; left: 6px; top: 2px; font-size: 0.7rem; color: var(--text-muted);">${formato(max)}</div>
+                    <div style="position: absolute; left: 6px; bottom: 2px; font-size: 0.7rem; color: var(--text-muted);">${formato(min)}</div>`;
+        }
+        function ejeX(id, etiquetas, centradas) {
+            const el = document.getElementById(id);
+            el.style.cssText = 'display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;';
+            el.innerHTML = etiquetas.map(t => `<span style="${centradas ? 'flex: 1; text-align: center;' : ''}">${t}</span>`).join('');
+        }
+        function tooltipHTML() {
+            return `<div class="tooltip-line" style="display: none;"></div><div class="tooltip-dot" style="display: none;"></div>
+                    <div class="tooltip" style="display: none; z-index: 2; white-space: nowrap;"></div>`;
+        }
+        function mostrarTooltip(el, xPct, yPx, html) {
+            const [linea, punto, caja] = el.querySelectorAll('.tooltip-line, .tooltip-dot, .tooltip');
+            const yPct = yPx / ALTO * 100;
+            [linea, punto, caja].forEach(n => n.style.display = '');
+            linea.style.left = `${xPct}%`; linea.style.top = `${yPct}%`; linea.style.height = `${100 - yPct}%`;
+            punto.style.left = `${xPct}%`; punto.style.top = `calc(${yPct}% - 6px)`;
+            // La caja se abre hacia el lado con más espacio para no salirse del gráfico
+            caja.style.left = `${xPct}%`; caja.style.top = `${Math.max(yPct - 30, 0)}%`;
+            caja.style.transform = xPct > 60 ? 'translateX(calc(-100% - 12px))' : (xPct < 40 ? 'translateX(12px)' : 'translateX(-50%)');
+            caja.innerHTML = html;
+        }
+        function badge(texto, bueno) {
+            const color = bueno === null ? 'var(--text-muted)' : (bueno ? 'var(--green-positive)' : ROJO);
+            const fondo = bueno === null ? 'rgba(255,255,255,0.05)' : (bueno ? 'rgba(74, 222, 128, 0.1)' : 'rgba(248, 113, 113, 0.1)');
+            return `<span style="color: ${color}; background: ${fondo}; padding: 2px 5px; border-radius: 5px; font-size: 0.7rem;">${texto}</span>`;
+        }
+
+        // Gráfico de líneas. series: [{nombre, xs, ys, color, ancho, guiones, relleno, banda: {lo, hi}}]
+        function graficoLineas(id, series, opciones) {
+            const el = document.getElementById(id);
+            const todos = series.flatMap(s => [...s.ys, ...(s.banda ? [...s.banda.lo, ...s.banda.hi] : [])]).filter(Number.isFinite);
+            const [min, max] = rango(todos, opciones.desdeCero);
+            const y = escalaY(min, max);
+            const xs = series[0].xs, n = xs.length;
+            const x = i => i / (n - 1) * ANCHO;
+            const grad = `fillGrad${++contadorGrad}`;
+            let svg = `<defs><linearGradient id="${grad}" x1="0" y1="0" x2="0" y2="1">
+                         <stop offset="0%" stop-color="#9D50BB" stop-opacity="0.4"/>
+                         <stop offset="100%" stop-color="#9D50BB" stop-opacity="0"/>
+                       </linearGradient></defs>`;
+            series.forEach(s => {
+                if (s.banda) {
+                    const sup = s.banda.hi.map((v, i) => `${x(i)},${y(v)}`).join(' L');
+                    const inf = s.banda.lo.map((v, i) => `${x(i)},${y(v)}`).reverse().join(' L');
+                    svg += `<path d="M${sup} L${inf} Z" fill="${s.color}" fill-opacity="0.15"></path>`;
+                }
+            });
+            series.forEach(s => {
+                const d = s.ys.map((v, i) => `${i ? 'L' : 'M'}${x(i)},${y(v)}`).join(' ');
+                if (s.relleno) svg += `<path d="${d} L${ANCHO},${ALTO} L0,${ALTO} Z" fill="url(#${grad})"></path>`;
+                svg += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.ancho || 3}"
+                         ${s.guiones ? 'stroke-dasharray="10 6"' : ''} vector-effect="non-scaling-stroke"
+                         stroke-opacity="${s.opacidad || 1}"></path>`;
+            });
+            el.innerHTML = `<svg class="graph-svg" preserveAspectRatio="none" viewBox="0 0 ${ANCHO} ${ALTO}">${svg}</svg>` +
+                etiquetasEjes(el, min, max, opciones.formatoY) + tooltipHTML();
+            el.onmousemove = ev => {
+                const r = el.getBoundingClientRect();
+                const i = Math.round(Math.min(Math.max((ev.clientX - r.left) / r.width, 0), 1) * (n - 1));
+                const p = series[0];
+                mostrarTooltip(el, i / (n - 1) * 100, y(p.ys[i]), opciones.tooltip(i));
+            };
+            // Tooltip inicial en el último punto, como en el prototipo
+            const p = series[0];
+            mostrarTooltip(el, 100 * (n - 1) / (n - 1), y(p.ys[n - 1]), opciones.tooltip(n - 1));
+        }
+
+        // Ranking horizontal: una fila por estrategia, ordenadas de mejor a peor, con el valor
+        // escrito al final de la barra, la línea de la referencia y la mejora frente a ella.
+        // filas: [{nombre, media, lo, hi, tipo: 'seleccionada'|'config'|'base'|'referencia', alerta, detalle}]
+        function graficoRanking(id, filas, opciones) {
+            const el = document.getElementById(id);
+            el.onmousemove = null;
+            el.style.alignItems = 'stretch';
+            // Eje desde 0 y hasta un poco más que la peor media. El rango de confianza no se
+            // dibuja (es para expertos): está en el tooltip
+            const maxMedia = Math.max(...filas.map(f => f.media));
+            const maxEje = maxMedia * 1.12 || 1;
+            const pct = v => Math.max(0, Math.min(v / maxEje * 100, 100));
+            const ref = filas.find(f => f.tipo === 'referencia');
+            const relleno = {
+                seleccionada: 'linear-gradient(90deg, var(--accent-purple), var(--accent-pink))',
+                config: 'rgba(157, 80, 187, 0.55)',
+                base: 'rgba(255, 255, 255, 0.22)',
+                referencia: 'rgba(255, 255, 255, 0.45)',
+            };
+            const filasHTML = filas.map((f, i) => {
+                const m = f.tipo === 'referencia' ? null : mejora(f.media, ref.media, opciones.sentido);
+                const delta = m === null
+                    ? `<span style="color: var(--text-muted);">referencia</span>`
+                    : `<span style="color: ${m >= 0 ? 'var(--green-positive)' : ROJO};">${m >= 0 ? '▲' : '▼'} ${fmt(Math.abs(m), 1)}% ${m >= 0 ? 'mejor' : 'peor'}</span>`;
+                const destacada = f.tipo === 'seleccionada';
+                return `<div class="fila-ranking" data-i="${i}" style="display: grid; grid-template-columns: 170px 1fr 120px; align-items: center;
+                            gap: 14px; padding: 5px 8px; border-radius: 10px; cursor: default;
+                            ${destacada ? 'background: rgba(233, 117, 168, 0.08);' : ''}">
+                    <div style="text-align: right; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+                                color: ${destacada ? 'var(--text-main)' : 'var(--text-muted)'}; font-weight: ${destacada ? 600 : 400};">
+                        ${f.alerta ? '<span style="color: #F39C12;" title="En una de las pruebas el tráfico se trancó">⚠ </span>' : ''}${f.nombre}
+                    </div>
+                    <div style="position: relative; height: 22px;">
+                        <div class="barra-ranking" data-ancho="${pct(f.media)}" style="position: absolute; left: 0; top: 4px; bottom: 4px; width: 0;
+                             border-radius: 0 4px 4px 0; background: ${relleno[f.tipo]};
+                             ${destacada ? 'box-shadow: 0 0 14px rgba(233, 117, 168, 0.45);' : ''}
+                             transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.04}s;"></div>
+                        ${(() => {
+                            // El valor va a la derecha de la barra; si no cabe, dentro de ella
+                            const fin = pct(f.media);
+                            const dentro = fin > 78;
+                            return `<div style="position: absolute; top: 50%; transform: translateY(-50%); z-index: 1;
+                                 ${dentro ? 'left: 10px;' : `left: calc(${fin}% + 10px);`}
+                                 font-size: 0.8rem; font-weight: 600; color: var(--text-main); white-space: nowrap;
+                                 text-shadow: 0 1px 3px rgba(0,0,0,0.6);">${opciones.formato(f.media)}</div>`;
+                        })()}
+                    </div>
+                    <div style="font-size: 0.75rem; white-space: nowrap;">${delta}</div>
+                </div>`;
+            }).join('');
+            // Línea vertical en el valor de la referencia, sobre la columna de barras
+            const lineaRef = `<div style="position: absolute; top: 0; bottom: 0; left: calc(170px + 14px + 8px + (100% - 170px - 120px - 28px - 16px) * ${pct(ref.media) / 100});
+                                 border-left: 1px dashed rgba(255,255,255,0.5); pointer-events: none;">
+                                <span style="position: absolute; top: -18px; left: 0; transform: translateX(-50%); white-space: nowrap;
+                                             font-size: 0.7rem; color: var(--text-muted);">${ref.nombre}: ${opciones.formato(ref.media)}</span>
+                              </div>`;
+            el.innerHTML = `<div style="position: relative; width: 100%; padding-top: 22px; display: flex; flex-direction: column; gap: 2px;">
+                                <div style="position: relative; display: flex; flex-direction: column; gap: 2px;">${lineaRef}${filasHTML}</div>
+                            </div>` + tooltipHTML();
+            // Animación: las barras crecen desde 0 al cambiar de filtro o de métrica
+            // (se fuerza un reflow para que la transición parta de 0 sin depender de requestAnimationFrame)
+            const barrasDom = el.querySelectorAll('.barra-ranking');
+            void el.offsetWidth;
+            barrasDom.forEach(b => b.style.width = `${b.dataset.ancho}%`);
+            // Tooltip con el detalle (IC95, p-valor, alertas) al pasar el mouse por una fila
+            const caja = el.querySelector('.tooltip');
+            el.querySelectorAll('.fila-ranking').forEach(fila => {
+                fila.onmouseenter = () => {
+                    const f = filas[+fila.dataset.i];
+                    fila.style.background = f.tipo === 'seleccionada' ? 'rgba(233, 117, 168, 0.14)' : 'rgba(255, 255, 255, 0.04)';
+                    caja.innerHTML = f.detalle;
+                    caja.style.display = '';
+                    caja.style.left = 'auto'; caja.style.right = '0'; caja.style.transform = 'none';
+                    caja.style.top = `${fila.getBoundingClientRect().bottom - el.getBoundingClientRect().top + 4}px`;
+                };
+                fila.onmouseleave = () => {
+                    fila.style.background = filas[+fila.dataset.i].tipo === 'seleccionada' ? 'rgba(233, 117, 168, 0.08)' : '';
+                    caja.style.display = 'none';
+                };
+            });
+        }
+
+        function botones(id, opciones, activo, accion) {
+            document.getElementById(id).innerHTML = opciones.map(([valor, texto]) =>
+                `<button class="time-btn ${activo(valor) ? 'active' : ''}" onclick='${accion}(${JSON.stringify(valor)})'>${texto}</button>`
+            ).join('');
+        }
+
+        // ---------- Gráfico principal del Dashboard ----------
+        function renderGraficoPrincipal() {
+            if (ESTADO.modo === 'Evaluación') return graficoEvaluacion();
+            if (ESTADO.modo === 'Entrenamiento') return graficoEntrenamiento();
+            return graficoSimulacion();
+        }
+        function elegirMetrica(m) {
+            if (m === '__semillas') ESTADO.semillas = !ESTADO.semillas;
+            else if (ESTADO.modo === 'Evaluación') ESTADO.metEval = m;
+            else if (ESTADO.modo === 'Entrenamiento') ESTADO.metEnt = m;
+            else ESTADO.metSim = m;
+            renderGraficoPrincipal();
+        }
+
+        function graficoEvaluacion() {
+            const m = ESTADO.metEval;
+            botones('grafico-filtros', [['espera_media', 'Espera'], ['perdida_tiempo_media', 'Tiempo perdido'],
+                    ['peatones_espera_media', 'Peatones'], ['co2_total_kg', 'CO₂'], ['viajes_completados', 'Viajes']],
+                    v => v === m, 'elegirMetrica');
+            const sentido = sentidoDe(m);
+            const PREGUNTA = {
+                espera_media: '¿Cuánto esperan los carros en promedio?',
+                perdida_tiempo_media: '¿Cuánto tiempo pierde cada viaje por los semáforos?',
+                peatones_espera_media: '¿Cuánto esperan los peatones para cruzar?',
+                co2_total_kg: '¿Cuánto CO₂ emiten los carros en una hora?',
+                viajes_completados: '¿Cuántos viajes terminan en una hora?',
+            };
+            document.getElementById('grafico-titulo').innerText =
+                `${PREGUNTA[m]} · ${escenarioTexto()} · ${sentido === 'menor' ? 'menos' : 'más'} es mejor`;
+            // El tooltip trae el detalle; el rango de confianza va en palabras
+            const rango = e => `rango probable ${fmt(e.ic95_inf)} – ${fmt(e.ic95_sup)}`;
+            const filas = CONFIGS.map(c => {
+                const e = evalConfig(c, m);
+                const alerta = alertaDe(c);
+                return {
+                    nombre: NOMBRE[c], media: e.media, alerta: alerta.length > 0,
+                    tipo: c === ESTADO.config ? 'seleccionada' : 'config',
+                    detalle: `<span>${NOMBRE[c]}</span><strong>${conUnidad(e.media, m)}</strong>` + badge(rango(e), null) +
+                             (alerta.length ? badge('⚠ en una prueba el tráfico se trancó', false) : ''),
+                };
+            });
+            BASES.forEach(b => {
+                const e = evalBase(b, m);
+                filas.push({
+                    nombre: NOMBRE[b], media: e.media,
+                    tipo: b === ESTADO.ref ? 'referencia' : 'base',
+                    detalle: `<span>${NOMBRE[b]} · sin IA</span><strong>${conUnidad(e.media, m)}</strong>` + badge(rango(e), null),
+                });
+            });
+            filas.sort((a, b) => sentido === 'menor' ? a.media - b.media : b.media - a.media);
+            graficoRanking('grafico-principal', filas, {sentido, formato: v => conUnidad(v, m)});
+            // Leyenda (identidad nunca solo por color: la columna de nombres también la da)
+            const muestra = fondo => `<span style="display: inline-block; width: 12px; height: 8px; border-radius: 2px;
+                                       background: ${fondo}; margin-right: 6px; vertical-align: middle;"></span>`;
+            const leyenda = document.getElementById('grafico-principal-x');
+            leyenda.style.cssText = 'display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; font-size: 0.7rem; color: var(--text-muted); margin-top: 12px;';
+            leyenda.innerHTML =
+                `<span>${muestra('linear-gradient(90deg, #9D50BB, #E975A8)')}${NOMBRE[ESTADO.config]} (la que elegiste)</span>` +
+                `<span>${muestra('rgba(157, 80, 187, 0.55)')}Otras versiones de la IA</span>` +
+                `<span>${muestra('rgba(255, 255, 255, 0.3)')}Semáforos sin IA</span>` +
+                `<span><span style="display: inline-block; width: 0; height: 10px; border-left: 1px dashed rgba(255,255,255,0.6);
+                       margin-right: 6px; vertical-align: middle;"></span>Punto de comparación: ${NOMBRE[ESTADO.ref]}</span>`;
+        }
+
+        function graficoEntrenamiento() {
+            const m = ESTADO.metEnt;
+            const NOMBRES = {recompensa_ext: 'el puntaje de la IA (más alto es mejor)', espera_media: 'la espera de los carros (s)',
+                             recompensa_int: 'el premio por curiosidad (RND)'};
+            if (!NOMBRES[m]) ESTADO.metEnt = 'recompensa_ext';
+            botones('grafico-filtros', [['espera_media', 'Espera'], ['recompensa_ext', 'Puntaje'],
+                    ['recompensa_int', 'Curiosidad'], ['__semillas', 'Ver cada intento']],
+                    v => v === ESTADO.metEnt || (v === '__semillas' && ESTADO.semillas), 'elegirMetrica');
+            document.getElementById('grafico-titulo').innerText =
+                `Cómo aprende la ${NOMBRE[ESTADO.config]}: ${NOMBRES[ESTADO.metEnt]} en cada hora de práctica`;
+            return graficoEntrenamientoCurva(ESTADO.metEnt);
+        }
+        function graficoEntrenamientoCurva(m) {
+            const f = q(`SELECT episodio, ${m} AS y, ${m}_min AS lo, ${m}_max AS hi FROM v_entrenamiento_config
+                         WHERE config = ? ORDER BY episodio`, [ESTADO.config]);
+            const series = [{xs: f.map(r => r.episodio), ys: f.map(r => r.y), color: '#E975A8', relleno: true,
+                             banda: ESTADO.semillas ? null : {lo: f.map(r => r.lo), hi: f.map(r => r.hi)}}];
+            let porSemilla = [];
+            if (ESTADO.semillas) {
+                porSemilla = [0, 1, 2].map(s => q(`SELECT ${m} AS y, ventana, escala FROM entrenamiento_episodios
+                    WHERE config = ? AND semilla_entrenamiento = ? ORDER BY episodio`, [ESTADO.config, s]));
+                porSemilla.forEach(p => series.push({xs: series[0].xs, ys: p.map(r => r.y), color: '#9D50BB', ancho: 1.5, opacidad: 0.8}));
+            }
+            const ctx = q(`SELECT episodio, ventana, escala FROM entrenamiento_episodios WHERE config = ? AND semilla_entrenamiento = 0
+                           ORDER BY episodio`, [ESTADO.config]);
+            graficoLineas('grafico-principal', series, {
+                formatoY: v => fmt(v),
+                tooltip: i => `<span>Hora de práctica ${f[i].episodio}</span><strong>${fmt(f[i].y)}</strong>` +
+                    badge(ESTADO.semillas ? `intentos: ${porSemilla.map(p => fmt(p[i].y)).join(' · ')}`
+                                          : `entre ${fmt(f[i].lo)} y ${fmt(f[i].hi)} en los 3 intentos`, null) +
+                    `<span style="font-size: 0.7rem; color: var(--text-muted);">${escenarioTexto(ctx[i].ventana, ctx[i].escala)
+                        .replace(/20% (más|menos) tráfico/, `${Math.round(Math.abs(ctx[i].escala - 1) * 100)}% $1 tráfico`)}</span>`,
+            });
+            ejeX('grafico-principal-x', ['Inicio', 'Horas de práctica (cada una con tráfico distinto) · la banda une los 3 intentos', `${f.length} h`]);
+        }
+
+        // Serie promediada por minuto (12 decisiones de 5 s): a 5 s el ciclo del semáforo la vuelve ilegible
+        function serieConfig(config, columna, ventana, escala) {
+            const t0 = uno('SELECT MIN(tiempo_s) AS t FROM evaluacion_series_tiempo WHERE ventana = ?', [ventana]).t;
+            return q(`SELECT MIN(tiempo_s) AS tiempo_s, AVG(${columna}) AS y FROM v_series_config
+                      WHERE config = ? AND ventana = ? AND escala = ? AND tiempo_s < ?
+                      GROUP BY CAST((tiempo_s - ?) / 60 AS INTEGER) ORDER BY 1`,
+                     [config, ventana, escala, t0 + 3600, t0]);
+        }
+        function graficoSeries(id, columna, titulo) {
+            const a = serieConfig(ESTADO.config, columna, ESTADO.ventana, escalaSim());
+            const b = serieConfig(ESTADO.ref, columna, ESTADO.ventana, escalaSim());
+            const t0 = a[0].tiempo_s;
+            const minuto = i => Math.round((a[i].tiempo_s - t0) / 60);
+            const sentido = columna === 'velocidad_media' ? 'mayor' : 'menor';
+            graficoLineas(id, [
+                {xs: a.map(r => r.tiempo_s), ys: a.map(r => r.y), color: '#E975A8', relleno: true},
+                {xs: b.map(r => r.tiempo_s), ys: b.map(r => r.y), color: '#FFFFFF', ancho: 2, guiones: true, opacidad: 0.6},
+            ], {
+                desdeCero: true, formatoY: v => fmt(v),
+                tooltip: i => `<span>Minuto ${minuto(i) + 1}</span><strong>${fmt(a[i].y)}</strong>` +
+                    badge(`${NOMBRE[ESTADO.ref]}: ${fmt(b[i].y)}`, b[i].y === a[i].y ? null : (sentido === 'menor' ? a[i].y < b[i].y : a[i].y > b[i].y)),
+            });
+            ejeX(id + '-x', ['Minuto 0', `— ${NOMBRE[ESTADO.config]}   - - ${NOMBRE[ESTADO.ref]}`, 'Minuto 60']);
+        }
+        function graficoSimulacion() {
+            const m = ESTADO.metSim;
+            const NOMBRES = {espera_media: 'Espera de los carros (s)', vehiculos_detenidos: 'Carros detenidos',
+                             velocidad_media: 'Velocidad media (m/s)'};
+            botones('grafico-filtros', [['espera_media', 'Espera'], ['vehiculos_detenidos', 'Detenidos'],
+                    ['velocidad_media', 'Velocidad']], v => v === m, 'elegirMetrica');
+            document.getElementById('grafico-titulo').innerText =
+                `${NOMBRES[m]} minuto a minuto durante una hora · ${escenarioTexto(ESTADO.ventana, escalaSim())}`;
+            graficoSeries('grafico-principal', m);
+        }
+
+        // ---------- Página: Red de Tráfico (visor de la simulación de SUMO) ----------
+        // animacion.json lo genera dashboard/generar_animacion.py: posiciones de cada vehículo y
+        // peatón segundo a segundo y el estado de cada semáforo, grabados por SUMO con y sin la IA.
+        const SIM = {datos: null, cargando: false, t: 0, reproduciendo: false, velocidad: 5, vista: 'este',
+                     ultimo: null, indices: {}, promedios: {}, vistas: {}};
+        const COLOR_SIM = {via: '#34303F', anden: '#211E29', cruce_peatonal: '#4A4556',
+                           detenido: '#F87171', avanza: '#4ADE80', peaton: '#E5E7EB',
+                           verde: '#4ADE80', amarillo: '#FBBF24', rojo: '#EF4444'};
+        const TAM_VEHICULO = [[4.5, 1.8], [2.2, 0.8], [12, 2.5]];  // carro, moto, bus (largo, ancho en m)
+        const NOMBRE_VISTA = {este: 'Cruces C1, C3 y C4', oeste: 'Cruce C2', todo: 'Toda la zona'};
+
+        async function cargarSimulacion() {
+            if (SIM.datos || SIM.cargando) return;
+            SIM.cargando = true;
+            const texto = document.getElementById('sim-explicacion');
+            try {
+                const resp = await fetch('animacion.json');
+                if (!resp.ok) throw new Error('falta animacion.json');
+                SIM.datos = await resp.json();
+                prepararSimulacion();
+                alternarReproduccion();  // arranca sola la primera vez
+            } catch (err) {
+                texto.innerHTML = 'No se encontró la simulación. Para generarla (requiere SUMO): ' +
+                                  '<code>python dashboard/generar_animacion.py</code>';
+            }
+        }
+
+        function prepararSimulacion() {
+            const d = SIM.datos;
+            const caja = (cruces, m) => {
+                const xs = cruces.map(c => d.cruces[c][0]), ys = cruces.map(c => d.cruces[c][1]);
+                return [Math.min(...xs) - m, Math.min(...ys) - m, Math.max(...xs) + m, Math.max(...ys) + m];
+            };
+            SIM.vistas = {este: caja(['C1', 'C3', 'C4'], 45), oeste: caja(['C2'], 55), todo: [0, 0, d.ancho, d.alto]};
+            for (const modo of ['fijo', 'rl']) {
+                // id -> posición en cada cuadro, para interpolar el movimiento entre segundos
+                SIM.indices[modo] = d[modo].cuadros.map(c => new Map(c.v.map((v, i) => [v[0], i])));
+                let suma = 0;
+                SIM.promedios[modo] = d[modo].cuadros.map((c, i) => (suma += c.d) / (i + 1));
+            }
+            const n = d.fijo.cuadros.length;
+            const prom = m => SIM.promedios[m][n - 1];
+            const menos = (prom('fijo') - prom('rl')) / prom('fijo') * 100;
+            const hora = d.escenario.ventana === 'pico' ? 'hora pico' : 'hora valle';
+            const trafico = d.escenario.escala === 1 ? 'tráfico normal' : (d.escenario.escala > 1 ? 'más tráfico de lo normal' : 'menos tráfico de lo normal');
+            document.getElementById('sim-explicacion').innerHTML =
+                `Las dos ventanas muestran exactamente los mismos ${Math.round(n / 60)} minutos de ${hora} (${trafico}): ` +
+                `los mismos carros, con las mismas rutas, y los mismos peatones. Lo único que cambia es quién decide ` +
+                `cuándo cambia cada semáforo. <strong style="color: var(--text-main);">Con la inteligencia artificial hay en promedio ` +
+                `${fmt(menos, 0)}% menos carros detenidos.</strong>`;
+            const punto = (color, forma = '50%') => `<span style="display: inline-block; width: 10px; height: 10px; border-radius: ${forma};
+                                                     background: ${color}; margin-right: 6px; vertical-align: middle;"></span>`;
+            document.getElementById('sim-leyenda').innerHTML =
+                `<span>${punto(COLOR_SIM.avanza, '2px')}carro avanzando</span>` +
+                `<span>${punto(COLOR_SIM.detenido, '2px')}carro detenido</span>` +
+                `<span>${punto(COLOR_SIM.peaton)}peatón</span>` +
+                `<span>${punto(COLOR_SIM.verde, '1px')}${punto(COLOR_SIM.amarillo, '1px')}${punto(COLOR_SIM.rojo, '1px')}luz del semáforo (barra sobre el carril)</span>` +
+                `<span>Velocidad ×5 = 5 segundos de simulación por cada segundo real</span>`;
+            botones('sim-vistas', Object.entries(NOMBRE_VISTA), v => v === SIM.vista, 'elegirVistaSim');
+            botones('sim-velocidades', [[1, '×1'], [5, '×5'], [10, '×10'], [20, '×20']], v => v === SIM.velocidad, 'elegirVelocidadSim');
+            dibujarSimulacion();
+        }
+
+        function elegirVistaSim(v) { SIM.vista = v; botones('sim-vistas', Object.entries(NOMBRE_VISTA), x => x === v, 'elegirVistaSim'); dibujarSimulacion(); }
+        function elegirVelocidadSim(v) { SIM.velocidad = v; botones('sim-velocidades', [[1, '×1'], [5, '×5'], [10, '×10'], [20, '×20']], x => x === v, 'elegirVelocidadSim'); }
+
+        function alternarReproduccion() {
+            if (!SIM.datos) return;
+            const n = SIM.datos.fijo.cuadros.length;
+            if (!SIM.reproduciendo && SIM.t >= n - 1) SIM.t = 0;  // al final, vuelve a empezar
+            SIM.reproduciendo = !SIM.reproduciendo;
+            SIM.ultimo = null;
+            document.getElementById('sim-play').innerText = SIM.reproduciendo ? '⏸ Pausar' : '▶ Reproducir';
+            if (SIM.reproduciendo) requestAnimationFrame(cicloSimulacion);
+        }
+        function pausarSimulacion() {
+            if (SIM.reproduciendo) alternarReproduccion();
+        }
+        function cicloSimulacion(ts) {
+            if (!SIM.reproduciendo) return;
+            const n = SIM.datos.fijo.cuadros.length;
+            if (SIM.ultimo !== null) SIM.t += (ts - SIM.ultimo) / 1000 * SIM.velocidad;
+            SIM.ultimo = ts;
+            if (SIM.t >= n - 1) { SIM.t = n - 1; dibujarSimulacion(); alternarReproduccion(); return; }
+            dibujarSimulacion();
+            requestAnimationFrame(cicloSimulacion);
+        }
+        function buscarEnSimulacion(ev) {
+            if (!SIM.datos) return;
+            const r = ev.currentTarget.getBoundingClientRect();
+            SIM.t = Math.min(Math.max((ev.clientX - r.left) / r.width, 0), 1) * (SIM.datos.fijo.cuadros.length - 1);
+            SIM.ultimo = null;
+            dibujarSimulacion();
+        }
+
+        const reloj = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+        function dibujarSimulacion() {
+            if (!SIM.datos) return;
+            const n = SIM.datos.fijo.cuadros.length;
+            for (const modo of ['fijo', 'rl']) dibujarPanel(document.getElementById(`sim-${modo}`), modo);
+            const i = Math.min(Math.floor(SIM.t), n - 1);
+            for (const modo of ['fijo', 'rl']) {
+                document.getElementById(`sim-${modo}-detenidos`).innerText = SIM.datos[modo].cuadros[i].d;
+                document.getElementById(`sim-${modo}-promedio`).innerText = `promedio hasta ahora: ${fmt(SIM.promedios[modo][i], 1)}`;
+            }
+            document.getElementById('sim-progreso').style.width = `${SIM.t / (n - 1) * 100}%`;
+            document.getElementById('sim-reloj').innerText = `${reloj(SIM.t)} / ${reloj(n)}`;
+        }
+
+        function colorLuz(estado, enlaces) {
+            if (!estado) return COLOR_SIM.rojo;
+            const letras = enlaces.map(k => estado[k] || 'r');
+            if (letras.some(l => l === 'G' || l === 'g')) return COLOR_SIM.verde;
+            if (letras.some(l => l === 'y' || l === 'Y')) return COLOR_SIM.amarillo;
+            return COLOR_SIM.rojo;
+        }
+
+        function dibujarPanel(canvas, modo) {
+            const d = SIM.datos, cuadros = d[modo].cuadros, n = cuadros.length;
+            const dpr = window.devicePixelRatio || 1, W = canvas.clientWidth, H = canvas.clientHeight;
+            if (!W || !H) return;
+            if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) {
+                canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+            }
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, W, H);
+            // Encuadre: la vista elegida, centrada y sin deformar (en SUMO la y crece hacia arriba)
+            const [x0, y0, x1, y1] = SIM.vistas[SIM.vista];
+            const esc = Math.min(W / (x1 - x0), H / (y1 - y0));
+            const ox = (W - (x1 - x0) * esc) / 2, oy = (H - (y1 - y0) * esc) / 2;
+            const px = x => ox + (x - x0) * esc, py = y => H - oy - (y - y0) * esc;
+
+            // Intersecciones (el área interior de cada cruce), luego calles, andenes y pasos peatonales
+            ctx.fillStyle = COLOR_SIM.via;
+            for (const poligono of d.intersecciones || []) {
+                ctx.beginPath();
+                poligono.forEach(([x, y], k) => k ? ctx.lineTo(px(x), py(y)) : ctx.moveTo(px(x), py(y)));
+                ctx.closePath(); ctx.fill();
+            }
+            ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
+            for (const c of d.carriles) {
+                ctx.strokeStyle = COLOR_SIM[c.t];
+                ctx.lineWidth = Math.max(1, c.a * esc);
+                ctx.beginPath();
+                c.p.forEach(([x, y], k) => k ? ctx.lineTo(px(x), py(y)) : ctx.moveTo(px(x), py(y)));
+                ctx.stroke();
+            }
+
+            const i = Math.min(Math.floor(SIM.t), n - 1), f = SIM.t - i;
+            // Semáforos: una barra atravesada al final de cada carril que entra al cruce
+            ctx.lineWidth = Math.max(2.5, 0.9 * esc); ctx.lineCap = 'round';
+            for (const s of d.semaforos) {
+                const estado = d[modo].semaforos[s.cruce][i];
+                for (const p of s.pare) {
+                    const a = p.ang * Math.PI / 180, mitad = 1.5 * esc;
+                    const nx = Math.sin(a) * mitad, ny = Math.cos(a) * mitad;  // perpendicular al carril (en pantalla)
+                    ctx.strokeStyle = colorLuz(estado, p.enlaces);
+                    ctx.beginPath();
+                    ctx.moveTo(px(p.x) - nx, py(p.y) - ny); ctx.lineTo(px(p.x) + nx, py(p.y) + ny);
+                    ctx.stroke();
+                }
+            }
+
+            // Vehículos, interpolando entre el segundo actual y el siguiente para que se muevan suave
+            const actual = cuadros[i], siguiente = cuadros[i + 1], idx = SIM.indices[modo][i + 1];
+            for (const v of actual.v) {
+                let x = v[1] / 10, y = v[2] / 10, ang = v[3];
+                const j = siguiente ? idx.get(v[0]) : undefined;
+                if (j !== undefined) {
+                    const w = siguiente.v[j];
+                    x += (w[1] / 10 - x) * f; y += (w[2] / 10 - y) * f;
+                    ang += (((w[3] - ang + 540) % 360) - 180) * f;
+                }
+                const [largo, ancho] = TAM_VEHICULO[v[5]];
+                const l = Math.max(largo * esc, 3), a = Math.max(ancho * esc, 1.5);
+                ctx.save();
+                ctx.translate(px(x), py(y));
+                ctx.rotate(ang * Math.PI / 180);  // ángulo de SUMO: 0 = norte, horario
+                ctx.fillStyle = v[4] ? COLOR_SIM.detenido : COLOR_SIM.avanza;
+                ctx.fillRect(-a / 2, 0, a, l);    // (x, y) de SUMO es el frente del vehículo
+                ctx.restore();
+            }
+            // Peatones
+            ctx.fillStyle = COLOR_SIM.peaton;
+            for (const [x, y] of actual.p) {
+                ctx.beginPath(); ctx.arc(px(x / 10), py(y / 10), Math.max(1.5, 0.45 * esc), 0, 2 * Math.PI); ctx.fill();
+            }
+            // Nombre de los cruces visibles
+            ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.font = '600 11px Inter, sans-serif'; ctx.textAlign = 'center';
+            for (const [cruce, [x, y]] of Object.entries(d.cruces)) {
+                if (x >= x0 && x <= x1 && y >= y0 && y <= y1) ctx.fillText(cruce, px(x), py(y) - 14 * Math.min(1, esc));
+            }
+        }
+
+        function renderRed() {
+            if (SIM.datos) dibujarSimulacion(); else cargarSimulacion();
+        }
+
+        // ---------- Página: Entrenamiento ----------
+        function renderEntrenamientoPagina() {
+            const NOMBRES = {espera_media: 'la espera de los carros (s)', recompensa_ext: 'el puntaje de la IA'};
+            if (!NOMBRES[ESTADO.entMet]) ESTADO.entMet = 'espera_media';
+            const m = ESTADO.entMet;
+            botones('ent-filtros', [['espera_media', 'Espera'], ['recompensa_ext', 'Puntaje']], v => v === m, 'elegirMetEnt');
+            document.getElementById('ent-titulo').innerText =
+                `Cómo aprenden las 6 versiones de la IA: ${NOMBRES[m]} en cada hora de práctica (rosado = la que elegiste)`;
+            // Media móvil de 5 episodios para que las 6 curvas se puedan leer juntas
+            const suavizar = ys => ys.map((_, i) => { const v = ys.slice(Math.max(0, i - 4), i + 1); return v.reduce((a, b) => a + b, 0) / v.length; });
+            const datos = Object.fromEntries(CONFIGS.map(c => [c, q(`SELECT episodio, ${m} AS y FROM v_entrenamiento_config
+                                                                     WHERE config = ? ORDER BY episodio`, [c])]));
+            const orden = [...CONFIGS.filter(c => c !== ESTADO.config), ESTADO.config];
+            const series = orden.map(c => ({xs: datos[c].map(r => r.episodio), ys: suavizar(datos[c].map(r => r.y)),
+                                           color: c === ESTADO.config ? '#E975A8' : '#9D50BB', ancho: c === ESTADO.config ? 3 : 1.5,
+                                           opacidad: c === ESTADO.config ? 1 : 0.6, relleno: c === ESTADO.config}));
+            series.unshift(series.pop());  // la seleccionada primero: es la que sigue el tooltip
+            graficoLineas('ent-grafico', series, {
+                formatoY: v => fmt(v),
+                tooltip: i => `<span>Hora de práctica ${i + 1}</span><strong>${NOMBRE[ESTADO.config]}: ${fmt(series[0].ys[i])}</strong>`,
+            });
+            ejeX('ent-grafico-x', ['Inicio', 'Horas de práctica (curvas suavizadas)', '150 h']);
+
+            // Una fila por versión de la IA: qué la hace distinta y cuánto esperan los carros al final
+            const DESCRIPCION = {
+                base: 'La configuración estándar: premia que bajen las colas y la espera.',
+                sin_rnd: 'Igual que la estándar, pero sin el premio por explorar situaciones nuevas ("curiosidad").',
+                mas_exploracion: 'Prueba más opciones distintas mientras aprende.',
+                prioriza_espera: 'Le da el doble de importancia a la espera de los carros.',
+                penaliza_cambio: 'Se le castiga más cada vez que cambia la luz, para que la cambie menos.',
+                peatones_alto: 'Le da más importancia a la espera de los peatones.',
+            };
+            const versiones = q(`SELECT tag, AVG(e.espera_media) AS espera_final FROM corridas c
+                                 JOIN entrenamiento_episodios e ON e.corrida = c.corrida AND e.episodio > 140
+                                 WHERE c.tag IN (${listaSQL(CONFIGS)}) GROUP BY tag ORDER BY espera_final`);
+            document.getElementById('ent-corridas').innerHTML = versiones.map(v => kpiItem(
+                v.tag === ESTADO.config ? '◎' : '○', NOMBRE[v.tag], DESCRIPCION[sinPrefijo(v.tag)],
+                `${fmt(v.espera_final)} s`, '<p style="color: var(--text-muted);">espera al final</p>')).join('');
+        }
+        function elegirMetEnt(m) { ESTADO.entMet = m; renderEntrenamientoPagina(); }
+
+        // ---------- Páginas de texto: Configuración y Soporte ----------
+        function renderTexto() {
+            const meta = Object.fromEntries(q('SELECT clave, valor FROM meta').map(f => [f.clave, f.valor]));
+            const tablas = Object.keys(meta).filter(k => k.startsWith('filas_'))
+                .map(k => `${k.slice(6)}: ${Number(meta[k]).toLocaleString('en-US')}`).join(' · ');
+            document.getElementById('config-texto').innerHTML =
+                `Base de datos <strong>citadel.db</strong> (SQLite), construida el ${meta.construida.replace('T', ' ')} ` +
+                `desde <code>${meta.fuente}</code>. Campaña ${meta.campana}.<br><br>${tablas}<br><br>` +
+                `Para actualizarla: <code>python dashboard/construir_bd.py</code> y recargar esta página.`;
+            document.getElementById('soporte-texto').innerHTML = [
+                '<strong>¿Qué es esto?</strong> Una inteligencia artificial que aprende a manejar los semáforos de 4 cruces de Bogotá. ' +
+                'Se entrena en un simulador de tráfico (SUMO) y se compara con otras formas de controlar los semáforos.',
+                '<strong>Semáforo fijo</strong>: el programa actual, con tiempos que no cambian. ' +
+                '<strong>Semáforo con sensores</strong>: alarga la luz verde mientras detecta carros (técnico: semáforo actuado). ' +
+                '<strong>Regla de colas</strong>: da la luz verde a la calle con más fila (técnico: max-pressure); no ve a los peatones.',
+                '<strong>Versiones de la IA</strong>: la misma IA entrenada con prioridades distintas. La "curiosidad" es un premio extra ' +
+                'por explorar situaciones nuevas mientras aprende (técnico: RND).',
+                '<strong>% mejor / peor</strong>: siempre se compara con el punto de comparación que elijas arriba.',
+                ...ALERTAS.map(textoAlerta),
+                '<span style="font-size: 0.8rem;">Detalle técnico (para el equipo): IA = RND-MAPPO; cada versión se entrenó 3 veces (semillas) ' +
+                'y se evaluó con 5 semillas de SUMO. La versión "más exploradora" se entrenó con SUMO 1.28.0 y se evaluó con 1.27.1. ' +
+                'Algoritmo v1/v2 en CLAUDE.md; columnas y unidades en datos_dashboard/diccionario_datos.md.</span>',
+            ].join('<br><br>');
+        }
+
+        // ---------- Orquestación ----------
+        function paginaActiva() { return document.querySelector('.page-section.active-page').id; }
+        function renderPagina() {
+            if (!DB) return;
+            const p = paginaActiva();
+            if (p !== 'red-trafico-page') pausarSimulacion();  // no seguir animando lo que no se ve
+            if (p === 'dashboard-page') {
+                renderRecompensa(); renderKPIs(); renderAgentes(); renderInsight(); renderGraficoPrincipal();
+            } else if (p === 'red-trafico-page') renderRed();
+            else if (p === 'entrenamiento-page') renderEntrenamientoPagina();
+            else renderTexto();
+        }
+
+        async function cargarBase() {
+            const indicador = document.getElementById('current-mode-indicator');
+            indicador.innerText = 'Cargando citadel.db…';
+            try {
+                if (location.protocol === 'file:') throw new Error('Abre el dashboard con un servidor local: cd dashboard; python -m http.server 8000');
+                const SQL = await initSqlJs({locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${f}`});
+                const resp = await fetch('citadel.db');
+                if (!resp.ok) throw new Error('No se encontró citadel.db: corre python dashboard/construir_bd.py');
+                DB = new SQL.Database(new Uint8Array(await resp.arrayBuffer()));
+                METRICAS = Object.fromEntries(q('SELECT * FROM metricas').map(m => [m.metrica, m]));
+                // Versiones del algoritmo con evaluación en la base (el filtro solo aparece si hay más de una)
+                const configsEnBase = new Set(q('SELECT DISTINCT config FROM evaluacion_configs').map(f => f.config));
+                ALGS_DISPONIBLES = Object.keys(PREFIJO_ALG).map(Number)
+                    .filter(a => CONFIGS_BASE.some(c => configsEnBase.has(PREFIJO_ALG[a] + c)));
+                ALERTAS = q('SELECT * FROM alertas');
+                renderFiltros();
+                actualizarIndicador();
+                renderPagina();
+                renderTexto();
+            } catch (err) {
+                indicador.innerText = `Error: ${err.message}`;
+                indicador.style.color = ROJO;
+                console.error(err);
+            }
+        }
+        window.addEventListener('resize', () => renderPagina());
+        cargarBase();
+    </script>
+</body>
+</html>

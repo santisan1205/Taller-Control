@@ -24,3 +24,6 @@ resultados/prueba_*/
 # Logs de la campana y paquetes para pasar resultados entre PCs
 resultados/*.log
 *.zip
+
+# Base del dashboard: se regenera en segundos con python dashboard/construir_bd.py
+dashboard/citadel.db
