@@ -48,13 +48,19 @@ POLITICAS_V1 = {
 CONFIGS_V2 = ['v2_base', 'v2_penaliza_cambio', 'v2_prioriza_espera', 'v2_peatones_alto',
               'v2_mas_exploracion', 'v2_sin_rnd']
 SEMILLAS_ENTRENAMIENTO_V2 = [0, 1, 2]
-POLITICAS_V2 = {f'{c}_seed{s}': f'_{c}_seed{s}' for c in CONFIGS_V2 for s in SEMILLAS_ENTRENAMIENTO_V2}
+# Las CONFIGS_V2 se entrenaron con el algoritmo 1. La campaña repetida con el algoritmo 2
+# (crítico por agente + ValueNorm, RND con normalización acumulada) usa las mismas
+# configuraciones con el prefijo v2a2_, para que convivan y se puedan comparar
+PREFIJO_ALGORITMO = {1: 'v2_', 2: 'v2a2_'}
+CONFIGS_V2_ALG2 = [PREFIJO_ALGORITMO[2] + c[len(PREFIJO_ALGORITMO[1]):] for c in CONFIGS_V2]
+POLITICAS_V2 = {f'{c}_seed{s}': f'_{c}_seed{s}' for c in CONFIGS_V2 + CONFIGS_V2_ALG2 for s in SEMILLAS_ENTRENAMIENTO_V2}
 POLITICAS = {**POLITICAS_V1, **POLITICAS_V2}
 
 # Controladores que no se entrenan: el modo coincide con el nombre de la "política"
 LINEAS_BASE = {'tiempo_fijo': 'fijo', 'actuado': 'actuado', 'max_pressure': 'max_pressure'}
 
 DELTA_TIME = 5  # segundos simulados por paso del agente (igual que en setup_entorno)
+PASOS_EPISODIO = 720  # episodio completo: 3600 s / DELTA_TIME
 
 
 def _cargar_actores(sufijo_pesos, agentes, obs_dims, action_dims):
@@ -68,10 +74,16 @@ def _cargar_actores(sufijo_pesos, agentes, obs_dims, action_dims):
     return actores
 
 
-def prefijo_episodio(politica, modo, semilla, escala, max_green=False, entorno='v1', ventana='valle'):
+def prefijo_episodio(politica, modo, semilla, escala, max_green=False, entorno='v1', ventana='valle',
+                     pasos=PASOS_EPISODIO):
     # En v1 solo existe la ventana valle y se conserva el nombre de siempre
-    # (así sirven los episodios ya simulados); en v2 la ventana va en el nombre
+    # (así sirven los episodios ya simulados); en v2 la ventana va en el nombre.
+    # Un episodio más corto que el completo lleva __p<pasos>: si no, una prueba
+    # con --pasos 50 quedaba en la caché con el mismo nombre y una evaluación
+    # completa posterior la reutilizaba sin avisar.
     nombre = f'{politica}__{modo}__' + (f'{ventana}__' if entorno == 'v2' else '') + f's{semilla}__x{escala:g}'
+    if pasos != PASOS_EPISODIO:
+        nombre += f'__p{pasos}'
     return os.path.join(carpeta_episodios(max_green, entorno), nombre)
 
 
@@ -179,7 +191,7 @@ def correr_trabajo(politica, modo, semilla, escala, ventana, pasos, forzar=False
     simular, para poder retomar una evaluación larga que se interrumpió.
     """
     torch.set_num_threads(1)  # varios episodios corren en paralelo
-    prefijo = prefijo_episodio(politica, modo, semilla, escala, max_green, entorno, ventana)
+    prefijo = prefijo_episodio(politica, modo, semilla, escala, max_green, entorno, ventana, pasos)
     archivos = [f'{prefijo}.pasos.csv', f'{prefijo}.tripinfo.xml', f'{prefijo}.stats.xml', f'{prefijo}.control.csv']
     if not forzar and all(os.path.exists(a) for a in archivos):
         return prefijo, 'cache'
@@ -328,7 +340,7 @@ def trabajos_evaluacion(politicas, semillas, escalas, determinista=False, lineas
     return trabajos
 
 
-def evaluar(politicas, semillas=(10, 20, 30, 40, 50), escalas=(0.8, 1.0, 1.2), pasos=720,
+def evaluar(politicas, semillas=(10, 20, 30, 40, 50), escalas=(0.8, 1.0, 1.2), pasos=PASOS_EPISODIO,
             determinista=False, procesos=4, forzar=False, max_green=True, entorno='v1',
             lineas_base=('tiempo_fijo',), ventanas=('valle',)):
     validas = POLITICAS_V2 if entorno == 'v2' else POLITICAS_V1
@@ -349,7 +361,8 @@ def evaluar(politicas, semillas=(10, 20, 30, 40, 50), escalas=(0.8, 1.0, 1.2), p
 
     filas = []
     for politica, modo, semilla, escala, ventana in trabajos:
-        fila, _ = resumir_episodio(prefijo_episodio(politica, modo, semilla, escala, max_green, entorno, ventana))
+        fila, _ = resumir_episodio(prefijo_episodio(politica, modo, semilla, escala, max_green, entorno, ventana, pasos),
+                                   duracion_s=pasos * DELTA_TIME)
         filas.append({'politica': politica, 'modo': modo, 'ventana': ventana, 'semilla': semilla,
                       'escala': escala, **fila})
     # El detalle completo (todas las corridas de evaluación en disco) lo
@@ -406,7 +419,9 @@ if __name__ == '__main__':
     parser.add_argument('--semillas', type=int, nargs='+', default=[10, 20, 30, 40, 50])
     parser.add_argument('--escalas', type=float, nargs='+', default=[0.8, 1.0, 1.2],
                         help='Multiplicador de la demanda de SUMO (--scale): prueba la política con menos/más tráfico')
-    parser.add_argument('--pasos', type=int, default=720)
+    parser.add_argument('--pasos', type=int, default=PASOS_EPISODIO,
+                        help='Pasos por episodio. Si no es el completo (720), los archivos llevan __p<pasos> y '
+                             'exportar_datos.py los ignora')
     parser.add_argument('--determinista', action='store_true', help='Evalua tambien la politica greedy (argmax)')
     parser.add_argument('--procesos', type=int, default=4, help='Episodios de SUMO en paralelo')
     parser.add_argument('--forzar', action='store_true', help='Re-simula aunque ya existan los archivos del episodio')

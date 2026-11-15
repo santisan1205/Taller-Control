@@ -84,8 +84,11 @@ def exportar_corridas(corridas=CORRIDAS):
         if os.path.exists(ruta_config):
             with open(ruta_config) as f:
                 fila = {'corrida': corrida, **json.load(f), 'notas': ''}
+            # Las corridas anteriores a modelo_red_rl.VERSION_ALGORITMO no la registraban
+            fila.setdefault('version_algoritmo', 1)
         else:
-            fila = {'corrida': corrida, **HIPERPARAMETROS_DEFAULT, **CORRIDAS_HISTORICAS.get(corrida, {})}
+            fila = {'corrida': corrida, **HIPERPARAMETROS_DEFAULT, **CORRIDAS_HISTORICAS.get(corrida, {}),
+                    'version_algoritmo': 1}
         filas.append(fila)
     return pd.DataFrame(filas)
 
@@ -94,16 +97,22 @@ def _episodios_evaluados(carpeta):
     """(claves, prefijo) de cada episodio de evaluación en disco. Las claves son
     politica, modo, semilla, escala y, en el entorno v2, ventana."""
     episodios = []
+    parciales = 0
     for ruta in sorted(glob.glob(os.path.join(carpeta, '*.pasos.csv'))):
         prefijo = ruta[:-len('.pasos.csv')]
         m = re.fullmatch(r'(?P<politica>.+?)__(?P<modo>.+?)__(?:(?P<ventana>valle|pico)__)?'
-                         r's(?P<semilla>\d+)__x(?P<escala>[\d.]+)', os.path.basename(prefijo))
+                         r's(?P<semilla>\d+)__x(?P<escala>[\d.]+)(?:__p(?P<pasos>\d+))?', os.path.basename(prefijo))
+        if m and m['pasos']:
+            parciales += 1  # episodio de prueba más corto que la hora completa: no se consolida
+            continue
         if m:
             claves = {'politica': m['politica'], 'modo': m['modo'], 'semilla': int(m['semilla']),
                       'escala': float(m['escala'])}
             if m['ventana']:
                 claves = {'ventana': m['ventana'], **claves}
             episodios.append((claves, prefijo))
+    if parciales:
+        print(f'  Se ignoraron {parciales} episodios parciales (__p<pasos>) de {carpeta}')
     return episodios
 
 

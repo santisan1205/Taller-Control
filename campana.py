@@ -1,5 +1,11 @@
 """
-Campaña de entrenamiento v2 repartida entre los 4 PCs del equipo.
+Campaña de entrenamiento del entorno v2 repartida entre los 4 PCs del equipo.
+
+Entrena las 6 configuraciones x 3 semillas con el algoritmo actual
+(modelo_red_rl.VERSION_ALGORITMO). Los nombres llevan el prefijo de ese
+algoritmo: v2_ fue la campaña con el algoritmo 1 (ya consolidada en
+datos_dashboard/v2/) y v2a2_ es la campaña con el algoritmo 2. Como el código
+actual solo entrena con el algoritmo 2, esta campaña siempre produce v2a2_*.
 
 Cada PC corre su lista fija de corridas (ASIGNACION), varias a la vez. Todas
 usan el entorno v2 (peatones en C1/C4, demanda variable con valle y hora pico,
@@ -21,36 +27,39 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-from evaluar_comparacion import CONFIGS_V2, SEMILLAS_ENTRENAMIENTO_V2
+from evaluar_comparacion import PREFIJO_ALGORITMO, CONFIGS_V2, SEMILLAS_ENTRENAMIENTO_V2
+from modelo_red_rl import VERSION_ALGORITMO
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
 EPISODIOS = 150
 ARGS_COMUNES = ['--peatones', '--demanda-variable']
+PREFIJO = PREFIJO_ALGORITMO[VERSION_ALGORITMO]
 
-# Lo que cambia cada configuración respecto a los defaults de train.py
+# Lo que cambia cada configuración respecto a los defaults de train.py (sin prefijo)
 ARGS_CONFIG = {
-    'v2_base': [],
-    'v2_penaliza_cambio': ['--p-cambio', '2.0'],
-    'v2_prioriza_espera': ['--w2', '2.0'],
-    'v2_peatones_alto': ['--w3', '5.0'],
-    'v2_mas_exploracion': ['--entropy-coef', '0.05'],
-    'v2_sin_rnd': ['--sin-rnd'],
+    'base': [],
+    'penaliza_cambio': ['--p-cambio', '2.0'],
+    'prioriza_espera': ['--w2', '2.0'],
+    'peatones_alto': ['--w3', '5.0'],
+    'mas_exploracion': ['--entropy-coef', '0.05'],
+    'sin_rnd': ['--sin-rnd'],
 }
-assert set(ARGS_CONFIG) == set(CONFIGS_V2), 'ARGS_CONFIG y evaluar_comparacion.CONFIGS_V2 deben coincidir'
+assert {PREFIJO_ALGORITMO[1] + c for c in ARGS_CONFIG} == set(CONFIGS_V2), \
+    'ARGS_CONFIG y evaluar_comparacion.CONFIGS_V2 deben tener las mismas configuraciones'
 
 # PC -> [(configuración, semilla)]. 18 corridas en total, repartidas según la
 # prueba de 20 episodios (h por corrida de 150, una a la vez): PC1 2,0 h,
 # PC2 4,1 h, PC3 6,1 h, PC4 3,8 h. El PC1 lleva 3 tandas de 3 y los demás una,
 # para que todos terminen en ~7-9 h. El PC3, el más lento, lleva
-# v2_mas_exploracion, que es la primera configuración que se recorta si no alcanza.
+# mas_exploracion, que es la primera configuración que se recorta si no alcanza.
 def _tres_semillas(config):
-    return [(config, s) for s in SEMILLAS_ENTRENAMIENTO_V2]
+    return [(PREFIJO + config, s) for s in SEMILLAS_ENTRENAMIENTO_V2]
 
 ASIGNACION = {
-    1: _tres_semillas('v2_base') + _tres_semillas('v2_sin_rnd') + _tres_semillas('v2_prioriza_espera'),
-    2: _tres_semillas('v2_penaliza_cambio'),
-    3: _tres_semillas('v2_mas_exploracion'),
-    4: _tres_semillas('v2_peatones_alto'),
+    1: _tres_semillas('base') + _tres_semillas('sin_rnd') + _tres_semillas('prioriza_espera'),
+    2: _tres_semillas('penaliza_cambio'),
+    3: _tres_semillas('mas_exploracion'),
+    4: _tres_semillas('peatones_alto'),
 }
 
 
@@ -60,7 +69,7 @@ def nombre_corrida(config, semilla):
 
 def comando(config, semilla, episodios):
     return [sys.executable, os.path.join(RAIZ, 'train.py'), '--tag', config, '--seed', str(semilla),
-            '--episodios', str(episodios), *ARGS_COMUNES, *ARGS_CONFIG[config]]
+            '--episodios', str(episodios), *ARGS_COMUNES, *ARGS_CONFIG[config[len(PREFIJO):]]]
 
 
 def correr(config, semilla, episodios, hilos_torch):
@@ -93,6 +102,7 @@ def main():
     parser.add_argument('--listar', action='store_true', help='Muestra el reparto de corridas y sale')
     args = parser.parse_args()
 
+    print(f'Algoritmo {VERSION_ALGORITMO}: corridas con prefijo {PREFIJO}')
     if args.listar:
         for pc, corridas in ASIGNACION.items():
             print(f'PC{pc}: ' + ', '.join(nombre_corrida(c, s) for c, s in corridas))

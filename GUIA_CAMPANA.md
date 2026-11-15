@@ -1,5 +1,24 @@
 # Guía: campaña de entrenamiento v2 (4 PCs)
 
+> **Campaña con el algoritmo 2 (`v2a2_*`).** La campaña descrita abajo (`v2_*`) se entrenó con el algoritmo 1 y ya
+> está consolidada en `datos_dashboard/v2/`. El código actual entrena con el algoritmo 2: crítico con una salida
+> por agente + ValueNorm, y RND con normalización acumulada (ver `CLAUDE.md`). Se repite la misma campaña,
+> con las mismas 6 configuraciones × 3 semillas y el mismo reparto, y los nombres llevan el prefijo `v2a2_`
+> para que no se pisen con los `v2_*` y se puedan comparar.
+>
+> 1. Los 4 PCs en el **mismo commit** (`git pull`) y con **SUMO 1.27.1**. En la campaña anterior, el PC3 usó
+>    1.28.0 y hubo que rehacer su evaluación.
+> 2. `python campana.py --listar` debe decir `Algoritmo 2: corridas con prefijo v2a2_`.
+> 3. Opcional: `python campana.py --pc N --prueba` (20 episodios) para medir tiempos; después borren
+>    `resultados/prueba_*` y los `*prueba_*.pth`.
+> 4. `python campana.py --pc N` (pasos 2 a 4 de abajo, igual que antes).
+> 5. Evaluación en cada PC: `python evaluar_comparacion.py --entorno v2 --ventanas valle pico --procesos 8`.
+>    Sin `--politicas`, evalúa todas las que tengan pesos en ese PC, también las `v2a2_*`. Las líneas base y los
+>    `v2_*` ya evaluados salen de la caché.
+> 6. En el PC que consolida: copiar `resultados/v2a2_*`, los `.pth` `v2a2_` y `resultados_eval/episodios_v2/`,
+>    y correr `python exportar_datos.py --v2` y `python dashboard/construir_bd.py`. En el dashboard aparece el
+>    filtro **Algoritmo v1 / v2**.
+
 ## Qué cambia en el entorno v2
 - **Peatones** solo en dos pasos peatonales semaforizados: `:cluster_10564135163_13571629282_5146149679_c0` (C1) y `:cluster_10564135212_13571629279_13571629299_c0` (C4). La demanda la genera `python generar_peatones.py` (120 personas/h por sentido; 240/h en la hora pico).
   - C1 y C4 ven dos valores más en su observación: peatones esperando y la espera máxima.

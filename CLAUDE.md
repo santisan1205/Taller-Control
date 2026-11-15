@@ -49,6 +49,16 @@ Profesor: Jorge Alfredo López Jiménez. **Responder siempre en español.**
   verde máximo de 60 s también en entrenamiento, líneas base actuado y max-pressure. Todo lleva prefijo `v2_`.
   Detalles y procedimiento de la campaña en `GUIA_CAMPANA.md`.
 
+## Versión del algoritmo (`modelo_red_rl.VERSION_ALGORITMO`, se guarda en `config.json`)
+- **1** (campaña v1 y campaña v2 consolidada): crítico con una sola salida, actualizado por turnos con la
+  recompensa de cada agente; RND normalizando cada observación con su propia media → R_int < 1 % de |R_ext|.
+- **2** (corridas nuevas): crítico con una salida V_i(s) por agente + ValueNorm y un solo optimizador;
+  RND con media/desviación acumuladas de las observaciones y R_int normalizada por su desviación acumulada.
+  `critic_loss` queda en unidades normalizadas (no comparable con la versión 1). Los `critic_mappo_*.pth`
+  cambian de forma; la evaluación solo carga los actores, así que los modelos viejos se siguen evaluando.
+- Hay que reentrenar para medir el efecto: los resultados actuales (incluido "RND no aporta") son de la versión 1.
+- `evaluar_comparacion.py --pasos N` (N ≠ 720) guarda los episodios como `__p<N>` y `exportar_datos.py` los ignora.
+
 ## Mensajes clave de los resultados (v2)
 - El agente logra un compromiso vehículos/peatones frente a max-pressure.
 - RND (curiosidad) no aporta: `v2_sin_rnd` rinde parecido a `v2_base`.

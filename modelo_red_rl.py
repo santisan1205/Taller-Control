@@ -7,10 +7,49 @@ import numpy as np
 # Definir la GPU dedicada
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+# Versión del algoritmo de entrenamiento (se guarda en config.json de cada corrida).
+#   1: crítico con una sola salida, actualizado por turnos con la recompensa de cada
+#      agente, y RND normalizando cada observación con su propia media y desviación.
+#      Es con lo que se entrenaron la campaña v1 y la campaña v2 consolidada.
+#   2: crítico con una salida por agente + normalización de valores (ValueNorm),
+#      un solo optimizador del crítico, y RND con estadísticas acumuladas de las
+#      observaciones y de la recompensa intrínseca.
+VERSION_ALGORITMO = 2
+
+
+class RunningMeanStd:
+    """
+    Media y varianza acumuladas (algoritmo paralelo de Chan et al.), por
+    componente. Se usa para normalizar las observaciones y la recompensa
+    intrínseca de RND, y los retornos del crítico (ValueNorm).
+    """
+    def __init__(self, shape=(), epsilon=1e-4):
+        self.mean = np.zeros(shape, dtype=np.float64)
+        self.var = np.ones(shape, dtype=np.float64)
+        self.count = epsilon
+
+    def update(self, x):
+        x = np.asarray(x, dtype=np.float64).reshape(-1, *self.mean.shape)
+        batch_mean, batch_var, batch_count = x.mean(axis=0), x.var(axis=0), x.shape[0]
+        delta = batch_mean - self.mean
+        total = self.count + batch_count
+        self.mean = self.mean + delta * batch_count / total
+        m2 = self.var * self.count + batch_var * batch_count + delta ** 2 * self.count * batch_count / total
+        self.var = m2 / total
+        self.count = total
+
+    @property
+    def std(self):
+        return np.sqrt(self.var) + 1e-8
+
+
 class RNDModule(nn.Module):
+    # Las observaciones normalizadas se recortan a [-CLIP_OBS, CLIP_OBS], como en el artículo de RND
+    CLIP_OBS = 5.0
+
     def __init__(self, input_dim, output_dim=64, lr=1e-4):
         super(RNDModule, self).__init__()
-        
+
         # Red Objetivo (g): Posee pesos aleatorios congelados.
         self.target_net = nn.Sequential(
             nn.Linear(input_dim, 128),
@@ -19,62 +58,67 @@ class RNDModule(nn.Module):
         )
         for param in self.target_net.parameters():
             param.requires_grad = False # Pesos congelados.
-            
+
         # Red Predictora (f): Se entrena para minimizar la función de pérdida frente a la red objetivo.
         self.predictor_net = nn.Sequential(
             nn.Linear(input_dim, 128),
             nn.ReLU(),
             nn.Linear(128, output_dim)
         )
-        
+
         # Mediante descenso de gradiente se ajustan los pesos de la red predictora
         self.optimizer = optim.Adam(self.predictor_net.parameters(), lr=lr)
-        
+
+        # Estadísticas acumuladas: de cada componente de la observación (para
+        # normalizarla) y de la recompensa intrínseca (para que su escala no
+        # dependa de la inicialización de las redes ni decaiga a ~0)
+        self.obs_rms = RunningMeanStd(shape=(input_dim,))
+        self.r_int_rms = RunningMeanStd()
+        self.ultima_r_int_cruda = 0.0
+
         # Enviar redes a la GPU
         self.target_net.to(device)
         self.predictor_net.to(device)
-        
+
     def normalize_state(self, state):
-        # Es fundamental normalizar el vector de observación (media 0, varianza 1) antes de pasarlo por las redes
-        # Esto evita inestabilidad numérica generada al mezclar distintas escalas
-        mean = state.mean()
-        std = state.std() + 1e-8
-        return (state - mean) / std
+        # Normaliza cada componente con la media y la desviación acumuladas de
+        # las observaciones vistas (no con las del propio vector: eso borraba
+        # la información de escala y hacía que estados distintos se vieran iguales)
+        mean = torch.tensor(self.obs_rms.mean, dtype=torch.float32, device=device)
+        std = torch.tensor(self.obs_rms.std, dtype=torch.float32, device=device)
+        return torch.clamp((state - mean) / std, -self.CLIP_OBS, self.CLIP_OBS)
+
+    def _a_tensor(self, state):
+        if not isinstance(state, torch.Tensor):
+            state = torch.tensor(np.asarray(state), dtype=torch.float32)
+        return state.to(device)
 
     def compute_intrinsic_reward(self, state):
-        # Convertir a tensor si no lo es
-        if not isinstance(state, torch.Tensor):
-            state = torch.tensor(state, dtype=torch.float32)
-            
-        # Enviar el tensor a la GPU
-        state = state.to(device)
-            
-        # 1. Normalización del vector de observación
-        norm_state = self.normalize_state(state)
-        
-        # 2. Paso por la Red Objetivo (g) y la Red Predictora (f)
-        target_features = self.target_net(norm_state)
-        predicted_features = self.predictor_net(norm_state)
-        
-        # 3. Cálculo del Error Cuadrático Medio (MSE) para obtener la recompensa escalar
-        mse = nn.MSELoss(reduction='none')
-        intrinsic_reward = mse(predicted_features, target_features).mean(dim=-1)
-        
-        return intrinsic_reward.cpu().detach().numpy() # R_int.
-        
+        """
+        R_int = ||f(s') - g(s')||² / desviación acumulada de R_int. Actualiza las
+        estadísticas de la observación con s' antes de normalizarla.
+        """
+        state = self._a_tensor(state)
+        self.obs_rms.update(state.detach().cpu().numpy())
+        with torch.no_grad():
+            norm_state = self.normalize_state(state)
+            target_features = self.target_net(norm_state)
+            predicted_features = self.predictor_net(norm_state)
+            # Error cuadrático medio entre las dos redes = novedad del estado
+            r_int = float(((predicted_features - target_features) ** 2).mean(dim=-1))
+        self.r_int_rms.update(r_int)
+        self.ultima_r_int_cruda = r_int
+        return r_int / float(self.r_int_rms.std)  # R_int normalizada
+
     def update_predictor(self, state):
-        # Entrenamiento en lotes mediante retropropagación.
-        if not isinstance(state, torch.Tensor):
-            state = torch.tensor(state, dtype=torch.float32)
-            
-        state = state.to(device)
-            
+        # Un paso de descenso de gradiente de la red predictora sobre s'
+        state = self._a_tensor(state)
         norm_state = self.normalize_state(state)
         target_features = self.target_net(norm_state)
         predicted_features = self.predictor_net(norm_state)
-        
+
         loss = nn.MSELoss()(predicted_features, target_features)
-        
+
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
@@ -88,11 +132,11 @@ class RewardCalculator:
         self.w2 = w2
         self.w3 = w3
         self.p_cambio = p_cambio # Penalización leve por cambio de fase.
-        
+
     def calculate_extrinsic_reward(self, delta_q, delta_w_veh, delta_w_ped, phase_changed):
         # Se emplea una Recompensa Basada en la Diferencia (Delta Reward) para garantizar estabilidad.
         penalizacion_cambio = self.p_cambio if phase_changed else 0.0
-        
+
         # Fórmula: R_ext = -(w1 * delta_Q + w2 * delta_W_veh + w3 * delta_W_ped) - P_cambio.
         r_ext = -(self.w1 * delta_q + self.w2 * delta_w_veh + self.w3 * delta_w_ped) - penalizacion_cambio
         return r_ext
@@ -121,7 +165,7 @@ class MAPPOActor(nn.Module):
         # Convertir logits en probabilidades con Softmax
         logits = self.red(obs)
         probabilidades = torch.softmax(logits, dim=-1)
-        
+
         # Crear una distribución categórica para muestrear la acción
         distribucion = Categorical(probabilidades)
         return distribucion
@@ -130,15 +174,18 @@ class MAPPOActor(nn.Module):
         dist = self.forward(obs)
         action = dist.sample()
         log_prob = dist.log_prob(action)
-        
+
         # Desconectar log_prob de la GPU y del grafo de gradientes extrayendo solo su valor numérico
         return action.item(), log_prob.detach().cpu().item()
 
 
 class MAPPOCritic(nn.Module):
-    def __init__(self, global_obs_dim):
+    def __init__(self, global_obs_dim, n_agentes=1):
         """
-        Crítico centralizado: Observa toda la red para evaluar la acción conjunta.
+        Crítico centralizado: observa el estado global de la red y estima el
+        valor de cada agente (una salida por agente). Cada agente optimiza su
+        propia recompensa, cuyas escalas son muy distintas (C2/C3 frente a C4),
+        así que un único V(s) no puede ajustar los retornos de los cuatro.
         """
         super(MAPPOCritic, self).__init__()
         self.red = nn.Sequential(
@@ -146,14 +193,14 @@ class MAPPOCritic(nn.Module):
             nn.ReLU(),
             nn.Linear(256, 128),
             nn.ReLU(),
-            nn.Linear(128, 1) # Salida: Valor escalar del estado (V)
+            nn.Linear(128, n_agentes) # Salida: V_i(s) de cada agente (normalizado, ver CriticTrainer)
         )
 
     def forward(self, global_obs):
         valor_estado = self.red(global_obs)
         return valor_estado
-    
-    
+
+
 class RolloutBuffer:
     def __init__(self):
         self.limpiar()
@@ -189,7 +236,7 @@ class RolloutBuffer:
         """
         ventajas = []
         ventaja_acumulada = 0
-        
+
         # Recorremos el buffer en reversa para propagar el valor futuro hacia atrás
         for t in reversed(range(len(self.rewards))):
             if t == len(self.rewards) - 1:
@@ -201,78 +248,70 @@ class RolloutBuffer:
 
             # Error TD (Diferencia Temporal)
             delta = self.rewards[t] + gamma * next_val * next_non_terminal - self.values[t]
-            
+
             # GAE
             ventaja_acumulada = delta + gamma * lam * next_non_terminal * ventaja_acumulada
             ventajas.insert(0, ventaja_acumulada)
-            
+
         retornos = [v + val for v, val in zip(ventajas, self.values)]
-        
+
         # Convertir a tensores para el optimizador
         return (
-            torch.tensor(self.obs, dtype=torch.float32).to(device),
-            torch.tensor(self.global_obs, dtype=torch.float32).to(device),
+            torch.tensor(np.array(self.obs), dtype=torch.float32).to(device),
+            torch.tensor(np.array(self.global_obs), dtype=torch.float32).to(device),
             torch.tensor(self.actions, dtype=torch.float32).to(device),
             torch.tensor(self.log_probs, dtype=torch.float32).to(device),
             torch.tensor(retornos, dtype=torch.float32).to(device),
             torch.tensor(ventajas, dtype=torch.float32).to(device)
         )
-        
+
 
 class MAPPOTrainer:
-    def __init__(self, actor, critic, lr_actor=3e-4, lr_critic=1e-3, clip_ratio=0.2, entropy_coef=0.01):
+    def __init__(self, actor, lr_actor=3e-4, clip_ratio=0.2, entropy_coef=0.01):
         """
-        Gestiona la actualización de pesos de las redes Actor y Crítico.
+        Actualiza el Actor de un agente con el objetivo recortado de PPO. El
+        Crítico compartido se actualiza aparte, una sola vez por episodio y con
+        los retornos de todos los agentes (CriticTrainer).
         """
         self.actor = actor
-        self.critic = critic
         self.clip_ratio = clip_ratio
         self.entropy_coef = entropy_coef # Fomenta la exploración
-        
+
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr_actor)
-        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=lr_critic)
-        
+
     def update(self, buffer_tensors, ppo_epochs=4):
         """
         Ejecuta la optimización utilizando un lote de trayectorias.
         """
         # Extraer tensores del buffer (calculados previamente con GAE)
-        obs, global_obs, old_actions, old_log_probs, returns, advantages = buffer_tensors
-        
+        obs, _, old_actions, old_log_probs, _, advantages = buffer_tensors
+
         # Normalizar las ventajas estabiliza drásticamente el entrenamiento de la red
         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
 
         # Diagnósticos promediados sobre las épocas PPO (se registran en el log de entrenamiento)
-        historial = {'actor_loss': [], 'critic_loss': [], 'entropia': [], 'kl_aprox': [], 'clip_frac': []}
+        historial = {'actor_loss': [], 'entropia': [], 'kl_aprox': [], 'clip_frac': []}
 
         for _ in range(ppo_epochs):
             # 1. Evaluar las acciones pasadas con la política ACTUAL
             dist = self.actor(obs)
             new_log_probs = dist.log_prob(old_actions)
             entropy = dist.entropy().mean()
-            
+
             # 2. Ratio de probabilidad (pi_theta_nueva / pi_theta_vieja)
             ratios = torch.exp(new_log_probs - old_log_probs)
-            
+
             # 3. Función de pérdida del Actor (Clipped Surrogate Objective)
             surr1 = ratios * advantages
             surr2 = torch.clamp(ratios, 1.0 - self.clip_ratio, 1.0 + self.clip_ratio) * advantages
-            
+
             # Se minimiza el negativo de la ecuación para realizar ascenso de gradiente
             actor_loss = -torch.min(surr1, surr2).mean() - self.entropy_coef * entropy
-            
-            # 4. Función de pérdida del Crítico (Mean Squared Error)
-            state_values = self.critic(global_obs).squeeze()
-            critic_loss = nn.MSELoss()(state_values, returns)
-            
-            # 5. Backpropagation y Optimización
+
+            # 4. Backpropagation y Optimización
             self.actor_optimizer.zero_grad()
             actor_loss.backward()
             self.actor_optimizer.step()
-            
-            self.critic_optimizer.zero_grad()
-            critic_loss.backward()
-            self.critic_optimizer.step()
 
             # KL aproximada (pi_vieja || pi_nueva) y fracción de muestras recortadas por el clip:
             # indican qué tanto se mueve la política en cada actualización
@@ -281,7 +320,44 @@ class MAPPOTrainer:
                 historial['kl_aprox'].append(((ratios - 1) - log_ratio).mean().item())
                 historial['clip_frac'].append(((ratios - 1.0).abs() > self.clip_ratio).float().mean().item())
             historial['actor_loss'].append(actor_loss.item())
-            historial['critic_loss'].append(critic_loss.item())
             historial['entropia'].append(entropy.item())
 
         return {clave: float(np.mean(valores)) for clave, valores in historial.items()}
+
+
+class CriticTrainer:
+    def __init__(self, critic, n_agentes, lr_critic=1e-3):
+        """
+        Entrena el Crítico centralizado con un solo optimizador. Usa ValueNorm
+        (como MAPPO, Yu et al. 2022): la red predice retornos normalizados por
+        agente con media y desviación acumuladas, y se desnormalizan al usarlos
+        en GAE. Así las cuatro salidas tienen la misma escala aunque las
+        recompensas de cada cruce difieran en órdenes de magnitud.
+        """
+        self.critic = critic
+        self.norm = RunningMeanStd(shape=(n_agentes,))
+        self.optimizer = optim.Adam(self.critic.parameters(), lr=lr_critic)
+
+    def valores(self, global_obs):
+        """V_i(s) de cada agente, en la escala de las recompensas (numpy, una por agente)."""
+        with torch.no_grad():
+            normalizados = self.critic(torch.as_tensor(global_obs, dtype=torch.float32, device=device))
+        return normalizados.cpu().numpy() * self.norm.std + self.norm.mean
+
+    def update(self, global_obs, retornos, ppo_epochs=4):
+        """
+        global_obs: [T, dim_global]. retornos: [T, n_agentes] (columna i = retornos del agente i).
+        Devuelve la pérdida media (MSE en unidades normalizadas).
+        """
+        self.norm.update(retornos.cpu().numpy())
+        media = torch.tensor(self.norm.mean, dtype=torch.float32, device=device)
+        std = torch.tensor(self.norm.std, dtype=torch.float32, device=device)
+        objetivo = (retornos - media) / std
+        perdidas = []
+        for _ in range(ppo_epochs):
+            perdida = nn.MSELoss()(self.critic(global_obs), objetivo)
+            self.optimizer.zero_grad()
+            perdida.backward()
+            self.optimizer.step()
+            perdidas.append(perdida.item())
+        return float(np.mean(perdidas))

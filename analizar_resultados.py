@@ -24,8 +24,12 @@ CORRIDAS = {
 
 
 def corridas_v2():
-    """Corridas de la campaña v2 que hay en disco (train.py --tag v2_<config> --seed <s>)."""
-    carpetas = sorted(glob.glob(os.path.join(CARPETA_RESULTADOS, 'v2_*_seed*')))
+    """
+    Corridas del entorno v2 que hay en disco (train.py --tag <prefijo><config> --seed <s>):
+    v2_* (algoritmo 1) y v2a2_* (algoritmo 2).
+    """
+    carpetas = sorted(glob.glob(os.path.join(CARPETA_RESULTADOS, 'v2_*_seed*')) +
+                      glob.glob(os.path.join(CARPETA_RESULTADOS, 'v2a2_*_seed*')))
     return {os.path.basename(c): c for c in carpetas if os.path.isdir(c)}
 
 # Un episodio real tiene ~720 filas; el CSV del reset() inicial tiene solo 1

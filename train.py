@@ -2,6 +2,7 @@ import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import json
 import random
+import subprocess
 import time
 from collections import Counter
 import numpy as np
@@ -9,7 +10,8 @@ import pandas as pd
 import torch
 from setup_entorno import (crear_entorno_sumo, configurar_episodio, nombre_cruce, RED_XML, rutas_demanda,
                            VENTANAS)
-from modelo_red_rl import MAPPOActor, MAPPOCritic, RolloutBuffer, MAPPOTrainer, RNDModule, RewardCalculator
+from modelo_red_rl import (MAPPOActor, MAPPOCritic, RolloutBuffer, MAPPOTrainer, CriticTrainer, RNDModule,
+                           RewardCalculator, VERSION_ALGORITMO)
 
 # 1. Define el dispositivo de cómputo: GPU si está disponible, de lo contrario CPU
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -23,6 +25,19 @@ def obtener_estado_global(obs_dict, agents):
     que requiere el Crítico centralizado de MAPPO.
     """
     return np.concatenate([obs_dict[agent] for agent in agents])
+
+
+def commit_actual():
+    """Commit de git con el que se lanza la corrida (para saber qué código la produjo)."""
+    try:
+        raiz = os.path.dirname(os.path.abspath(__file__))
+        commit = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], cwd=raiz,
+                                         stderr=subprocess.DEVNULL, text=True).strip()
+        sucio = subprocess.call(['git', 'diff', '--quiet', 'HEAD', '--', '*.py'], cwd=raiz,
+                                stderr=subprocess.DEVNULL) != 0
+        return commit + ('+cambios' if sucio else '')
+    except (OSError, subprocess.CalledProcessError):
+        return None
 
 def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=None,
           lr_actor=3e-4, lr_critic=1e-3, clip_ratio=0.2, entropy_coef=0.01, ppo_epochs=4,
@@ -82,6 +97,9 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
             'escala_min': escala_min if demanda_variable else 1.0,
             'escala_max': escala_max if demanda_variable else 1.0,
             'sin_rnd': sin_rnd,
+            # Versión del algoritmo (ver modelo_red_rl.VERSION_ALGORITMO) y commit del código
+            'version_algoritmo': VERSION_ALGORITMO,
+            'commit': commit_actual(),
         }, f, indent=2)
 
     # 1. Inicialización del Entorno con el escenario SUMO real (sector de Bogotá modelado)
@@ -105,12 +123,13 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
     # 2. Inicialización de Redes y Módulos
     # Un Actor independiente por agente (dimensiones heterogéneas impiden compartir pesos)
     # y un único Crítico centralizado que observa el estado global de la red (paradigma CTDE)
+    # con una salida V_i(s) por agente, porque cada agente tiene su propia recompensa.
     # Se envía a la GPU si está disponible, de lo contrario a la CPU
     actores = {agent: MAPPOActor(obs_dims[agent], action_dims[agent]).to(device) for agent in agentes}
-    critic = MAPPOCritic(global_obs_dim).to(device)
+    critic = MAPPOCritic(global_obs_dim, n_agentes=len(agentes)).to(device)
+    critic_trainer = CriticTrainer(critic, n_agentes=len(agentes), lr_critic=lr_critic)
     trainers = {
-        agent: MAPPOTrainer(actores[agent], critic, lr_actor=lr_actor, lr_critic=lr_critic,
-                             clip_ratio=clip_ratio, entropy_coef=entropy_coef)
+        agent: MAPPOTrainer(actores[agent], lr_actor=lr_actor, clip_ratio=clip_ratio, entropy_coef=entropy_coef)
         for agent in agentes
     }
 
@@ -138,6 +157,7 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
         recompensa_acumulada = 0
         r_ext_acumulada = 0.0
         r_int_acumulada = 0.0
+        r_int_cruda_acumulada = 0.0
         perdidas_rnd = []
         inicio_episodio = time.time()
         # Fase verde efectiva de cada semáforo (no la acción pedida: min_green
@@ -148,21 +168,20 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
         conteo_acciones = {agent: Counter() for agent in agentes}
 
         for paso in range(PASOS_POR_EPISODIO):
-            # El Crítico evalúa el estado actual de toda la ciudad en la GPU
-            estado_global_tensor = torch.tensor(estado_global, dtype=torch.float32).to(device)
-            valor_global = critic(estado_global_tensor).item()
+            # El Crítico evalúa el estado actual de toda la ciudad: un valor por agente
+            valores_globales = critic_trainer.valores(estado_global)
             acciones = {}
             log_probs = {}
             valores_estado = {}
-            
+
             # Cada agente decide su acción de forma descentralizada
-            for agent in agentes:
+            for i, agent in enumerate(agentes):
                 obs_tensor = torch.tensor(obs_dict[agent], dtype=torch.float32).to(device)
                 accion, log_prob = actores[agent].get_action(obs_tensor)
-                
+
                 acciones[agent] = accion
                 log_probs[agent] = log_prob
-                valores_estado[agent] = valor_global
+                valores_estado[agent] = float(valores_globales[i])
                 
             # Ejecutar acciones en el entorno
             siguientes_obs, r_ext_dict, terminations, truncations, infos = env.step(acciones)
@@ -172,7 +191,7 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
             for agent in agentes:
                 r_ext = r_ext_dict[agent]
 
-                # Recompensa intrínseca (curiosidad)
+                # Recompensa intrínseca (curiosidad), normalizada por su desviación acumulada
                 r_int = rnd_modules[agent].compute_intrinsic_reward(siguientes_obs[agent])
                 perdidas_rnd.append(rnd_modules[agent].update_predictor(siguientes_obs[agent]))
 
@@ -181,6 +200,7 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
                 recompensa_acumulada += r_total
                 r_ext_acumulada += float(r_ext)
                 r_int_acumulada += float(r_int)
+                r_int_cruda_acumulada += rnd_modules[agent].ultima_r_int_cruda
 
                 conteo_acciones[agent][acciones[agent]] += 1
                 fase = semaforos[agent].green_phase
@@ -205,22 +225,26 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
         print(f"Episodio {episodio + 1}/{EPISODIOS} | Recompensa Total: {recompensa_acumulada:.2f} | "
               f"Lambda RND: {lambda_t:.2f} | Ventana: {ventana_ep} x{escala_ep:g}")
         
-        # Siguiente valor para calcular la ventaja (Bootstrapping)
-        estado_global_next = torch.tensor(estado_global, dtype=torch.float32).to(device)
-        next_global_val = critic(estado_global_next).item()
-        
+        # Siguiente valor de cada agente para calcular la ventaja (Bootstrapping)
+        next_valores = critic_trainer.valores(estado_global)
+
         diagnosticos = []
-        for agent in agentes:
-            # Calcular GAE y extraer tensores del buffer
+        retornos_por_agente = []
+        for i, agent in enumerate(agentes):
+            # Calcular GAE (con el V_i del propio agente) y extraer tensores del buffer
+            buffer_tensors = buffers[agent].calcular_ventajas_gae(float(next_valores[i]), gamma=gamma, lam=lam)
+            global_obs_tensor = buffer_tensors[1]  # igual en todos los buffers
+            retornos_por_agente.append(buffer_tensors[4])
 
-            buffer_tensors = buffers[agent].calcular_ventajas_gae(next_global_val, gamma=gamma, lam=lam)
-
-            # Actualizar redes Actor y Crítico (cada agente actualiza su propio Actor;
-            # el Crítico, al ser compartido, recibe una actualización por agente)
+            # Cada agente actualiza su propio Actor
             diagnosticos.append(trainers[agent].update(buffer_tensors, ppo_epochs=ppo_epochs))
 
             # Vaciar el buffer para la siguiente política (On-Policy)
             buffers[agent].limpiar()
+
+        # El Crítico se actualiza una sola vez, con los retornos de los cuatro agentes a la vez
+        perdida_critico = critic_trainer.update(global_obs_tensor, torch.stack(retornos_por_agente, dim=1),
+                                                ppo_epochs=ppo_epochs)
 
         # Registrar las métricas de entrenamiento del episodio. El número de
         # episodio coincide con el de analizar_resultados (que renumera los CSV
@@ -231,13 +255,17 @@ def train(episodios=100, pasos_por_episodio=720, use_gui=False, seed=None, tag=N
             'escala': escala_ep,
             'recompensa_total': float(recompensa_acumulada),
             'recompensa_ext': r_ext_acumulada,
-            'recompensa_int': r_int_acumulada,
+            'recompensa_int': r_int_acumulada,              # normalizada: la que se suma a R_ext
+            'recompensa_int_cruda': r_int_cruda_acumulada,  # error de predicción de RND sin normalizar
             'lambda_rnd': lambda_t,
             'rnd_loss': float(np.mean(perdidas_rnd)) if perdidas_rnd else float('nan'),
             'duracion_s': time.time() - inicio_episodio,
         }
         for clave in diagnosticos[0]:
             fila_log[clave] = float(np.mean([d[clave] for d in diagnosticos]))
+        # En la versión 2 la pérdida del crítico está en unidades normalizadas (ValueNorm):
+        # no se compara con la de corridas anteriores
+        fila_log['critic_loss'] = perdida_critico
         for agent in agentes:
             cruce = nombre_cruce(agent)
             total_acciones = sum(conteo_acciones[agent].values())
