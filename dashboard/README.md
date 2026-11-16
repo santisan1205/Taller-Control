@@ -24,15 +24,26 @@ Si cambian los CSV (`python exportar_datos.py --v2`), se vuelve a correr `constr
 
 Índices sobre `politica`, `config`, `modo`, `ventana`, `escala`, `metrica`, `referencia` y `cruce`.
 
-## Animación de los carros (`animacion.json`)
-La página **Red de Tráfico** reproduce 10 minutos reales de SUMO, con los mismos carros a los dos lados:
-semáforos de tiempo fijo frente a la IA. La genera, con SUMO instalado:
+## Animación de los carros (`animacion/`)
+La página **Red de Tráfico** muestra dos ventanas con 10 minutos reales de SUMO (hora pico, tráfico normal,
+semilla 10). Cada ventana tiene un selector para elegir el método que se compara: los 3 semáforos sin IA
+(fijo, con sensores y regla de colas) y las 6 versiones de la IA de cada algoritmo (semilla de entrenamiento 0).
+Todos los métodos ven exactamente los mismos carros, así que cualquier pareja se puede comparar.
+Se generan con SUMO instalado:
 ```powershell
-python dashboard/generar_animacion.py   # por defecto: v2_base_seed0, hora pico, tráfico normal, semilla 10
+python dashboard/generar_animacion.py   # todos los métodos con pesos en el PC; los ya generados se saltan
 ```
 SUMO graba la posición de cada vehículo y peatón cada segundo (`--fcd-output`) y el estado de cada semáforo
-(`SaveTLSStates`). El script lo recorta a la zona de los 4 cruces (unos 2 MB), así que quien abre el dashboard
-no necesita SUMO. `--help` muestra cómo cambiar la política, la hora, el tráfico o la duración.
+(`SaveTLSStates`). El script lo recorta a la zona de los 4 cruces: `animacion/red.json` (geometría, escenario y
+lista de métodos) y un `animacion/<metodo>.json` por método (~1 MB cada uno; el navegador solo descarga los que
+se eligen). Quien abre el dashboard no necesita SUMO. `--help` muestra cómo cambiar el escenario o los métodos.
+`v2_peatones_alto_seed0` (algoritmo 1) no está: sus pesos quedaron en el PC4 y nunca se subieron.
+
+## Logo (`img/`)
+`citadel_logo_original.jpg` es el logo original (fondo negro). A partir de él se generaron, con fondo transparente
+(el alfa sale del brillo de cada píxel, así se conservan el degradado y el brillo): `citadel_logo.png` (logo
+completo, en la pantalla de inicio), `citadel_emblema.png` (solo el símbolo, en el menú lateral y en Comunidad) y
+`favicon.png` (ícono de la pestaña).
 
 ## Qué muestra cada parte de la interfaz
 Está pensada para **alguien que no conoce el proyecto**: nombres sencillos ("IA estándar", "Semáforo fijo",
@@ -47,6 +58,10 @@ Los filtros de arriba (versión de la IA, hora, tráfico y punto de comparación
   - *Simulación*: espera, detenidos o velocidad minuto a minuto durante una hora (solo con tráfico normal).
   - *Explorar Insights IA*: mensajes en palabras calculados con los datos (peatones, curiosidad, más tráfico,
     mejor versión y el episodio en que el tráfico se trancó).
-- **Red de Tráfico**: la animación de SUMO, con tres encuadres (C1/C3/C4, C2, toda la zona) y velocidades.
+- **Red de Tráfico**: la animación de SUMO de los dos métodos elegidos, con tres encuadres (C1/C3/C4, C2, toda la zona) y velocidades.
 - **Entrenamiento**: curvas de las 6 versiones de la IA y qué hace distinta a cada una.
-- **Configuración**: estado de la base. **Soporte**: glosario en lenguaje sencillo.
+- **Comunidad**: enlace al repositorio en GitHub (con el comando para clonarlo) y el equipo.
+- **Configuración**: qué contiene la base y cómo actualizarla. **Soporte**: glosario en lenguaje sencillo.
+
+Los filtros de arriba solo se muestran en el Dashboard y en Entrenamiento, donde tienen efecto. En pantallas
+angostas el menú lateral queda solo con íconos y las tarjetas pasan a una columna.

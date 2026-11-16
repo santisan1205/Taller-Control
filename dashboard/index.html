@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard MAPPO - Diseño Oscuro</title>
+    <title>C.I.T.A.D.E.L. · Dashboard</title>
+    <link rel="icon" type="image/png" href="img/favicon.png">
     <!-- SQLite en el navegador (lee dashboard/citadel.db, generada por construir_bd.py) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
     <style>
@@ -605,6 +606,141 @@
             height: 80%;
             background: dashed 1px var(--text-muted);
         }
+
+        /* =====================================================================
+           REFINAMIENTO VISUAL (misma identidad: oscuro, rosado y morado)
+           ===================================================================== */
+        html { color-scheme: dark; }
+        body { -webkit-font-smoothing: antialiased; }
+        #login-overlay { transition: opacity 0.3s ease; }
+
+        /* Barras de desplazamiento oscuras (antes salían blancas) */
+        .main-content { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.14) transparent; }
+        .main-content::-webkit-scrollbar { width: 8px; height: 8px; }
+        .main-content::-webkit-scrollbar-track { background: transparent; }
+        .main-content::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.14); border-radius: 8px; }
+        .main-content::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.24); }
+
+        /* Botones: respuesta al pasar el mouse y foco visible con teclado */
+        .toggle-btn, .time-btn { white-space: nowrap; transition: color 0.2s, background-color 0.2s, border-color 0.2s; }
+        .toggle-btn:hover, .time-btn:hover { color: var(--text-main); border-color: rgba(255, 255, 255, 0.16); }
+        .toggle-btn:focus-visible, .time-btn:focus-visible, .ai-btn:focus-visible, .menu-item:focus-visible,
+        .selector-metodo:focus-visible, .enlace-boton:focus-visible { outline: 2px solid var(--accent-pink); outline-offset: 2px; }
+        .card, .chart-section, .agent-card { transition: border-color 0.25s ease; }
+        .card:hover, .chart-section:hover { border-color: rgba(255, 255, 255, 0.09); }
+        .page-section.active-page { animation: fadeIn 0.25s ease; }
+
+        /* Acceso directo a la simulación (en el lugar de la barra de búsqueda del prototipo) */
+        .search-bar { cursor: pointer; text-decoration: none; width: auto; white-space: nowrap; transition: border-color 0.2s, color 0.2s; }
+        .search-bar:hover { color: var(--text-main); border-color: rgba(233, 117, 168, 0.4); }
+
+        /* Barra de filtros: cada grupo en su propia cápsula */
+        .barra-filtros { display: flex; flex-wrap: wrap; gap: 10px; }
+        .grupo-filtro {
+            display: flex; align-items: center; gap: 2px; flex-wrap: wrap;
+            padding: 4px 5px 4px 14px; border-radius: 999px;
+            background: rgba(255, 255, 255, 0.025); border: 1px solid var(--card-border);
+        }
+        .grupo-filtro .etiqueta {
+            font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--text-muted); margin-right: 6px;
+        }
+        .grupo-filtro .toggle-btn { padding: 5px 10px; font-size: 0.75rem; background: transparent; border-color: transparent; }
+        .grupo-filtro .toggle-btn.active {
+            color: var(--text-main); border-color: rgba(233, 117, 168, 0.35);
+            background: linear-gradient(90deg, rgba(233, 117, 168, 0.22), rgba(157, 80, 187, 0.22));
+        }
+
+        /* Fila de modos: botones e indicador alineados */
+        .fila-modos { display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .fila-modos .mode-indicator { margin-bottom: 0; font-size: 0.85rem; }
+
+        /* Títulos de gráfico con subtítulo */
+        .chart-header { gap: 20px; align-items: flex-start; }
+        .time-filters { flex-wrap: wrap; justify-content: flex-end; }
+        .titulo-grafico { display: flex; flex-direction: column; gap: 4px; font-size: 0.95rem; font-weight: 500; }
+        .titulo-grafico .sub { font-size: 0.75rem; font-weight: 400; color: var(--text-muted); }
+
+        /* Piezas pequeñas reutilizables */
+        .insignia { border: 1px solid var(--card-border); padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+        .nota-tarjeta { color: var(--text-muted); font-size: 0.75rem; line-height: 1.45; margin-top: 8px; }
+        .agent-val, .kpi-stats h4 { font-variant-numeric: tabular-nums; }
+        .kpi-stats p { white-space: nowrap; }
+
+        /* Selector de método del visor (con flecha propia) */
+        .selector-metodo {
+            appearance: none; -webkit-appearance: none; max-width: 75%;
+            background: var(--card-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23E975A8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
+            color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 20px;
+            padding: 7px 34px 7px 14px; font-size: 0.85rem; font-family: inherit; cursor: pointer; outline: none;
+            transition: border-color 0.2s;
+        }
+        .selector-metodo:hover { border-color: rgba(233, 117, 168, 0.5); }
+        .selector-metodo option, .selector-metodo optgroup { background: var(--card-bg); color: var(--text-main); }
+
+        /* Páginas de texto (Comunidad, Configuración y Soporte) */
+        .pagina-texto { display: flex; flex-direction: column; gap: 20px; }
+        .pagina-texto h2 { font-size: 1.15rem; font-weight: 600; }
+        .pagina-texto p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; }
+        .pagina-texto code, .bloque-codigo {
+            font-size: 0.8rem; color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); border-radius: 6px; padding: 1px 6px;
+        }
+        .pagina-texto code, .bloque-codigo span { font-family: 'Cascadia Code', Consolas, monospace; }
+        .bloque-codigo { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; }
+        .rejilla-textos { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
+        .tarjeta-texto { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 15px; padding: 16px; }
+        .tarjeta-texto h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+        .tarjeta-texto p { font-size: 0.8rem; line-height: 1.5; color: var(--text-muted); }
+        .tarjeta-texto .tecnico { display: block; margin-top: 6px; font-size: 0.7rem; color: var(--text-muted); opacity: 0.75; }
+        .tarjeta-texto.alerta { border-color: rgba(243, 156, 18, 0.35); background: rgba(243, 156, 18, 0.06); }
+        .enlace-boton {
+            display: inline-flex; align-items: center; gap: 8px; text-decoration: none; align-self: flex-start;
+            background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple)); color: white; font-weight: 600;
+            padding: 10px 20px; border-radius: 20px; box-shadow: 0 0 20px var(--glow-purple); transition: transform 0.2s;
+        }
+        .enlace-boton:hover { transform: scale(1.03); }
+        .miembro { display: flex; align-items: center; gap: 12px; }
+        .avatar {
+            width: 38px; height: 38px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 600; background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+        }
+        .boton-copiar { background: transparent; border: 1px solid var(--card-border); color: var(--text-muted); border-radius: 8px;
+                        padding: 4px 10px; font-size: 0.75rem; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .boton-copiar:hover { color: var(--text-main); border-color: rgba(255, 255, 255, 0.2); }
+
+        /* Logo del proyecto */
+        .logo { gap: 12px; }
+        .logo-emblema { width: 44px; height: 44px; flex: none; filter: drop-shadow(0 0 10px rgba(233, 117, 168, 0.35)); }
+        .logo .logo-texto {
+            display: flex; flex-direction: column; gap: 3px; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.04em;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+        }
+        .logo .logo-texto small {
+            font-size: 0.62rem; font-weight: 500; letter-spacing: 0.01em; line-height: 1.3;
+            -webkit-text-fill-color: var(--text-muted); color: var(--text-muted);
+        }
+        .logo-inicio { display: block; width: 240px; margin: -10px auto 18px; }
+
+        /* Pantallas medianas y pequeñas */
+        @media (max-width: 1200px) {
+            .dashboard-grid { grid-template-columns: 1fr 1fr !important; }
+            .dashboard-grid > :last-child:nth-child(3) { grid-column: 1 / -1; }
+        }
+        @media (max-width: 900px) {
+            body { padding: 0; }
+            .app-container { height: 100vh; border-radius: 0; }
+            .sidebar { width: 72px; padding: 25px 10px; }
+            .logo { justify-content: center; }
+            .logo span, .menu-item .texto-menu { display: none; }
+            .menu-item { justify-content: center; padding: 12px; }
+            .main-content { padding: 20px; }
+            .header { flex-direction: column; gap: 15px; }
+            .dashboard-grid { grid-template-columns: 1fr !important; }
+            .chart-header { flex-direction: column; }
+            .time-filters { justify-content: flex-start; }
+        }
     </style>
 </head>
 <body>
@@ -612,6 +748,8 @@
     <!-- OVERLAY DE LOGIN / INGRESO DE NOMBRE -->
     <div id="login-overlay">
         <div class="login-card">
+            <img class="logo-inicio" src="img/citadel_logo.png"
+                 alt="C.I.T.A.D.E.L.: Control Inteligente de Tráfico Adaptativo con Distribución y Exploración Local">
             <h2>Configuración del <span>Dashboard</span></h2>
             <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Por favor, ingresa el nombre de la persona a cargo del monitoreo.</p>
             <input type="text" id="user-name-input" class="login-input" placeholder="Ej. Mariana, Profesor, Evaluador..." required>
@@ -623,31 +761,31 @@
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="logo">
-                <div class="icon"></div>
-                <span>Optimizador MAPPO</span>
+                <img class="logo-emblema" src="img/citadel_emblema.png" alt="">
+                <span class="logo-texto">C.I.T.A.D.E.L.<small>Semáforos con inteligencia artificial</small></span>
             </div>
 
             <nav class="menu">
                 <a class="menu-item active" data-page="dashboard-page" onclick="switchPage('dashboard-page', this)">
-                    <span>⊞</span> Dashboard
+                    <span>⊞</span> <span class="texto-menu">Dashboard</span>
                 </a>
                 <a class="menu-item" data-page="red-trafico-page" onclick="switchPage('red-trafico-page', this)">
-                    <span>⌘</span> Red de Tráfico
+                    <span>⌘</span> <span class="texto-menu">Red de Tráfico</span>
                 </a>
                 <a class="menu-item" data-page="entrenamiento-page" onclick="switchPage('entrenamiento-page', this)">
-                    <span>◎</span> Entrenamiento
+                    <span>◎</span> <span class="texto-menu">Entrenamiento</span>
                 </a>
                 <a class="menu-item" data-page="comunidad-page" onclick="switchPage('comunidad-page', this)">
-                    <span>⌂</span> Comunidad
+                    <span>⌂</span> <span class="texto-menu">Comunidad</span>
                 </a>
             </nav>
 
             <div class="menu bottom-menu">
                 <a class="menu-item" data-page="configuracion-page" onclick="switchPage('configuracion-page', this)">
-                    <span>⚙</span> Configuración
+                    <span>⚙</span> <span class="texto-menu">Configuración</span>
                 </a>
                 <a class="menu-item" data-page="soporte-page" onclick="switchPage('soporte-page', this)">
-                    <span>?</span> Soporte
+                    <span>?</span> <span class="texto-menu">Soporte</span>
                 </a>
             </div>
         </aside>
@@ -662,9 +800,9 @@
                     <p>Aquí está el resumen del rendimiento de tu modelo de tráfico</p>
                 </div>
                 <div class="header-right">
-                    <div class="search-bar">
-                        <span>🔍</span> Pregúntale a SUMO.ai
-                    </div>
+                    <a class="search-bar" href="#" onclick="irAPagina('red-trafico-page'); return false;" title="Ver los carros moviéndose en la simulación">
+                        <span>🚦</span> Ver los carros en la simulación
+                    </a>
                     <div class="profile">
                         <div class="profile-info">
                             <span class="profile-name" id="profile-name-display">Usuario</span>
@@ -676,14 +814,14 @@
             </header>
 
             <!-- FILTROS GLOBALES (configuración, ventana, escala y línea base de referencia) -->
-            <div id="filtros" class="toggles" style="flex-wrap: wrap; align-items: center; gap: 5px;"></div>
+            <div id="filtros" class="barra-filtros"></div>
 
             <!-- CONTENEDOR DE PÁGINAS -->
 
             <!-- 1. PÁGINA: DASHBOARD PRINCIPAL -->
             <div id="dashboard-page" class="page-section active-page">
 
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="fila-modos">
                     <div class="toggles">
                         <button class="toggle-btn active" onclick="setMode('Evaluación', this)">Evaluación</button>
                         <button class="toggle-btn" onclick="setMode('Entrenamiento', this)">Entrenamiento</button>
@@ -702,14 +840,16 @@
                         <div class="card">
                             <div class="card-header">
                                 <span>Recompensa Acumulada</span>
-                                <span id="recompensa-badge" style="border: 1px solid var(--card-border); padding: 2px 10px; border-radius: 10px; font-size: 0.8rem;">10k Ep</span>
+                                <span id="recompensa-badge" class="insignia">10k Ep</span>
                             </div>
                             <div class="total-value" id="recompensa-valor">12,304.11</div>
+                            <p class="nota-tarjeta">Puntaje de la IA en sus últimas horas de práctica. Más alto es mejor.</p>
                         </div>
 
                         <div class="card ai-card">
                             <div class="card-header">
                                 <span>Decisiones Guiadas por Datos</span>
+                                <span class="insignia" id="insight-contador"></span>
                             </div>
                             <p id="insight-texto">Ve más allá de las conjeturas con estrategias de exploración impulsadas por RND y MAPPO para optimizar el flujo.</p>
                             <button class="ai-btn" onclick="siguienteInsight()">Explorar Insights IA</button>
@@ -737,7 +877,7 @@
                     <div class="card">
                         <div class="card-header">
                             <span>Estado de Agentes (MAPPO)</span>
-                            <span onclick="irAPagina('red-trafico-page')" title="Ver los carros en cada cruce" style="border: 1px solid var(--card-border); padding: 2px 10px; border-radius: 10px; font-size: 0.8rem; cursor: pointer;">Ver todos ↗</span>
+                            <span onclick="irAPagina('red-trafico-page')" title="Ver los carros en cada cruce" class="insignia" style="cursor: pointer;">Ver todos ↗</span>
                         </div>
 
                         <div class="agents-grid" id="agentes-grid"></div>
@@ -747,7 +887,7 @@
                 <!-- GRAFICO BOTTOM -->
                 <div class="chart-section">
                     <div class="chart-header">
-                        <span id="grafico-titulo">Rendimiento del Entrenamiento (Recompensa)</span>
+                        <div id="grafico-titulo" class="titulo-grafico"></div>
                         <div class="time-filters" id="grafico-filtros"></div>
                     </div>
 
@@ -761,24 +901,33 @@
                 <!-- Visor: el mismo tráfico simulado en SUMO, con y sin inteligencia artificial -->
                 <div class="chart-section" style="margin-top: 0; flex: none;">
                     <div class="chart-header">
-                        <span>Mira los carros: mismo tráfico, dos formas de manejar los semáforos</span>
+                        <div class="titulo-grafico">Mira los carros: mismo tráfico, dos formas de manejar los semáforos<span class="sub">Elige un método en cada ventana</span></div>
                         <div class="time-filters" id="sim-vistas"></div>
                     </div>
                     <p id="sim-explicacion" style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 15px;">
                         Cargando la simulación…
                     </p>
                     <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                        <!-- Cada ventana tiene su selector: cualquier par de métodos se puede comparar -->
                         <div class="agent-card">
-                            <div class="agent-name" style="margin-bottom: 10px;"><span style="color: var(--text-main); font-size: 0.9rem;">Semáforos actuales</span><span>tiempo fijo</span></div>
-                            <canvas id="sim-fijo" style="width: 100%; height: 340px; display: block; border-radius: 10px; background: #17141E;"></canvas>
-                            <div class="agent-val" id="sim-fijo-detenidos">—</div>
-                            <div class="agent-name"><span>carros detenidos ahora en toda la zona</span><span id="sim-fijo-promedio"></span></div>
+                            <div class="agent-name" style="margin-bottom: 10px; align-items: center;">
+                                <select id="sim-a-sel" onchange="elegirMetodoSim('a', this.value)" class="selector-metodo"></select>
+                                <span id="sim-a-tipo"></span>
+                            </div>
+                            <p id="sim-a-desc" style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.45; margin-bottom: 10px; min-height: 4.4em;"></p>
+                            <canvas id="sim-a" style="width: 100%; height: 340px; display: block; border-radius: 10px; background: #17141E;"></canvas>
+                            <div class="agent-val" id="sim-a-detenidos">—</div>
+                            <div class="agent-name"><span>carros detenidos ahora en toda la zona</span><span id="sim-a-promedio"></span></div>
                         </div>
                         <div class="agent-card">
-                            <div class="agent-name" style="margin-bottom: 10px;"><span style="color: var(--text-main); font-size: 0.9rem;">Semáforos con inteligencia artificial</span><span>RND-MAPPO</span></div>
-                            <canvas id="sim-rl" style="width: 100%; height: 340px; display: block; border-radius: 10px; background: #17141E;"></canvas>
-                            <div class="agent-val" id="sim-rl-detenidos">—</div>
-                            <div class="agent-name"><span>carros detenidos ahora en toda la zona</span><span id="sim-rl-promedio"></span></div>
+                            <div class="agent-name" style="margin-bottom: 10px; align-items: center;">
+                                <select id="sim-b-sel" onchange="elegirMetodoSim('b', this.value)" class="selector-metodo"></select>
+                                <span id="sim-b-tipo"></span>
+                            </div>
+                            <p id="sim-b-desc" style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.45; margin-bottom: 10px; min-height: 4.4em;"></p>
+                            <canvas id="sim-b" style="width: 100%; height: 340px; display: block; border-radius: 10px; background: #17141E;"></canvas>
+                            <div class="agent-val" id="sim-b-detenidos">—</div>
+                            <div class="agent-name"><span>carros detenidos ahora en toda la zona</span><span id="sim-b-promedio"></span></div>
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 15px; margin-top: 20px;">
@@ -797,7 +946,7 @@
             <div id="entrenamiento-page" class="page-section">
                 <div class="chart-section" style="margin-top: 0; flex: none;">
                     <div class="chart-header">
-                        <span id="ent-titulo">Curvas de aprendizaje de las 6 configuraciones</span>
+                        <div id="ent-titulo" class="titulo-grafico"></div>
                         <div class="time-filters" id="ent-filtros"></div>
                     </div>
                     <div class="chart-visual" id="ent-grafico" style="min-height: 220px;"></div>
@@ -806,33 +955,72 @@
                 <div class="card">
                     <div class="card-header">
                         <span>Las 6 versiones de la IA que se entrenaron</span>
-                        <span style="border: 1px solid var(--card-border); padding: 2px 10px; border-radius: 10px; font-size: 0.8rem;">150 h de práctica · 3 intentos c/u</span>
+                        <span class="insignia">150 h de práctica · 3 intentos c/u</span>
                     </div>
                     <div class="kpi-container active-kpi" id="ent-corridas"></div>
                 </div>
             </div>
 
-            <!-- 4. PÁGINA: COMUNIDAD (Placeholder) -->
+            <!-- 4. PÁGINA: COMUNIDAD -->
             <div id="comunidad-page" class="page-section">
-                <div class="placeholder-page">
-                    <h2>⌂ Repositorio y Comunidad</h2>
-                    <p>Acceso a commits de GitHub, documentación técnica y notas de los desarrolladores.</p>
+                <div class="dashboard-grid" style="grid-template-columns: 1.4fr 1fr;">
+                    <div class="card pagina-texto" style="gap: 15px;">
+                        <div class="card-header" style="margin-bottom: 0;">
+                            <span>Repositorio del proyecto</span>
+                            <span class="insignia">GitHub</span>
+                        </div>
+                        <div class="miembro">
+                            <img src="img/citadel_emblema.png" alt="" style="width: 56px; height: 56px;">
+                            <h2>C.I.T.A.D.E.L.</h2>
+                        </div>
+                        <p>Control Inteligente de Tráfico Adaptativo con Distribución y Exploración Local. Todo el código del
+                           proyecto está en el repositorio: el simulador, el entrenamiento de la IA, la evaluación, el póster
+                           y este dashboard.</p>
+                        <a class="enlace-boton" href="https://github.com/santisan1205/Taller-Control" target="_blank" rel="noopener">
+                            Abrir el repositorio en GitHub ↗
+                        </a>
+                        <p style="margin-top: 5px;">Para descargarlo en tu computador:</p>
+                        <div class="bloque-codigo">
+                            <span id="comando-clonar">git clone https://github.com/santisan1205/Taller-Control.git</span>
+                            <button class="boton-copiar" onclick="copiarComando(this)">Copiar</button>
+                        </div>
+                    </div>
+                    <div class="card pagina-texto" style="gap: 15px;">
+                        <div class="card-header" style="margin-bottom: 0;">
+                            <span>Equipo</span>
+                            <span class="insignia">Taller de Control · Uniandes</span>
+                        </div>
+                        <div class="miembro"><div class="avatar">TC</div><div><h4>Tomás Castro</h4></div></div>
+                        <div class="miembro"><div class="avatar">AB</div><div><h4>Andrés Felipe Barbosa</h4></div></div>
+                        <div class="miembro"><div class="avatar">MV</div><div><h4>Mariana Vanoy</h4></div></div>
+                        <div class="miembro"><div class="avatar">SS</div><div><h4>Santiago Sánchez</h4></div></div>
+                        <p style="border-top: 1px solid var(--card-border); padding-top: 12px;">
+                            Profesor: Jorge Alfredo López Jiménez<br>
+                            Departamento de Ingeniería Eléctrica y Electrónica
+                        </p>
+                    </div>
                 </div>
             </div>
 
             <!-- 6. PÁGINA: CONFIGURACION -->
             <div id="configuracion-page" class="page-section">
-                <div class="placeholder-page">
-                    <h2>⚙ Configuración del Sistema</h2>
-                    <p id="config-texto">Ajustes de la plataforma, conexión con el backend de Python y exportación de datos.</p>
+                <div class="card pagina-texto">
+                    <div class="card-header" style="margin-bottom: 0;">
+                        <span>Datos del dashboard</span>
+                        <span class="insignia">citadel.db</span>
+                    </div>
+                    <div id="config-texto" class="pagina-texto"></div>
                 </div>
             </div>
 
             <!-- 7. PÁGINA: SOPORTE -->
             <div id="soporte-page" class="page-section">
-                <div class="placeholder-page">
-                    <h2>? Soporte y Documentación</h2>
-                    <p id="soporte-texto">Manual de usuario para operar el dashboard y entender las métricas de evaluación.</p>
+                <div class="card pagina-texto">
+                    <div class="card-header" style="margin-bottom: 0;">
+                        <span>¿Qué significa cada cosa?</span>
+                        <span class="insignia">Glosario</span>
+                    </div>
+                    <div id="soporte-texto" class="pagina-texto"></div>
                 </div>
             </div>
 
@@ -943,6 +1131,25 @@
             prioriza_espera: 'IA prioriza espera', penaliza_cambio: 'IA cambia menos', peatones_alto: 'IA prioriza peatones',
         };
         const NOMBRE = {tiempo_fijo: 'Semáforo fijo', actuado: 'Semáforo con sensores', max_pressure: 'Regla de colas'};
+        // Qué es cada opción, en una frase (visor de Red de Tráfico y página Entrenamiento)
+        const DESCRIPCION_BASE = {
+            tiempo_fijo: 'El programa actual: cada luz dura siempre lo mismo, haya o no carros esperando.',
+            actuado: 'Alarga la luz verde mientras sus sensores detectan carros llegando (entre 15 y 60 s).',
+            max_pressure: 'Da la luz verde a la calle con más carros detenidos que tenga espacio para avanzar. ' +
+                          'No ve a los peatones.',
+        };
+        const DESCRIPCION_CONFIG = {
+            base: 'La configuración estándar: aprendió a reducir las colas y la espera.',
+            sin_rnd: 'Igual que la estándar, pero aprendió sin el premio extra por explorar situaciones nuevas ("curiosidad").',
+            mas_exploracion: 'Mientras aprendía, probó más opciones distintas antes de decidirse.',
+            prioriza_espera: 'Aprendió dándole el doble de importancia al tiempo que esperan los carros.',
+            penaliza_cambio: 'Aprendió con un castigo mayor cada vez que cambia la luz, para cambiarla menos.',
+            peatones_alto: 'Aprendió dándole más importancia a la espera de los peatones (cruces C1 y C4).',
+        };
+        const DESCRIPCION_ALG = {
+            1: 'Algoritmo 1: la primera versión del entrenamiento.',
+            2: 'Algoritmo 2: la versión corregida, en la que cada cruce evalúa sus propios resultados.',
+        };
         Object.values(PREFIJO_ALG).forEach(p => CONFIGS_BASE.forEach(c => NOMBRE[p + c] = NOMBRE_BASE[c]));
         const BASES = ['tiempo_fijo', 'actuado', 'max_pressure'];
         const ROJO = '#F87171';
@@ -1030,19 +1237,18 @@
         // ---------- Filtros globales ----------
         function renderFiltros() {
             const grupo = (titulo, clave, opciones) =>
-                `<span style="color: var(--text-muted); font-size: 0.75rem; margin: 0 4px 0 10px;">${titulo}</span>` +
-                opciones.map(([valor, texto]) =>
-                    `<button class="toggle-btn ${ESTADO[clave] === valor ? 'active' : ''}"
-                        style="padding: 4px 10px; font-size: 0.75rem;"
+                `<div class="grupo-filtro"><span class="etiqueta">${titulo}</span>` +
+                opciones.map(([valor, texto, ayuda]) =>
+                    `<button class="toggle-btn ${ESTADO[clave] === valor ? 'active' : ''}" ${ayuda ? `title="${ayuda}"` : ''}
                         onclick='cambiarFiltro(${JSON.stringify(clave)}, ${JSON.stringify(valor)})'>${texto}</button>`
-                ).join('');
+                ).join('') + '</div>';
             document.getElementById('filtros').innerHTML =
+                grupo('Versión de la IA', 'config', CONFIGS.map(c => [c, NOMBRE[c], DESCRIPCION_CONFIG[sinPrefijo(c)]])) +
                 (ALGS_DISPONIBLES.length > 1
-                    ? grupo('Algoritmo', 'alg', ALGS_DISPONIBLES.map(a => [a, `v${a}`])) : '') +
-                grupo('Versión de la IA', 'config', CONFIGS.map(c => [c, NOMBRE[c]])) +
+                    ? grupo('Algoritmo', 'alg', ALGS_DISPONIBLES.map(a => [a, `v${a}`, DESCRIPCION_ALG[a]])) : '') +
                 grupo('Hora', 'ventana', [['valle', 'Valle'], ['pico', 'Pico']]) +
                 grupo('Tráfico', 'escala', [[0.8, '−20%'], [1.0, 'Normal'], [1.2, '+20%']]) +
-                grupo('Comparar con', 'ref', BASES.map(b => [b, NOMBRE[b]]));
+                grupo('Comparar con', 'ref', BASES.map(b => [b, NOMBRE[b], DESCRIPCION_BASE[b]]));
         }
         function cambiarFiltro(clave, valor) {
             if (clave === 'alg') {
@@ -1137,7 +1343,7 @@
                                     FROM v_series_config WHERE config = ? AND ventana = ? AND escala = ?`,
                                    [c, ESTADO.ventana, escalaSim()]);
                 const a = s(ESTADO.config), b = s(ESTADO.ref);
-                const sub = t => `${t} · frente a ${ref}`;
+                const sub = () => `frente a ${ref}`;  // el título ya dice qué se mide
                 tiempo = [kpiItem('⏱', 'Tiempo de Espera', sub('Hora simulada'), `${fmt(a.esp)} s`, cambioHTML(a.esp, b.esp, 'menor')),
                           kpiItem('🚥', 'Longitud de Cola', sub('Detenidos prom.'), `${fmt(a.det)} veh`, cambioHTML(a.det, b.det, 'menor')),
                           kpiItem('🛑', 'Pico de Detenidos', sub('Máx. de la serie'), `${fmt(a.det_max)} veh`, cambioHTML(a.det_max, b.det_max, 'menor'))];
@@ -1239,11 +1445,15 @@
         function siguienteInsight() {
             const lista = insights();
             insightIdx = (insightIdx + 1) % lista.length;
-            document.getElementById('insight-texto').innerText = lista[insightIdx];
+            mostrarInsight(lista);
         }
         function renderInsight() {
-            const lista = insights();
-            document.getElementById('insight-texto').innerText = lista[insightIdx % lista.length];
+            mostrarInsight(insights());
+        }
+        function mostrarInsight(lista) {
+            const i = insightIdx % lista.length;
+            document.getElementById('insight-texto').innerText = lista[i];
+            document.getElementById('insight-contador').innerText = `${i + 1} de ${lista.length}`;
         }
 
         // =====================================================================
@@ -1414,6 +1624,12 @@
             });
         }
 
+        // Título de un gráfico con su subtítulo en gris debajo
+        function ponerTitulo(id, titulo, sub) {
+            document.getElementById(id).innerHTML = `${titulo}<span class="sub">${sub}</span>`;
+        }
+        const mayusculaInicial = s => s.charAt(0).toUpperCase() + s.slice(1);
+
         function botones(id, opciones, activo, accion) {
             document.getElementById(id).innerHTML = opciones.map(([valor, texto]) =>
                 `<button class="time-btn ${activo(valor) ? 'active' : ''}" onclick='${accion}(${JSON.stringify(valor)})'>${texto}</button>`
@@ -1447,8 +1663,8 @@
                 co2_total_kg: '¿Cuánto CO₂ emiten los carros en una hora?',
                 viajes_completados: '¿Cuántos viajes terminan en una hora?',
             };
-            document.getElementById('grafico-titulo').innerText =
-                `${PREGUNTA[m]} · ${escenarioTexto()} · ${sentido === 'menor' ? 'menos' : 'más'} es mejor`;
+            ponerTitulo('grafico-titulo', PREGUNTA[m],
+                        `${mayusculaInicial(escenarioTexto())} · ${sentido === 'menor' ? 'menos' : 'más'} es mejor · ordenado de mejor a peor`);
             // El tooltip trae el detalle; el rango de confianza va en palabras
             const rango = e => `rango probable ${fmt(e.ic95_inf)} – ${fmt(e.ic95_sup)}`;
             const filas = CONFIGS.map(c => {
@@ -1492,8 +1708,8 @@
             botones('grafico-filtros', [['espera_media', 'Espera'], ['recompensa_ext', 'Puntaje'],
                     ['recompensa_int', 'Curiosidad'], ['__semillas', 'Ver cada intento']],
                     v => v === ESTADO.metEnt || (v === '__semillas' && ESTADO.semillas), 'elegirMetrica');
-            document.getElementById('grafico-titulo').innerText =
-                `Cómo aprende la ${NOMBRE[ESTADO.config]}: ${NOMBRES[ESTADO.metEnt]} en cada hora de práctica`;
+            ponerTitulo('grafico-titulo', `Cómo aprende la ${NOMBRE[ESTADO.config]}`,
+                        `${mayusculaInicial(NOMBRES[ESTADO.metEnt])} en cada hora de práctica`);
             return graficoEntrenamientoCurva(ESTADO.metEnt);
         }
         function graficoEntrenamientoCurva(m) {
@@ -1550,61 +1766,89 @@
                              velocidad_media: 'Velocidad media (m/s)'};
             botones('grafico-filtros', [['espera_media', 'Espera'], ['vehiculos_detenidos', 'Detenidos'],
                     ['velocidad_media', 'Velocidad']], v => v === m, 'elegirMetrica');
-            document.getElementById('grafico-titulo').innerText =
-                `${NOMBRES[m]} minuto a minuto durante una hora · ${escenarioTexto(ESTADO.ventana, escalaSim())}`;
+            ponerTitulo('grafico-titulo', `${NOMBRES[m]} minuto a minuto durante una hora`,
+                        mayusculaInicial(escenarioTexto(ESTADO.ventana, escalaSim())));
             graficoSeries('grafico-principal', m);
         }
 
         // ---------- Página: Red de Tráfico (visor de la simulación de SUMO) ----------
-        // animacion.json lo genera dashboard/generar_animacion.py: posiciones de cada vehículo y
-        // peatón segundo a segundo y el estado de cada semáforo, grabados por SUMO con y sin la IA.
-        const SIM = {datos: null, cargando: false, t: 0, reproduciendo: false, velocidad: 5, vista: 'este',
-                     ultimo: null, indices: {}, promedios: {}, vistas: {}};
+        // animacion/ lo genera dashboard/generar_animacion.py: red.json (geometría, escenario y lista de
+        // métodos) y un <metodo>.json por método con la posición de cada vehículo y peatón segundo a
+        // segundo y el estado de cada semáforo. Todos los métodos ven exactamente la misma demanda.
+        const SIM = {red: null, cargando: false, t: 0, reproduciendo: false, velocidad: 5, vista: 'este',
+                     ultimo: null, metodos: {}, lado: {a: 'tiempo_fijo', b: null}, vistas: {}};
         const COLOR_SIM = {via: '#34303F', anden: '#211E29', cruce_peatonal: '#4A4556',
                            detenido: '#F87171', avanza: '#4ADE80', peaton: '#E5E7EB',
                            verde: '#4ADE80', amarillo: '#FBBF24', rojo: '#EF4444'};
         const TAM_VEHICULO = [[4.5, 1.8], [2.2, 0.8], [12, 2.5]];  // carro, moto, bus (largo, ancho en m)
         const NOMBRE_VISTA = {este: 'Cruces C1, C3 y C4', oeste: 'Cruce C2', todo: 'Toda la zona'};
 
+        // Nombre y grupo de cada método: semáforos sin IA o una versión de la IA de cada algoritmo
+        function infoMetodo(id) {
+            if (BASES.includes(id)) return {nombre: NOMBRE[id], grupo: 'Semáforos sin IA', tipo: 'sin IA',
+                                            descripcion: DESCRIPCION_BASE[id]};
+            const config = id.replace(/_seed\d+$/, '');
+            const alg = config.startsWith(PREFIJO_ALG[2]) ? 2 : 1;
+            const base = config.slice(PREFIJO_ALG[alg].length);
+            return {nombre: NOMBRE[config] || config, grupo: `Inteligencia artificial · algoritmo ${alg}`, tipo: `IA · algoritmo ${alg}`,
+                    descripcion: `${DESCRIPCION_CONFIG[base] || ''} ${DESCRIPCION_ALG[alg]}`};
+        }
+        const segundosSim = () => SIM.red.escenario.segundos;
+
         async function cargarSimulacion() {
-            if (SIM.datos || SIM.cargando) return;
+            if (SIM.red || SIM.cargando) return;
             SIM.cargando = true;
-            const texto = document.getElementById('sim-explicacion');
             try {
-                const resp = await fetch('animacion.json');
-                if (!resp.ok) throw new Error('falta animacion.json');
-                SIM.datos = await resp.json();
+                const resp = await fetch('animacion/red.json');
+                if (!resp.ok) throw new Error('falta animacion/red.json');
+                SIM.red = await resp.json();
                 prepararSimulacion();
                 alternarReproduccion();  // arranca sola la primera vez
             } catch (err) {
-                texto.innerHTML = 'No se encontró la simulación. Para generarla (requiere SUMO): ' +
-                                  '<code>python dashboard/generar_animacion.py</code>';
+                document.getElementById('sim-explicacion').innerHTML = 'No se encontró la simulación. Para generarla ' +
+                    '(requiere SUMO): <code>python dashboard/generar_animacion.py</code>';
             }
         }
 
+        // Descarga la simulación de un método la primera vez que se elige y la deja lista para dibujar
+        async function cargarMetodo(id) {
+            if (SIM.metodos[id]) return;
+            SIM.metodos[id] = {};  // marcador: cargando
+            const datos = await (await fetch(`animacion/${id}.json`)).json();
+            let suma = 0;
+            SIM.metodos[id] = {
+                cuadros: datos.cuadros, semaforos: datos.semaforos,
+                // id -> posición en cada cuadro, para interpolar el movimiento entre segundos
+                indices: datos.cuadros.map(c => new Map(c.v.map((v, i) => [v[0], i]))),
+                promedios: datos.cuadros.map((c, i) => (suma += c.d) / (i + 1)),
+            };
+            dibujarSimulacion();
+        }
+
         function prepararSimulacion() {
-            const d = SIM.datos;
+            const d = SIM.red;
             const caja = (cruces, m) => {
                 const xs = cruces.map(c => d.cruces[c][0]), ys = cruces.map(c => d.cruces[c][1]);
                 return [Math.min(...xs) - m, Math.min(...ys) - m, Math.max(...xs) + m, Math.max(...ys) + m];
             };
             SIM.vistas = {este: caja(['C1', 'C3', 'C4'], 45), oeste: caja(['C2'], 55), todo: [0, 0, d.ancho, d.alto]};
-            for (const modo of ['fijo', 'rl']) {
-                // id -> posición en cada cuadro, para interpolar el movimiento entre segundos
-                SIM.indices[modo] = d[modo].cuadros.map(c => new Map(c.v.map((v, i) => [v[0], i])));
-                let suma = 0;
-                SIM.promedios[modo] = d[modo].cuadros.map((c, i) => (suma += c.d) / (i + 1));
+            // A la derecha, por defecto, la versión de la IA elegida arriba (semilla 0) si está generada
+            const ids = d.metodos.map(m => m.id);
+            const preferida = `${ESTADO.config}_seed0`;
+            SIM.lado.b = ids.includes(preferida) ? preferida : ids.find(id => !BASES.includes(id));
+            if (!ids.includes(SIM.lado.a)) SIM.lado.a = ids[0];
+            // Selectores agrupados: semáforos sin IA, IA con el algoritmo 1 e IA con el algoritmo 2
+            const grupos = {};
+            ids.forEach(id => (grupos[infoMetodo(id).grupo] ||= []).push(id));
+            const opciones = Object.entries(grupos).map(([g, lista]) =>
+                `<optgroup label="${g}" style="background: #1C1924;">` +
+                lista.map(id => `<option value="${id}" style="background: #1C1924;">${infoMetodo(id).nombre}</option>`).join('') +
+                '</optgroup>').join('');
+            for (const lado of ['a', 'b']) {
+                const sel = document.getElementById(`sim-${lado}-sel`);
+                sel.innerHTML = opciones;
+                sel.value = SIM.lado[lado];
             }
-            const n = d.fijo.cuadros.length;
-            const prom = m => SIM.promedios[m][n - 1];
-            const menos = (prom('fijo') - prom('rl')) / prom('fijo') * 100;
-            const hora = d.escenario.ventana === 'pico' ? 'hora pico' : 'hora valle';
-            const trafico = d.escenario.escala === 1 ? 'tráfico normal' : (d.escenario.escala > 1 ? 'más tráfico de lo normal' : 'menos tráfico de lo normal');
-            document.getElementById('sim-explicacion').innerHTML =
-                `Las dos ventanas muestran exactamente los mismos ${Math.round(n / 60)} minutos de ${hora} (${trafico}): ` +
-                `los mismos carros, con las mismas rutas, y los mismos peatones. Lo único que cambia es quién decide ` +
-                `cuándo cambia cada semáforo. <strong style="color: var(--text-main);">Con la inteligencia artificial hay en promedio ` +
-                `${fmt(menos, 0)}% menos carros detenidos.</strong>`;
             const punto = (color, forma = '50%') => `<span style="display: inline-block; width: 10px; height: 10px; border-radius: ${forma};
                                                      background: ${color}; margin-right: 6px; vertical-align: middle;"></span>`;
             document.getElementById('sim-leyenda').innerHTML =
@@ -1612,18 +1856,59 @@
                 `<span>${punto(COLOR_SIM.detenido, '2px')}carro detenido</span>` +
                 `<span>${punto(COLOR_SIM.peaton)}peatón</span>` +
                 `<span>${punto(COLOR_SIM.verde, '1px')}${punto(COLOR_SIM.amarillo, '1px')}${punto(COLOR_SIM.rojo, '1px')}luz del semáforo (barra sobre el carril)</span>` +
-                `<span>Velocidad ×5 = 5 segundos de simulación por cada segundo real</span>`;
+                `<span>Las versiones de la IA usan su primer entrenamiento (semilla 0)</span>`;
             botones('sim-vistas', Object.entries(NOMBRE_VISTA), v => v === SIM.vista, 'elegirVistaSim');
             botones('sim-velocidades', [[1, '×1'], [5, '×5'], [10, '×10'], [20, '×20']], v => v === SIM.velocidad, 'elegirVelocidadSim');
+            actualizarComparacion();
+            cargarMetodo(SIM.lado.a); cargarMetodo(SIM.lado.b);
             dibujarSimulacion();
+        }
+
+        function elegirMetodoSim(lado, id) {
+            SIM.lado[lado] = id;
+            actualizarComparacion();
+            cargarMetodo(id);
+            dibujarSimulacion();
+        }
+
+        // Frase que compara los dos métodos elegidos (promedio de detenidos en los 10 minutos)
+        function actualizarComparacion() {
+            const d = SIM.red, prom = id => d.metodos.find(m => m.id === id).detenidos_promedio;
+            const [a, b] = [SIM.lado.a, SIM.lado.b];
+            // Nombre con artículo; si se comparan dos IA de algoritmos distintos, se dice cuál es cuál
+            const ARTICULO = {tiempo_fijo: 'el semáforo fijo', actuado: 'el semáforo con sensores', max_pressure: 'la regla de colas'};
+            const algDe = id => BASES.includes(id) ? null : (id.startsWith(PREFIJO_ALG[2]) ? 2 : 1);
+            const distinguir = algDe(a) && algDe(b) && algDe(a) !== algDe(b);
+            const conArticulo = id => ARTICULO[id] || `la ${infoMetodo(id).nombre}${distinguir ? ` (algoritmo ${algDe(id)})` : ''}`;
+            const [na, nb] = [conArticulo(a), conArticulo(b)];
+            const mayuscula = s => s.charAt(0).toUpperCase() + s.slice(1);
+            for (const lado of ['a', 'b']) {
+                const info = infoMetodo(SIM.lado[lado]);
+                document.getElementById(`sim-${lado}-tipo`).innerText = info.tipo;
+                document.getElementById(`sim-${lado}-desc`).innerText = info.descripcion;
+            }
+            const hora = d.escenario.ventana === 'pico' ? 'hora pico' : 'hora valle';
+            const trafico = d.escenario.escala === 1 ? 'tráfico normal' : (d.escenario.escala > 1 ? 'más tráfico de lo normal' : 'menos tráfico de lo normal');
+            let conclusion;
+            if (a === b) conclusion = 'Elegiste el mismo método en las dos ventanas: elige otro en una de ellas para compararlos.';
+            else {
+                const dif = (prom(a) - prom(b)) / prom(a) * 100;
+                conclusion = Math.abs(dif) < 3
+                    ? `${mayuscula(nb)} y ${na} dejan prácticamente los mismos carros detenidos en promedio.`
+                    : `Con ${nb} hay en promedio ${fmt(Math.abs(dif), 0)}% ${dif > 0 ? 'menos' : 'más'} carros detenidos que con ${na}.`;
+            }
+            document.getElementById('sim-explicacion').innerHTML =
+                `Elige arriba de cada ventana qué forma de manejar los semáforos quieres ver. Todas muestran exactamente los mismos ` +
+                `${Math.round(segundosSim() / 60)} minutos de ${hora} (${trafico}): los mismos carros, con las mismas rutas, y los mismos ` +
+                `peatones. <strong style="color: var(--text-main);">${conclusion}</strong>`;
         }
 
         function elegirVistaSim(v) { SIM.vista = v; botones('sim-vistas', Object.entries(NOMBRE_VISTA), x => x === v, 'elegirVistaSim'); dibujarSimulacion(); }
         function elegirVelocidadSim(v) { SIM.velocidad = v; botones('sim-velocidades', [[1, '×1'], [5, '×5'], [10, '×10'], [20, '×20']], x => x === v, 'elegirVelocidadSim'); }
 
         function alternarReproduccion() {
-            if (!SIM.datos) return;
-            const n = SIM.datos.fijo.cuadros.length;
+            if (!SIM.red) return;
+            const n = segundosSim();
             if (!SIM.reproduciendo && SIM.t >= n - 1) SIM.t = 0;  // al final, vuelve a empezar
             SIM.reproduciendo = !SIM.reproduciendo;
             SIM.ultimo = null;
@@ -1635,7 +1920,7 @@
         }
         function cicloSimulacion(ts) {
             if (!SIM.reproduciendo) return;
-            const n = SIM.datos.fijo.cuadros.length;
+            const n = segundosSim();
             if (SIM.ultimo !== null) SIM.t += (ts - SIM.ultimo) / 1000 * SIM.velocidad;
             SIM.ultimo = ts;
             if (SIM.t >= n - 1) { SIM.t = n - 1; dibujarSimulacion(); alternarReproduccion(); return; }
@@ -1643,22 +1928,24 @@
             requestAnimationFrame(cicloSimulacion);
         }
         function buscarEnSimulacion(ev) {
-            if (!SIM.datos) return;
+            if (!SIM.red) return;
             const r = ev.currentTarget.getBoundingClientRect();
-            SIM.t = Math.min(Math.max((ev.clientX - r.left) / r.width, 0), 1) * (SIM.datos.fijo.cuadros.length - 1);
+            SIM.t = Math.min(Math.max((ev.clientX - r.left) / r.width, 0), 1) * (segundosSim() - 1);
             SIM.ultimo = null;
             dibujarSimulacion();
         }
 
         const reloj = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
         function dibujarSimulacion() {
-            if (!SIM.datos) return;
-            const n = SIM.datos.fijo.cuadros.length;
-            for (const modo of ['fijo', 'rl']) dibujarPanel(document.getElementById(`sim-${modo}`), modo);
+            if (!SIM.red) return;
+            const n = segundosSim();
             const i = Math.min(Math.floor(SIM.t), n - 1);
-            for (const modo of ['fijo', 'rl']) {
-                document.getElementById(`sim-${modo}-detenidos`).innerText = SIM.datos[modo].cuadros[i].d;
-                document.getElementById(`sim-${modo}-promedio`).innerText = `promedio hasta ahora: ${fmt(SIM.promedios[modo][i], 1)}`;
+            for (const lado of ['a', 'b']) {
+                dibujarPanel(document.getElementById(`sim-${lado}`), lado);
+                const m = SIM.metodos[SIM.lado[lado]];
+                const listo = m && m.cuadros;
+                document.getElementById(`sim-${lado}-detenidos`).innerText = listo ? m.cuadros[i].d : '—';
+                document.getElementById(`sim-${lado}-promedio`).innerText = listo ? `promedio hasta ahora: ${fmt(m.promedios[i], 1)}` : '';
             }
             document.getElementById('sim-progreso').style.width = `${SIM.t / (n - 1) * 100}%`;
             document.getElementById('sim-reloj').innerText = `${reloj(SIM.t)} / ${reloj(n)}`;
@@ -1672,8 +1959,8 @@
             return COLOR_SIM.rojo;
         }
 
-        function dibujarPanel(canvas, modo) {
-            const d = SIM.datos, cuadros = d[modo].cuadros, n = cuadros.length;
+        function dibujarPanel(canvas, lado) {
+            const d = SIM.red, m = SIM.metodos[SIM.lado[lado]];
             const dpr = window.devicePixelRatio || 1, W = canvas.clientWidth, H = canvas.clientHeight;
             if (!W || !H) return;
             if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) {
@@ -1682,6 +1969,12 @@
             const ctx = canvas.getContext('2d');
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.clearRect(0, 0, W, H);
+            if (!m || !m.cuadros) {  // todavía cargando la simulación de ese método
+                ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '13px Inter, sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText('Cargando simulación…', W / 2, H / 2);
+                return;
+            }
+            const cuadros = m.cuadros, n = cuadros.length;
             // Encuadre: la vista elegida, centrada y sin deformar (en SUMO la y crece hacia arriba)
             const [x0, y0, x1, y1] = SIM.vistas[SIM.vista];
             const esc = Math.min(W / (x1 - x0), H / (y1 - y0));
@@ -1708,7 +2001,7 @@
             // Semáforos: una barra atravesada al final de cada carril que entra al cruce
             ctx.lineWidth = Math.max(2.5, 0.9 * esc); ctx.lineCap = 'round';
             for (const s of d.semaforos) {
-                const estado = d[modo].semaforos[s.cruce][i];
+                const estado = m.semaforos[s.cruce][i];
                 for (const p of s.pare) {
                     const a = p.ang * Math.PI / 180, mitad = 1.5 * esc;
                     const nx = Math.sin(a) * mitad, ny = Math.cos(a) * mitad;  // perpendicular al carril (en pantalla)
@@ -1720,7 +2013,7 @@
             }
 
             // Vehículos, interpolando entre el segundo actual y el siguiente para que se muevan suave
-            const actual = cuadros[i], siguiente = cuadros[i + 1], idx = SIM.indices[modo][i + 1];
+            const actual = cuadros[i], siguiente = cuadros[i + 1], idx = m.indices[i + 1];
             for (const v of actual.v) {
                 let x = v[1] / 10, y = v[2] / 10, ang = v[3];
                 const j = siguiente ? idx.get(v[0]) : undefined;
@@ -1751,7 +2044,7 @@
         }
 
         function renderRed() {
-            if (SIM.datos) dibujarSimulacion(); else cargarSimulacion();
+            if (SIM.red) dibujarSimulacion(); else cargarSimulacion();
         }
 
         // ---------- Página: Entrenamiento ----------
@@ -1760,8 +2053,8 @@
             if (!NOMBRES[ESTADO.entMet]) ESTADO.entMet = 'espera_media';
             const m = ESTADO.entMet;
             botones('ent-filtros', [['espera_media', 'Espera'], ['recompensa_ext', 'Puntaje']], v => v === m, 'elegirMetEnt');
-            document.getElementById('ent-titulo').innerText =
-                `Cómo aprenden las 6 versiones de la IA: ${NOMBRES[m]} en cada hora de práctica (rosado = la que elegiste)`;
+            ponerTitulo('ent-titulo', 'Cómo aprenden las 6 versiones de la IA',
+                        `${mayusculaInicial(NOMBRES[m])} en cada hora de práctica · en rosado, la que elegiste`);
             // Media móvil de 5 episodios para que las 6 curvas se puedan leer juntas
             const suavizar = ys => ys.map((_, i) => { const v = ys.slice(Math.max(0, i - 4), i + 1); return v.reduce((a, b) => a + b, 0) / v.length; });
             const datos = Object.fromEntries(CONFIGS.map(c => [c, q(`SELECT episodio, ${m} AS y FROM v_entrenamiento_config
@@ -1778,19 +2071,11 @@
             ejeX('ent-grafico-x', ['Inicio', 'Horas de práctica (curvas suavizadas)', '150 h']);
 
             // Una fila por versión de la IA: qué la hace distinta y cuánto esperan los carros al final
-            const DESCRIPCION = {
-                base: 'La configuración estándar: premia que bajen las colas y la espera.',
-                sin_rnd: 'Igual que la estándar, pero sin el premio por explorar situaciones nuevas ("curiosidad").',
-                mas_exploracion: 'Prueba más opciones distintas mientras aprende.',
-                prioriza_espera: 'Le da el doble de importancia a la espera de los carros.',
-                penaliza_cambio: 'Se le castiga más cada vez que cambia la luz, para que la cambie menos.',
-                peatones_alto: 'Le da más importancia a la espera de los peatones.',
-            };
             const versiones = q(`SELECT tag, AVG(e.espera_media) AS espera_final FROM corridas c
                                  JOIN entrenamiento_episodios e ON e.corrida = c.corrida AND e.episodio > 140
                                  WHERE c.tag IN (${listaSQL(CONFIGS)}) GROUP BY tag ORDER BY espera_final`);
             document.getElementById('ent-corridas').innerHTML = versiones.map(v => kpiItem(
-                v.tag === ESTADO.config ? '◎' : '○', NOMBRE[v.tag], DESCRIPCION[sinPrefijo(v.tag)],
+                v.tag === ESTADO.config ? '◎' : '○', NOMBRE[v.tag], DESCRIPCION_CONFIG[sinPrefijo(v.tag)],
                 `${fmt(v.espera_final)} s`, '<p style="color: var(--text-muted);">espera al final</p>')).join('');
         }
         function elegirMetEnt(m) { ESTADO.entMet = m; renderEntrenamientoPagina(); }
@@ -1798,26 +2083,55 @@
         // ---------- Páginas de texto: Configuración y Soporte ----------
         function renderTexto() {
             const meta = Object.fromEntries(q('SELECT clave, valor FROM meta').map(f => [f.clave, f.valor]));
-            const tablas = Object.keys(meta).filter(k => k.startsWith('filas_'))
-                .map(k => `${k.slice(6)}: ${Number(meta[k]).toLocaleString('en-US')}`).join(' · ');
+            const NOMBRE_TABLA = {
+                corridas: 'Entrenamientos (corridas)', entrenamiento_episodios: 'Horas de práctica registradas',
+                evaluacion_detalle: 'Pruebas de evaluación', evaluacion_por_cruce: 'Resultados por cruce',
+                evaluacion_series_tiempo: 'Mediciones a lo largo de la hora', evaluacion_configs: 'Comparaciones por versión',
+                evaluacion_resumen: 'Comparaciones por política', cruces: 'Cruces semaforizados',
+            };
+            const tarjetas = Object.keys(meta).filter(k => k.startsWith('filas_')).map(k => {
+                const tabla = k.slice(6);
+                return `<div class="tarjeta-texto"><h4>${Number(meta[k]).toLocaleString('es-CO')}</h4>
+                        <p>${NOMBRE_TABLA[tabla] || tabla}<span class="tecnico">tabla ${tabla}</span></p></div>`;
+            }).join('');
             document.getElementById('config-texto').innerHTML =
-                `Base de datos <strong>citadel.db</strong> (SQLite), construida el ${meta.construida.replace('T', ' ')} ` +
-                `desde <code>${meta.fuente}</code>. Campaña ${meta.campana}.<br><br>${tablas}<br><br>` +
-                `Para actualizarla: <code>python dashboard/construir_bd.py</code> y recargar esta página.`;
-            document.getElementById('soporte-texto').innerHTML = [
-                '<strong>¿Qué es esto?</strong> Una inteligencia artificial que aprende a manejar los semáforos de 4 cruces de Bogotá. ' +
-                'Se entrena en un simulador de tráfico (SUMO) y se compara con otras formas de controlar los semáforos.',
-                '<strong>Semáforo fijo</strong>: el programa actual, con tiempos que no cambian. ' +
-                '<strong>Semáforo con sensores</strong>: alarga la luz verde mientras detecta carros (técnico: semáforo actuado). ' +
-                '<strong>Regla de colas</strong>: da la luz verde a la calle con más fila (técnico: max-pressure); no ve a los peatones.',
-                '<strong>Versiones de la IA</strong>: la misma IA entrenada con prioridades distintas. La "curiosidad" es un premio extra ' +
-                'por explorar situaciones nuevas mientras aprende (técnico: RND).',
-                '<strong>% mejor / peor</strong>: siempre se compara con el punto de comparación que elijas arriba.',
-                ...ALERTAS.map(textoAlerta),
-                '<span style="font-size: 0.8rem;">Detalle técnico (para el equipo): IA = RND-MAPPO; cada versión se entrenó 3 veces (semillas) ' +
-                'y se evaluó con 5 semillas de SUMO. La versión "más exploradora" se entrenó con SUMO 1.28.0 y se evaluó con 1.27.1. ' +
-                'Algoritmo v1/v2 en CLAUDE.md; columnas y unidades en datos_dashboard/diccionario_datos.md.</span>',
-            ].join('<br><br>');
+                `<p>Los datos salen de <code>${meta.fuente}</code> y se guardaron en la base <code>citadel.db</code> el
+                    ${meta.construida.replace('T', ' a las ')}.</p>
+                 <div class="rejilla-textos">${tarjetas}</div>
+                 <p>Para actualizar la base después de nuevos entrenamientos, desde la carpeta del proyecto:</p>
+                 <div class="bloque-codigo"><span>python dashboard/construir_bd.py</span></div>
+                 <p>y luego recargar esta página.</p>`;
+
+            const termino = (titulo, texto, tecnico = '', clase = '') =>
+                `<div class="tarjeta-texto ${clase}"><h4>${titulo}</h4><p>${texto}${tecnico ? `<span class="tecnico">${tecnico}</span>` : ''}</p></div>`;
+            const TECNICO_BASE = {tiempo_fijo: 'Técnico: tiempo fijo', actuado: 'Técnico: semáforo actuado', max_pressure: 'Técnico: max-pressure'};
+            document.getElementById('soporte-texto').innerHTML =
+                `<p>Una inteligencia artificial que aprende a manejar los semáforos de 4 cruces de Bogotá. Se entrena en un
+                    simulador de tráfico (SUMO) y se compara con otras formas de controlar los semáforos.</p>
+                 <h2>Semáforos sin IA</h2>
+                 <div class="rejilla-textos">${BASES.map(b => termino(NOMBRE[b], DESCRIPCION_BASE[b], TECNICO_BASE[b])).join('')}</div>
+                 <h2>Versiones de la IA</h2>
+                 <div class="rejilla-textos">
+                     ${CONFIGS_BASE.map(c => termino(NOMBRE_BASE[c], DESCRIPCION_CONFIG[c], c === 'sin_rnd' ? 'Técnico: sin RND' : '')).join('')}
+                     ${termino('Algoritmo 1 y 2', `${DESCRIPCION_ALG[1]} ${DESCRIPCION_ALG[2]}`, 'Técnico: RND-MAPPO; en la versión 2, crítico por agente')}
+                 </div>
+                 <h2>Cómo leer los resultados</h2>
+                 <div class="rejilla-textos">
+                     ${termino('% mejor / peor', 'Siempre se compara con el "punto de comparación" que elijas arriba.')}
+                     ${termino('Hora y tráfico', 'Hora valle u hora pico, con 20 % menos carros, la cantidad normal o 20 % más.')}
+                     ${termino('Curiosidad', 'Un premio extra que recibe la IA por explorar situaciones nuevas mientras aprende.', 'Técnico: RND')}
+                     ${ALERTAS.map(a => termino('⚠ Tráfico trancado', textoAlerta(a).replace(/^⚠\s*/, ''), '', 'alerta')).join('')}
+                 </div>
+                 <p style="font-size: 0.75rem;">Detalle técnico (para el equipo): cada versión se entrenó 3 veces (semillas) y se evaluó
+                    con 5 semillas de SUMO. La versión "más exploradora" del algoritmo 1 se entrenó con SUMO 1.28.0 y se evaluó con 1.27.1.
+                    Columnas y unidades en <code>datos_dashboard/diccionario_datos.md</code>.</p>`;
+        }
+
+        // Copia el comando para clonar el repositorio (página Comunidad)
+        function copiarComando(boton) {
+            const texto = document.getElementById('comando-clonar').innerText;
+            const listo = () => { boton.innerText = '¡Copiado!'; setTimeout(() => boton.innerText = 'Copiar', 1500); };
+            if (navigator.clipboard) navigator.clipboard.writeText(texto).then(listo, () => {});
         }
 
         // ---------- Orquestación ----------
@@ -1826,6 +2140,8 @@
             if (!DB) return;
             const p = paginaActiva();
             if (p !== 'red-trafico-page') pausarSimulacion();  // no seguir animando lo que no se ve
+            // Los filtros solo afectan al Dashboard y a Entrenamiento: en las demás páginas se esconden
+            document.getElementById('filtros').style.display = ['dashboard-page', 'entrenamiento-page'].includes(p) ? '' : 'none';
             if (p === 'dashboard-page') {
                 renderRecompensa(); renderKPIs(); renderAgentes(); renderInsight(); renderGraficoPrincipal();
             } else if (p === 'red-trafico-page') renderRed();

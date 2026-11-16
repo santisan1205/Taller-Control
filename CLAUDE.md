@@ -28,7 +28,7 @@ Profesor: Jorge Alfredo López Jiménez. **Responder siempre en español.**
 | `demo_en_vivo.py` | Demo: dos sumo-gui lado a lado (tiempo fijo vs. agente). Ver `presentacion/GUIA_DEMO.md` |
 | `generar_peatones.py` | Genera la demanda peatonal de `2026-09-12-17-03-26/peatones.rou.xml` |
 | `dashboard/construir_bd.py` | Carga `datos_dashboard/v2/` en `dashboard/citadel.db` (SQLite; no se sube, se regenera en segundos) |
-| `dashboard/generar_animacion.py` | Graba con SUMO 10 min de hora pico (tiempo fijo vs. IA) en `dashboard/animacion.json` |
+| `dashboard/generar_animacion.py` | Graba con SUMO 10 min de hora pico de cada método (3 sin IA + versiones de la IA) en `dashboard/animacion/`; en el dashboard se eligen dos para compararlos |
 | `dashboard/index.html` | Dashboard. Abrir con `cd dashboard; python -m http.server 8000`. Pensado para alguien que no conoce el proyecto |
 
 ## Carpetas
