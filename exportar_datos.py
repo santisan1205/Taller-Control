@@ -226,6 +226,28 @@ def resumir_configs_v2(detalle):
     return pd.DataFrame(filas)
 
 
+def curvas_entrenamiento(corridas, consolidado_previo):
+    """
+    Curvas de aprendizaje de las corridas. Los CSV por episodio de sumo-rl no se suben a
+    git (pesan ~17 MB por corrida), así que el PC que consolida no tiene los de las
+    corridas entrenadas en otros PCs en campañas anteriores. Para esas se reutilizan sus
+    filas del entrenamiento_episodios.csv ya consolidado; si una corrida no tiene ni
+    CSV ni filas previas, se detiene con un error en vez de exportar datos incompletos.
+    """
+    con_csv = {c: d for c, d in corridas.items() if glob.glob(os.path.join(d, '*_ep*.csv'))}
+    sin_csv = sorted(set(corridas) - set(con_csv))
+    partes = [cargar_todas_las_corridas(con_csv)] if con_csv else []
+    if sin_csv:
+        previo = pd.read_csv(consolidado_previo) if os.path.exists(consolidado_previo) else pd.DataFrame(columns=['corrida'])
+        faltan = [c for c in sin_csv if c not in set(previo['corrida'])]
+        if faltan:
+            raise FileNotFoundError(f'Estas corridas no tienen los CSV por episodio ni filas en {consolidado_previo}: {faltan}')
+        reutilizadas = previo[previo['corrida'].isin(sin_csv)].drop(columns=['config', 'semilla_entrenamiento'], errors='ignore')
+        partes.append(reutilizadas)
+        print(f'  Curvas de {len(sin_csv)} corridas sin CSV locales tomadas de {os.path.relpath(consolidado_previo)}')
+    return pd.concat(partes, ignore_index=True)
+
+
 def main_v2():
     """Campaña v2 (peatones en C1/C4, valle y hora pico, 3 líneas base) -> datos_dashboard/v2/."""
     salida = os.path.join(CARPETA_SALIDA, 'v2')
@@ -234,7 +256,7 @@ def main_v2():
     corridas = corridas_v2()
     tablas = {}
     if corridas:
-        entrenamiento = cargar_todas_las_corridas(corridas)
+        entrenamiento = curvas_entrenamiento(corridas, os.path.join(salida, 'entrenamiento_episodios.csv'))
         entrenamiento[['config', 'semilla_entrenamiento']] = entrenamiento['corrida'].str.extract(r'^(.+)_seed(\d+)$')
         tablas['entrenamiento_episodios'] = entrenamiento
         tablas['corridas'] = exportar_corridas(corridas)
