@@ -27,9 +27,11 @@ Profesor: Jorge Alfredo López Jiménez. **Responder siempre en español.**
 | `analizar_resultados.py` | Gráficas de curvas de aprendizaje (v1) |
 | `demo_en_vivo.py` | Demo: dos sumo-gui lado a lado (tiempo fijo vs. agente). Ver `presentacion/GUIA_DEMO.md` |
 | `generar_peatones.py` | Genera la demanda peatonal de `2026-09-12-17-03-26/peatones.rou.xml` |
-| `dashboard/construir_bd.py` | Carga `datos_dashboard/v2/` en `dashboard/citadel.db` (SQLite; no se sube, se regenera en segundos) |
+| `dashboard/construir_bd.py` | Carga `datos_dashboard/v2/` en `dashboard/citadel.db` (SQLite; no se sube, se regenera en segundos) y la comprime en `citadel.db.gz` (~11 MB, **sí se sube**: es la que descarga el dashboard y la que usa GitHub Pages) |
 | `dashboard/generar_animacion.py` | Graba con SUMO 10 min de hora pico de cada método (3 sin IA + versiones de la IA) en `dashboard/animacion/`; en el dashboard se eligen dos para compararlos |
-| `dashboard/index.html` | Dashboard. Abrir con `cd dashboard; python -m http.server 8000`. Pensado para alguien que no conoce el proyecto |
+| `dashboard/index.html` | Dashboard. Abrir con `cd dashboard; python -m http.server 8000`. Pensado para alguien que no conoce el proyecto. Funciona en celular (menú abajo, ≤ 640 px) y tiene botón "Abrir en el celular" con QR |
+| `dashboard/servir_celular.py` | Sirve el dashboard en la red Wi-Fi (IP local) y muestra el QR: el celular debe estar en la misma red |
+| `dashboard/generar_qr.py` | QR fijo del sitio publicado (`https://santisan1205.github.io/Taller-Control/dashboard/`) en `dashboard/img/qr_dashboard.png/.svg`; lo usa la presentación final |
 
 ## Carpetas
 - `2026-09-12-17-03-26/`: escenario SUMO (red `Config_actualizado.net.xml`, rutas, peatones).
@@ -42,7 +44,10 @@ Profesor: Jorge Alfredo López Jiménez. **Responder siempre en español.**
 - `resultados_eval/`: evaluaciones (los episodios crudos no se suben, ver `.gitignore`).
 - `datos_dashboard/`: datos para el dashboard. **`datos_dashboard/v2/` es la versión final**: las dos campañas del
   entorno v2, 36 corridas (18 `v2_` con el algoritmo 1 + 18 `v2a2_` con el 2) + 3 líneas base, 1170 episodios.
-- `presentacion/`: presentación (`presentacion.html`/`.pdf`, fuente en `presentacion/fuente/`), guion, diagrama del proyecto.
+- `presentacion/`: presentación del 28 de octubre, de v1 (`presentacion.html`/`.pdf`, fuente en `presentacion/fuente/`, `GUION.pdf`),
+  y **presentación final** de 8–10 min con las dos versiones del algoritmo: `python presentacion/generar_final.py` genera
+  `presentacion_final.html` y `guion_final.html` desde `datos_dashboard/v2/` (los PDF se exportan con Chrome headless).
+  Expositores: Tomy 1–3, Andrés 4–6, Santi 7–9, Mariana 10–13.
 - `poster/`: póster 70×100 cm para la Semana de la Innovación.
   - `python poster/generar_graficas.py` → SVG en `poster/graficas/` + KPIs por consola.
   - `poster/poster.html` se exporta a PDF/PNG con Chrome headless.
@@ -81,6 +86,15 @@ Profesor: Jorge Alfredo López Jiménez. **Responder siempre en español.**
   la curiosidad ahora explora mucho al inicio (λ = 1). Siguiente experimento natural: λ inicial menor o más episodios.
 - `v2_peatones_alto_seed1` (algoritmo 1) cae en gridlock en hora pico con demanda ×1,2 (espera 94 s);
   es la única alerta de la base del dashboard.
+
+## Publicación del dashboard (GitHub Pages)
+- Sitio: `https://santisan1205.github.io/Taller-Control/` (el `index.html` de la raíz redirige a `dashboard/`;
+  `.nojekyll` evita el procesamiento de Jekyll). Pages se publica desde `main`, carpeta raíz.
+- Necesita en el repo `dashboard/citadel.db.gz` y `dashboard/animacion/`. Si cambian los resultados: correr
+  `construir_bd.py` (regenera el `.gz`), commit y push a `main`.
+- Si cambia la dirección pública: actualizar `URL_PUBLICA` en `dashboard/index.html` y `dashboard/generar_qr.py`,
+  y volver a correr `generar_qr.py` y `presentacion/generar_final.py`.
+- iCloud a veces renombra archivos con sufijo " 2" (`exportar_datos 2.py`): revisar antes de hacer commit.
 
 ## Convenciones
 - Ramas: el trabajo vive en `metricas-dashboard`; `main` se mantiene al día con ella.

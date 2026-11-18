@@ -7,6 +7,9 @@
     <link rel="icon" type="image/png" href="img/favicon.png">
     <!-- SQLite en el navegador (lee dashboard/citadel.db, generada por construir_bd.py) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+    <!-- Código QR para abrir el dashboard en el celular -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <meta name="theme-color" content="#141118">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -741,6 +744,76 @@
             .chart-header { flex-direction: column; }
             .time-filters { justify-content: flex-start; }
         }
+
+        /* Botón y ventana del código QR ("Abrir en el celular") */
+        .boton-qr { flex: none; }
+        #qr-overlay {
+            position: fixed; inset: 0; z-index: 1100; display: flex; align-items: center; justify-content: center;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); padding: 16px;
+        }
+        #qr-overlay[hidden] { display: none; }
+        .qr-card {
+            background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 28px;
+            width: 100%; max-width: 380px; text-align: center; display: flex; flex-direction: column; gap: 14px;
+            box-shadow: 0 0 50px rgba(157, 80, 187, 0.25);
+        }
+        .qr-card h2 { font-size: 1.2rem; font-weight: 600; }
+        .qr-card h2 span { color: var(--accent-pink); }
+        .qr-card p { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
+        #qr-codigo { background: #FFFFFF; border-radius: 14px; padding: 14px; align-self: center; line-height: 0; }
+        #qr-codigo img, #qr-codigo canvas { width: 240px; height: 240px; image-rendering: pixelated; }
+        #qr-url { font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.78rem; color: var(--text-main); word-break: break-all; }
+        .qr-acciones { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+        /* Celular: menú abajo, una sola columna y todo lo ancho de la pantalla */
+        @media (max-width: 640px) {
+            body { display: block; padding: 0; height: auto; min-height: 100dvh; background: var(--app-bg); }
+            .app-container { display: block; height: auto; min-height: 100dvh; max-width: none; border: none; border-radius: 0; box-shadow: none; overflow: visible; }
+            .sidebar {
+                position: fixed; left: 0; right: 0; bottom: 0; z-index: 900; width: auto;
+                flex-direction: row; align-items: stretch; gap: 0;
+                padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+                border-right: none; border-top: 1px solid rgba(255, 255, 255, 0.08);
+                background: rgba(23, 20, 30, 0.96); backdrop-filter: blur(10px);
+            }
+            .sidebar .logo { display: none; }
+            .menu, .bottom-menu { flex-direction: row; gap: 0; flex: 4; margin-top: 0; }
+            .bottom-menu { flex: 2; }
+            .menu-item { flex: 1; justify-content: center; padding: 10px 0; border-radius: 10px; font-size: 1.15rem; }
+            .menu-item.active { border-left: none; background: linear-gradient(180deg, rgba(157, 80, 187, 0.32), rgba(233, 117, 168, 0.12)); }
+            .main-content { overflow: visible; padding: 16px 16px calc(84px + env(safe-area-inset-bottom, 0px)); gap: 18px; }
+            .header { flex-direction: column; gap: 12px; }
+            .greeting h1 { font-size: 1.35rem; }
+            .greeting p { font-size: 0.8rem; }
+            .header-right { width: 100%; flex-wrap: wrap; gap: 10px; }
+            .header-right .search-bar { flex: 1; justify-content: center; padding: 9px 14px; font-size: 0.82rem; }
+            .profile { display: none; }
+            .barra-filtros { gap: 8px; }
+            .grupo-filtro { width: 100%; border-radius: 16px; padding: 6px 8px 6px 12px; }
+            .grupo-filtro .toggle-btn { padding: 6px 9px; }
+            .fila-modos { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 10px; }
+            .fila-modos .toggles { overflow-x: auto; scrollbar-width: none; }
+            .fila-modos .toggles::-webkit-scrollbar { display: none; }
+            .fila-modos .toggles { gap: 6px; }
+            .fila-modos .toggle-btn { padding: 8px 11px; font-size: 0.78rem; }
+            .fila-modos .mode-indicator { font-size: 0.78rem; padding: 9px 14px; }
+            .page-section { gap: 18px; height: auto; }
+            .dashboard-grid { gap: 16px; }
+            .card, .chart-section { border-radius: 16px; padding: 16px; }
+            .ai-card { margin-top: 0; }
+            .total-value { font-size: 1.9rem; }
+            .chart-header { gap: 12px; margin-bottom: 14px; }
+            .time-filters { gap: 6px; }
+            .agents-grid { gap: 10px; }
+            .agent-card { padding: 12px; }
+            #sim-a, #sim-b { height: 260px !important; }
+            .selector-metodo { max-width: 100%; }
+            .login-card { width: 100%; max-width: 400px; padding: 28px 22px; }
+            .logo-inicio { width: 200px; }
+            .rejilla-textos { grid-template-columns: 1fr; }
+            .bloque-codigo { flex-direction: column; align-items: flex-start; }
+            .bloque-codigo span { word-break: break-all; }
+        }
     </style>
 </head>
 <body>
@@ -754,6 +827,21 @@
             <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Por favor, ingresa el nombre de la persona a cargo del monitoreo.</p>
             <input type="text" id="user-name-input" class="login-input" placeholder="Ej. Mariana, Profesor, Evaluador..." required>
             <button class="login-btn" onclick="startDashboard()">Iniciar Monitoreo</button>
+        </div>
+    </div>
+
+    <!-- VENTANA DEL CÓDIGO QR (botón "Abrir en el celular") -->
+    <div id="qr-overlay" hidden onclick="if (event.target === this) cerrarQR()">
+        <div class="qr-card" role="dialog" aria-labelledby="qr-titulo">
+            <h2 id="qr-titulo">Abrir en el <span>celular</span></h2>
+            <p>Escanea el código con la cámara del celular.</p>
+            <div id="qr-codigo"></div>
+            <div id="qr-url"></div>
+            <p id="qr-nota"></p>
+            <div class="qr-acciones">
+                <button class="boton-copiar" onclick="copiarURLQR(this)">Copiar enlace</button>
+                <button class="boton-copiar" onclick="cerrarQR()">Cerrar</button>
+            </div>
         </div>
     </div>
 
@@ -802,6 +890,9 @@
                 <div class="header-right">
                     <a class="search-bar" href="#" onclick="irAPagina('red-trafico-page'); return false;" title="Ver los carros moviéndose en la simulación">
                         <span>🚦</span> Ver los carros en la simulación
+                    </a>
+                    <a class="search-bar boton-qr" href="#" onclick="abrirQR(); return false;" title="Muestra un código QR para abrir este dashboard en el celular">
+                        <span>📱</span> Abrir en el celular
                     </a>
                     <div class="profile">
                         <div class="profile-info">
@@ -1555,6 +1646,9 @@
             const maxEje = maxMedia * 1.12 || 1;
             const pct = v => Math.max(0, Math.min(v / maxEje * 100, 100));
             const ref = filas.find(f => f.tipo === 'referencia');
+            // En pantallas angostas (celular) las columnas de nombre y de mejora se achican
+            const angosto = el.clientWidth < 520;
+            const colNombre = angosto ? 104 : 170, colDelta = angosto ? 66 : 120, hueco = angosto ? 8 : 14;
             const relleno = {
                 seleccionada: 'linear-gradient(90deg, var(--accent-purple), var(--accent-pink))',
                 config: 'rgba(157, 80, 187, 0.55)',
@@ -1565,10 +1659,10 @@
                 const m = f.tipo === 'referencia' ? null : mejora(f.media, ref.media, opciones.sentido);
                 const delta = m === null
                     ? `<span style="color: var(--text-muted);">referencia</span>`
-                    : `<span style="color: ${m >= 0 ? 'var(--green-positive)' : ROJO};">${m >= 0 ? '▲' : '▼'} ${fmt(Math.abs(m), 1)}% ${m >= 0 ? 'mejor' : 'peor'}</span>`;
+                    : `<span style="color: ${m >= 0 ? 'var(--green-positive)' : ROJO};">${m >= 0 ? '▲' : '▼'} ${fmt(Math.abs(m), 1)}%${angosto ? '' : (m >= 0 ? ' mejor' : ' peor')}</span>`;
                 const destacada = f.tipo === 'seleccionada';
-                return `<div class="fila-ranking" data-i="${i}" style="display: grid; grid-template-columns: 170px 1fr 120px; align-items: center;
-                            gap: 14px; padding: 5px 8px; border-radius: 10px; cursor: default;
+                return `<div class="fila-ranking" data-i="${i}" style="display: grid; grid-template-columns: ${colNombre}px 1fr ${colDelta}px; align-items: center;
+                            gap: ${hueco}px; padding: 5px 8px; border-radius: 10px; cursor: default;
                             ${destacada ? 'background: rgba(233, 117, 168, 0.08);' : ''}">
                     <div style="text-align: right; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
                                 color: ${destacada ? 'var(--text-main)' : 'var(--text-muted)'}; font-weight: ${destacada ? 600 : 400};">
@@ -1593,7 +1687,7 @@
                 </div>`;
             }).join('');
             // Línea vertical en el valor de la referencia, sobre la columna de barras
-            const lineaRef = `<div style="position: absolute; top: 0; bottom: 0; left: calc(170px + 14px + 8px + (100% - 170px - 120px - 28px - 16px) * ${pct(ref.media) / 100});
+            const lineaRef = `<div style="position: absolute; top: 0; bottom: 0; left: calc(${colNombre + hueco + 8}px + (100% - ${colNombre + colDelta + 2 * hueco + 16}px) * ${pct(ref.media) / 100});
                                  border-left: 1px dashed rgba(255,255,255,0.5); pointer-events: none;">
                                 <span style="position: absolute; top: -18px; left: 0; transform: translateX(-50%); white-space: nowrap;
                                              font-size: 0.7rem; color: var(--text-muted);">${ref.nombre}: ${opciones.formato(ref.media)}</span>
@@ -2134,6 +2228,41 @@
             if (navigator.clipboard) navigator.clipboard.writeText(texto).then(listo, () => {});
         }
 
+        // ---------- Abrir en el celular (código QR) ----------
+        // Desde localhost el celular no puede entrar: se muestra el enlace público (GitHub Pages).
+        // Con python dashboard/servir_celular.py el dashboard se abre con la IP de la red y el QR apunta ahí.
+        const URL_PUBLICA = 'https://santisan1205.github.io/Taller-Control/dashboard/';
+        function urlParaCelular() {
+            const h = location.hostname;
+            if (location.protocol === 'file:' || ['localhost', '127.0.0.1', '::1', '[::1]', ''].includes(h)) {
+                return {url: URL_PUBLICA, nota: 'Enlace público. Para usar la red Wi-Fi en vez de internet, abre el dashboard con <code>python dashboard/servir_celular.py</code>.'};
+            }
+            const redLocal = /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(h);
+            return {url: location.origin + location.pathname,
+                    nota: redLocal ? 'El celular debe estar conectado a la misma red Wi-Fi que este computador.' : ''};
+        }
+        function abrirQR() {
+            const {url, nota} = urlParaCelular();
+            const caja = document.getElementById('qr-codigo');
+            caja.innerHTML = '';
+            if (window.QRCode) {
+                new QRCode(caja, {text: url, width: 480, height: 480, colorDark: '#1C1924', colorLight: '#FFFFFF',
+                                  correctLevel: QRCode.CorrectLevel.M});
+                caja.hidden = false;
+            } else caja.hidden = true;  // sin internet no carga la librería: queda el enlace escrito
+            document.getElementById('qr-url').innerText = url;
+            document.getElementById('qr-nota').innerHTML = nota;
+            document.getElementById('qr-overlay').hidden = false;
+        }
+        function cerrarQR() { document.getElementById('qr-overlay').hidden = true; }
+        function copiarURLQR(boton) {
+            const listo = () => { boton.innerText = '¡Copiado!'; setTimeout(() => boton.innerText = 'Copiar enlace', 1500); };
+            if (navigator.clipboard) navigator.clipboard.writeText(urlParaCelular().url).then(listo, () => {});
+        }
+        addEventListener('keydown', ev => { if (ev.key === 'Escape') cerrarQR(); });
+        // servir_celular.py abre el dashboard con ?qr=1 para mostrar el código de una vez
+        if (new URLSearchParams(location.search).get('qr') === '1') addEventListener('load', abrirQR);
+
         // ---------- Orquestación ----------
         function paginaActiva() { return document.querySelector('.page-section.active-page').id; }
         function renderPagina() {
@@ -2149,15 +2278,28 @@
             else renderTexto();
         }
 
+        // Primero la versión comprimida (citadel.db.gz, ~4 veces más liviana: importa en el celular);
+        // si no está, la base completa. Si el servidor ya la entregó descomprimida, se usa tal cual.
+        async function descargarBase() {
+            const gz = await fetch('citadel.db.gz').catch(() => null);
+            if (gz && gz.ok && 'DecompressionStream' in window) {
+                const bytes = new Uint8Array(await gz.arrayBuffer());
+                if (bytes[0] !== 0x1f || bytes[1] !== 0x8b) return bytes;
+                const flujo = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+                return new Uint8Array(await new Response(flujo).arrayBuffer());
+            }
+            const resp = await fetch('citadel.db');
+            if (!resp.ok) throw new Error('No se encontró citadel.db: corre python dashboard/construir_bd.py');
+            return new Uint8Array(await resp.arrayBuffer());
+        }
+
         async function cargarBase() {
             const indicador = document.getElementById('current-mode-indicator');
             indicador.innerText = 'Cargando citadel.db…';
             try {
                 if (location.protocol === 'file:') throw new Error('Abre el dashboard con un servidor local: cd dashboard; python -m http.server 8000');
                 const SQL = await initSqlJs({locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${f}`});
-                const resp = await fetch('citadel.db');
-                if (!resp.ok) throw new Error('No se encontró citadel.db: corre python dashboard/construir_bd.py');
-                DB = new SQL.Database(new Uint8Array(await resp.arrayBuffer()));
+                DB = new SQL.Database(await descargarBase());
                 METRICAS = Object.fromEntries(q('SELECT * FROM metricas').map(m => [m.metrica, m]));
                 // Versiones del algoritmo con evaluación en la base (el filtro solo aparece si hay más de una)
                 const configsEnBase = new Set(q('SELECT DISTINCT config FROM evaluacion_configs').map(f => f.config));
@@ -2174,7 +2316,9 @@
                 console.error(err);
             }
         }
-        window.addEventListener('resize', () => renderPagina());
+        // Solo si cambia el ancho: en el celular la barra de direcciones cambia el alto al hacer scroll
+        let anchoPrevio = innerWidth;
+        window.addEventListener('resize', () => { if (innerWidth !== anchoPrevio) { anchoPrevio = innerWidth; renderPagina(); } });
         cargarBase();
     </script>
 </body>

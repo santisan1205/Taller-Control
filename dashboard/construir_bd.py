@@ -17,6 +17,7 @@ Esquema:
   metrica, referencia).
 """
 import datetime as dt
+import gzip
 import os
 import sqlite3
 import sys
@@ -195,8 +196,17 @@ def construir(salida=SALIDA):
     con.execute('VACUUM')
     con.close()
     print(f'Tamaño: {os.path.getsize(salida) / 1e6:.1f} MB')
+    comprimir(salida)
     if errores:
         sys.exit(f'Las tablas {errores} no coinciden con sus CSV')
+
+
+def comprimir(salida=SALIDA):
+    """citadel.db.gz: la que descarga el dashboard (~4 veces más liviana, importa en el celular).
+    Es la que se sube al repositorio para GitHub Pages; citadel.db no se sube."""
+    with open(salida, 'rb') as f, gzip.GzipFile(salida + '.gz', 'wb', compresslevel=9, mtime=0) as gz:
+        gz.write(f.read())
+    print(f'Comprimida: {os.path.relpath(salida + ".gz", RAIZ)} ({os.path.getsize(salida + ".gz") / 1e6:.1f} MB)')
 
 
 if __name__ == '__main__':
