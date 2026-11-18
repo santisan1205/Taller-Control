@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C.I.T.A.D.E.L. · Presentación final</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; background: #0E1118; overflow: hidden; }
+  #lienzo { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; }
+  section { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; }
+  @media screen { section:not(.activa) { display: none !important; } }
+  table { border-collapse: collapse; width: 100%; overflow: hidden; }
+  th, td { padding: 0.36em 0.6em; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  th { font-weight: 700; }
+  hr { border: none; }
+  img { display: block; }
+  svg text { font-family: 'Inter', Arial, sans-serif; }
+  .notas { display: none; white-space: pre-line; }
+  body.ver-notas section.activa .notas { display: block; position: absolute; left: 0; right: 0; bottom: 0;
+    background: rgba(14,17,24,0.94); color: #F5F3EE; font: 26px/1.45 Arial, sans-serif;
+    padding: 32px 64px; max-height: 50%; overflow: auto; }
+  @media print {
+    @page { size: 1920px 1080px; margin: 0; }
+    html, body { overflow: visible; background: none; }
+    #lienzo { position: static; transform: none !important; width: auto; height: auto; }
+    section { position: relative; page-break-after: always; break-after: page; }
+    .notas { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<!-- Generado por presentacion/generar_final.py: no editar a mano. Teclas: flechas, N = notas, F = pantalla completa -->
+<div id="lienzo">
+<section id="cover" style="background:linear-gradient(135deg,#2A1B38 0%,#0F0C14 100%);color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:250px 128px 100px;display:flex;flex-direction:column;gap:22px">
+
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;left:128px;top:70px;width:270px;height:74px;object-fit:contain;filter:invert(1)">
+<p style="position:absolute;right:128px;top:92px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#A6A2B4">SUMO · sumo-rl · PyTorch</p>
+<img src="citadel_logo.png" alt="Logo de C.I.T.A.D.E.L." style="position:absolute;right:110px;top:250px;width:680px;filter:drop-shadow(0 0 40px rgba(233,117,168,0.25))">
+<div style="width:980px;display:flex;flex-direction:column;gap:22px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#E975A8">Ingeniería Eléctrica y Electrónica · Taller de Control</p>
+<h1 style="font-size:64px;font-weight:800;line-height:1.1;letter-spacing:-1px;color:#FFFFFF">Control semafórico multiagente con <span style="background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">RND-MAPPO</span></h1>
+<p style="font-size:32px;line-height:1.35;color:#D9D5E2">Aprendizaje por refuerzo para cuatro intersecciones de Bogotá simuladas en SUMO, con peatones y hora pico</p>
+<div style="height:4px;width:980px;background:linear-gradient(90deg,#9D50BB,#E975A8);margin:14px 0;border-radius:2px"></div>
+<p style="font-size:28px;line-height:1.4;color:#D9D5E2"><b style="color:#FFFFFF">Grupo:</b> Tomás Castro · Andrés Felipe Barbosa · Mariana Vanoy · Santiago Sánchez</p>
+<p style="font-size:28px;line-height:1.4;color:#D9D5E2"><b style="color:#FFFFFF">Profesor:</b> Jorge Alfredo López Jiménez · noviembre de 2026</p>
+</div>
+<aside class="notas">[Tomy · 0:20 · acumulado 0:20]
+Buenos días, profesor. Somos Tomás, Andrés, Mariana y Santiago, y este es C.I.T.A.D.E.L.: un sistema de control semafórico con aprendizaje por refuerzo multiagente. Cada uno de los cuatro semáforos de un sector de Bogotá es un agente que aprende, en el simulador SUMO, cuándo cambiar de fase, y lo comparamos con los controladores que se usan hoy.</aside>
+</section>
+<section id="agenda" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">2 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Estructura</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Agenda de la presentación</h2>
+<p style="font-size:28px;line-height:1.4;color:#A6A2B4">Formulación, método, resultados y análisis</p>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:32px 40px">
+<h3 style="font-size:36px;font-weight:700;color:#FFFFFF"><span style="color:#E975A8">01</span> El problema</h3>
+<p style="font-size:28px;line-height:1.4;color:#D9D5E2">Escenario de cuatro intersecciones con peatones; qué observa, qué decide y qué gana cada agente.</p></div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:32px 40px">
+<h3 style="font-size:36px;font-weight:700;color:#FFFFFF"><span style="color:#E975A8">02</span> El método</h3>
+<p style="font-size:28px;line-height:1.4;color:#D9D5E2">RND-MAPPO, sus dos versiones y el protocolo de entrenamiento y evaluación.</p></div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:32px 40px">
+<h3 style="font-size:36px;font-weight:700;color:#FFFFFF"><span style="color:#E975A8">03</span> Resultados</h3>
+<p style="font-size:28px;line-height:1.4;color:#D9D5E2">Aprendizaje, comparación con tres controladores, carros frente a peatones y demanda variable.</p></div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:32px 40px">
+<h3 style="font-size:36px;font-weight:700;color:#FFFFFF"><span style="color:#E975A8">04</span> Análisis y cierre</h3>
+<p style="font-size:28px;line-height:1.4;color:#D9D5E2">Versión 1 frente a 2, papel de la curiosidad, dashboard y conclusiones.</p></div>
+</div>
+<aside class="notas">[Tomy · 0:15 · acumulado 0:35]
+Primero les cuento el problema y cómo lo formulamos. Andrés explica el algoritmo y cómo lo entrenamos. Santi presenta los resultados, y Mariana cierra con el análisis, el dashboard y las conclusiones.</aside>
+</section>
+<section id="escenario" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">3 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">El problema</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Descripción del escenario</h2>
+<p style="font-size:28px;line-height:1.4;color:#A6A2B4">Red vial de un sector de Bogotá importada de OpenStreetMap y simulada en SUMO</p>
+</div>
+<div style="display:flex;gap:48px;align-items:flex-start">
+<div style="width:620px;display:flex;flex-direction:column;gap:30px">
+<div style="display:flex;flex-direction:column;gap:4px;padding-top:14px;position:relative">
+<div style="position:absolute;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,0.35)"></div>
+<p style="font-size:52px;font-weight:800;line-height:1.1;color:#FFFFFF">4 cruces</p>
+<p style="font-size:24px;line-height:1.3;color:#A6A2B4">intersecciones semaforizadas, C1 a C4; peatones en C1 y C4</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding-top:14px;position:relative">
+<div style="position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<p style="font-size:52px;font-weight:800;line-height:1.1;color:#E975A8">2 horas</p>
+<p style="font-size:24px;line-height:1.3;color:#A6A2B4">valle y hora pico, una hora simulada cada una (720 decisiones de 5 s)</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding-top:14px;position:relative">
+<div style="position:absolute;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,0.35)"></div>
+<p style="font-size:52px;font-weight:800;line-height:1.1;color:#FFFFFF">≈ 2.000 viajes/h</p>
+<p style="font-size:24px;line-height:1.3;color:#A6A2B4">en hora pico (≈ 1.380 en valle)</p></div>
+</div>
+<div style="flex:1"><table style="font-size:26px;color:#D9D5E2;width:100%">
+<tr style="background:#2E2140"><th style="width:40%;color:#FFFFFF;">Parámetro</th><th style="width:60%;color:#FFFFFF;">Valor</th></tr>
+<tr style="background:#18151F"><td style="">Simulador</td><td style="">SUMO 1.27.1 · sumo-rl 1.4.5</td></tr>
+<tr style="background:#1C1924"><td style="">Peatones</td><td style="">Pasos peatonales en C1 y C4</td></tr>
+<tr style="background:#18151F"><td style="">Ventanas</td><td style="">Valle (0–3600 s) y hora pico (4400–8000 s)</td></tr>
+<tr style="background:#1C1924"><td style="">Demanda</td><td style="">Rutas aleatorias + flujos; ×0,7 a ×1,3 al entrenar</td></tr>
+<tr style="background:#18151F"><td style="">Verde mínimo / máximo</td><td style="">15 s / 60 s</td></tr>
+<tr style="background:#1C1924"><td style="">Amarillo · teletransporte</td><td style="">3 s · desactivado</td></tr>
+<tr style="background:#18151F"><td style="">Líneas base</td><td style="">Tiempo fijo, actuado (SUMO), max-pressure</td></tr>
+</table></div>
+</div>
+<aside class="notas">[Tomy · 0:55 · acumulado 1:30]
+El escenario es un sector real de Bogotá: tomamos la red vial de OpenStreetMap y la llevamos a SUMO, un simulador que mueve cada vehículo y cada peatón por separado. Hay cuatro intersecciones semaforizadas, C1 a C4, y en C1 y C4 hay pasos peatonales. Simulamos dos horas del día: la hora valle y la hora pico, en la que pasan unos dos mil vehículos por hora. Cada semáforo respeta 15 segundos de verde mínimo, 3 de amarillo y 60 de verde máximo. Comparamos contra tres controladores: el tiempo fijo que trae la red, el semáforo actuado de SUMO, que alarga el verde cuando detecta carros, y max-pressure, un método clásico que da verde a la dirección con más cola acumulada.</aside>
+</section>
+<section id="formulacion" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">4 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Formulación</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Formulación del problema de control</h2>
+<p style="font-size:28px;line-height:1.4;color:#A6A2B4">Juego estocástico parcialmente observable con un agente por intersección</p>
+</div>
+<table style="font-size:25px;color:#D9D5E2;width:1664px">
+<tr style="background:#2E2140"><th style="width:19%;color:#FFFFFF;">Elemento</th><th style="width:52%;color:#FFFFFF;">Definición</th><th style="width:29%;color:#FFFFFF;">Implementación</th></tr>
+<tr style="background:#18151F"><td style="">Agente i</td><td style="">Controlador de la intersección Ci, i = 1…4</td><td style="">Un actor por intersección</td></tr>
+<tr style="background:#1C1924"><td style="">Observación o<sub>i</sub></td><td style="">Fase activa (one-hot), verde mínimo cumplido, densidad y cola por carril. En C1 y C4: peatones esperando y espera máxima</td><td style="">Observación de sumo-rl + peatones (TraCI)</td></tr>
+<tr style="background:#18151F"><td style="">Acción a<sub>i</sub></td><td style="">Siguiente fase verde (15 s mín., 3 s amarillo, 60 s máx.)</td><td style="">Discreta; |A<sub>i</sub>| = n.º de fases</td></tr>
+<tr style="background:#1C1924"><td style="">Recompensa r<sub>i</sub></td><td style="">Reducción de cola, espera de carros y espera de peatones; penalización por cambio de fase</td><td style="">Por intersección, cada Δt</td></tr>
+<tr style="background:#18151F"><td style="">Estado global s</td><td style="">Concatenación de las cuatro observaciones</td><td style="">Entrada del crítico</td></tr>
+<tr style="background:#1C1924"><td style="">Horizonte</td><td style="">720 pasos de 5 s · factor de descuento γ = 0,99</td><td style="">1 episodio = 1 h simulada</td></tr>
+</table>
+<aside class="notas">[Tomy · 0:45 · acumulado 2:15]
+Formalmente es un juego estocástico parcialmente observable: cuatro agentes, y ninguno ve la red completa. Cada uno observa su cruce: la fase activa, si ya cumplió el verde mínimo, y la densidad y la cola de cada carril; en C1 y C4, además, cuántos peatones esperan y cuánto lleva el que más espera. Cada 5 segundos elige la siguiente fase verde. La recompensa premia que bajen la cola, la espera de los carros y la de los peatones, que pesa el doble, y castiga cada cambio de fase. Un episodio es una hora: 720 decisiones. Andrés les cuenta cómo aprenden.</aside>
+</section>
+<section id="arquitectura" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">5 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Arquitectura</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">MAPPO: entrenamiento centralizado, ejecución descentralizada</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px;background:linear-gradient(135deg,#2A1B38 0%,#1C1924 100%);border:1px solid rgba(233,117,168,0.35);border-radius:12px;padding:30px 38px">
+<p style="font-size:40px;font-weight:800;line-height:1.1;color:#E975A8">Actor π<sub>i</sub>(a<sub>i</sub> | o<sub>i</sub>)</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:25px;line-height:1.4;color:#D9D5E2">o<sub>i</sub> → 128 → 64 → |A<sub>i</sub>| · ReLU · softmax</p>
+<p style="font-size:26px;line-height:1.4;color:#D9D5E2">Distribución sobre las fases. Cuatro actores independientes, porque |o<sub>i</sub>| y |A<sub>i</sub>| cambian entre intersecciones.</p></div>
+<div style="display:flex;flex-direction:column;gap:12px;background:linear-gradient(135deg,#2A1B38 0%,#1C1924 100%);border:1px solid rgba(233,117,168,0.35);border-radius:12px;padding:30px 38px">
+<p style="font-size:40px;font-weight:800;line-height:1.1;color:#E975A8">Crítico V(s)</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:25px;line-height:1.4;color:#D9D5E2">s → 256 → 128 → V · ReLU</p>
+<p style="font-size:26px;line-height:1.4;color:#D9D5E2">Valor del estado global (las cuatro observaciones). Solo se usa en el entrenamiento.</p></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Objetivo PPO</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Pérdida recortada con ε = 0,2 y bono de entropía c<sub>H</sub> = 0,01.</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Ventaja GAE</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">γ = 0,99 y λ = 0,95, con ventajas normalizadas por lote.</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Ejecución</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Cada controlador decide solo con o<sub>i</sub>: no necesita comunicarse con los demás.</p></div>
+</div>
+<aside class="notas">[Andrés · 0:45 · acumulado 3:00]
+Usamos MAPPO, la versión multiagente de PPO, con entrenamiento centralizado y ejecución descentralizada. Cada cruce tiene su actor: una red que recibe la observación local y da una probabilidad para cada fase; son cuatro redes distintas porque cada cruce tiene distintos carriles y fases. El crítico ve las cuatro observaciones juntas y solo se usa para entrenar: le dice a cada actor qué tan buena fue su decisión. En operación, cada semáforo decide solo con lo que ve, sin comunicarse. La actualización es la de PPO, con recorte de 0,2, bono de entropía y ventaja GAE.</aside>
+</section>
+<section id="recompensa" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">6 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Recompensa</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Recompensa extrínseca y exploración por RND</h2>
+<p style="font-size:28px;line-height:1.4;color:#A6A2B4">Random Network Distillation como bono de curiosidad con peso decreciente</p>
+</div>
+<div style="background:linear-gradient(135deg,#2A1B38 0%,#1C1924 100%);border:1px solid rgba(233,117,168,0.35);border-radius:12px;padding:34px 44px;display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:31px;line-height:1.5;color:#D9D5E2"><span style="color:#E975A8">R_ext</span> = −(w1·ΔQ + w2·ΔW_veh + w3·ΔW_ped) − P·1[cambio de fase]</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:31px;line-height:1.5;color:#D9D5E2"><span style="color:#E975A8">R_int</span> = ‖ f<sub>θ</sub>(s′) − g(s′) ‖²</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:31px;line-height:1.5;color:#D9D5E2"><span style="color:#E975A8">R_total</span> = R_ext + λ<sub>e</sub>·R_int,  λ<sub>e</sub> = max(0,01 ; 1 − e/E)</p>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Término extrínseco</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">ΔQ y ΔW: cambio de la cola y de la espera entre pasos. w1 = w2 = 1, <b>w3 = 2</b> (los peatones pesan el doble), P = 0,5.</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Término intrínseco</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">g: red aleatoria fija; f<sub>θ</sub>: predictor entrenado para imitarla. El error es alto en estados poco visitados.</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #9D50BB;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Decaimiento de λ</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Lineal en el episodio e de E: exploración al inicio y optimización del tráfico al final.</p></div>
+</div>
+<aside class="notas">[Andrés · 0:35 · acumulado 3:35]
+A la recompensa del tráfico le sumamos curiosidad, con Random Network Distillation. Hay una red aleatoria fija y otra que aprende a imitarla: en los estados que el agente ya conoce la imita bien; en los nuevos falla, y ese error se suma como premio por explorar. Su peso λ baja de 1 a casi 0 durante el entrenamiento: al inicio explora y al final solo optimiza el tráfico.</aside>
+</section>
+<section id="versiones" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">7 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Arquitectura</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Dos versiones del algoritmo</h2>
+<p style="font-size:28px;line-height:1.4;color:#A6A2B4">Mismo actor y misma recompensa; cambian el crítico y la normalización de la curiosidad</p>
+</div>
+<table style="font-size:26px;color:#D9D5E2;width:1664px">
+<tr style="background:#2E2140"><th style="width:22%;color:#FFFFFF;"></th><th style="width:37%;color:#FFFFFF;">Algoritmo 1</th><th style="width:41%;color:#FFFFFF;">Algoritmo 2</th></tr>
+<tr style="background:#18151F"><td style="">Crítico</td><td style="">Una salida V(s), actualizada por turnos con la recompensa de cada agente</td><td style="">Una salida V<sub>i</sub>(s) por agente + normalización de valores (ValueNorm), un solo optimizador</td></tr>
+<tr style="background:#1C1924"><td style="">Normalización de RND</td><td style="">Cada observación con su propia media</td><td style="">Media y desviación acumuladas; R<sub>int</sub> normalizada por su desviación</td></tr>
+<tr style="background:rgba(233,117,168,0.14)"><td style="">Peso real de la curiosidad</td><td style="">≈ 0,1 % de |R<sub>ext</sub>| (sin efecto)</td><td style="">≈ 2 % de |R<sub>ext</sub>| (≈ 30 veces más)</td></tr>
+</table>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Por qué un valor por agente</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Las recompensas de C2 y C3 son mucho mayores que las de C4: un único V(s) no puede ajustar los cuatro retornos a la vez.</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #9D50BB;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Por qué renormalizar RND</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Con la normalización original la curiosidad no tenía efecto: no se podía saber si RND servía o no.</p></div>
+</div>
+<aside class="notas">[Andrés · 0:40 · acumulado 4:15]
+Implementamos dos versiones del algoritmo. En la primera, el crítico tenía una sola salida y se actualizaba por turnos con la recompensa de cada agente; como las recompensas de C2 y C3 son mucho más grandes que las de C4, un solo valor no puede ajustarlas todas. Además, la normalización de RND dejaba la curiosidad en cerca del 0,1 % de la recompensa, o sea, sin efecto. En la versión 2 el crítico da un valor por agente, con normalización de valores, y la curiosidad pesa unas 30 veces más.</aside>
+</section>
+<section id="protocolo" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">8 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Entrenamiento</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Configuración experimental</h2>
+<p style="font-size:28px;line-height:1.4;color:#A6A2B4">Hiperparámetros del entrenamiento y protocolo de evaluación</p>
+</div>
+<div style="display:flex;gap:44px;align-items:flex-start">
+<div style="width:860px"><table style="font-size:25px;color:#D9D5E2;width:100%">
+<tr style="background:#2E2140"><th style="width:55%;color:#FFFFFF;">Hiperparámetro</th><th style="width:45%;text-align:right;color:#FFFFFF;">Valor</th></tr>
+<tr style="background:#18151F"><td style="">Episodios por corrida</td><td style="text-align:right;">150</td></tr>
+<tr style="background:#1C1924"><td style="">Tasa de aprendizaje actor / crítico</td><td style="text-align:right;">3·10⁻⁴ / 1·10⁻³</td></tr>
+<tr style="background:#18151F"><td style="">Recorte PPO ε / entropía c<sub>H</sub></td><td style="text-align:right;">0,2 / 0,01</td></tr>
+<tr style="background:#1C1924"><td style="">Épocas PPO por episodio</td><td style="text-align:right;">4</td></tr>
+<tr style="background:#18151F"><td style="">γ / λ<sub>GAE</sub></td><td style="text-align:right;">0,99 / 0,95</td></tr>
+<tr style="background:#1C1924"><td style="">Tasa de aprendizaje RND</td><td style="text-align:right;">1·10⁻⁴</td></tr>
+<tr style="background:#18151F"><td style="">Corridas</td><td style="text-align:right;">2 versiones × 6 config. × 3 semillas = 36</td></tr>
+</table></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Seis configuraciones</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Base, sin curiosidad, más exploración (c<sub>H</sub> = 0,05), prioriza espera (w2 = 2), penaliza cambio (P = 2) y prioriza peatones (w3 = 5).</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Evaluación pareada</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Valle y pico × demanda 80, 100 y 120 % × 5 semillas de SUMO: todos los métodos ven el mismo tráfico.</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #9D50BB;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">1.170 episodios</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">36 políticas + 3 líneas base; prueba t pareada.</p></div>
+</div></div>
+<aside class="notas">[Andrés · 0:35 · acumulado 4:50]
+Con cada versión entrenamos seis configuraciones: la base, una sin curiosidad y cuatro que cambian la exploración o los pesos de la recompensa; cada una con tres semillas y 150 episodios. Son 36 corridas. Luego evaluamos cada política en valle y en pico, con 80, 100 y 120 % de la demanda y cinco semillas de SUMO, siempre pareadas: todos los métodos ven exactamente el mismo tráfico. En total, 1.170 episodios de evaluación. Santi les muestra los resultados.</aside>
+</section>
+<section id="curva" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">9 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Resultados</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Curvas de aprendizaje</h2>
+<p style="font-size:28px;line-height:1.4;color:#A6A2B4">Episodios de hora pico de la configuración base · promedio de 3 semillas, en bloques de 10 episodios</p>
+</div>
+<div style="display:flex;gap:48px">
+<div style="width:1100px;display:flex;flex-direction:column;gap:8px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 24px">
+<svg width="1040" height="500" viewBox="0 0 1040 500" xmlns="http://www.w3.org/2000/svg" aria-label="Espera media en hora pico por bloque de 10 episodios: baja de unos 20 s a cerca de 2,5 s en las dos versiones">
+<line x1="70" y1="420" x2="1020" y2="420" stroke="#6B6778" stroke-width="2"/>
+<text x="56" y="428" font-size="24" text-anchor="end" fill="#A6A2B4">0</text>
+<line x1="70" y1="345" x2="1020" y2="345" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+<text x="56" y="353" font-size="24" text-anchor="end" fill="#A6A2B4">5</text>
+<line x1="70" y1="270" x2="1020" y2="270" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+<text x="56" y="278" font-size="24" text-anchor="end" fill="#A6A2B4">10</text>
+<line x1="70" y1="196" x2="1020" y2="196" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+<text x="56" y="204" font-size="24" text-anchor="end" fill="#A6A2B4">15</text>
+<line x1="70" y1="121" x2="1020" y2="121" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+<text x="56" y="129" font-size="24" text-anchor="end" fill="#A6A2B4">20</text>
+<line x1="70" y1="46" x2="1020" y2="46" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+<text x="56" y="54" font-size="24" text-anchor="end" fill="#A6A2B4">25</text>
+<line x1="70" y1="303" x2="1020" y2="303" stroke="#D9D5E2" stroke-width="4" stroke-dasharray="14 10"/>
+<text x="1020" y="289" font-size="24" font-weight="700" text-anchor="end" fill="#D9D5E2">Tiempo fijo, pico nominal: 7,8 s</text>
+<polyline fill="none" stroke="#E975A8" stroke-width="5" stroke-linejoin="round" points="102,75 165,167 228,306 292,320 355,347 418,360 482,359 545,358 608,372 672,378 735,378 798,378 862,382 925,386 988,384"/>
+<circle cx="102" cy="75" r="6" fill="#E975A8"/>
+<circle cx="165" cy="167" r="6" fill="#E975A8"/>
+<circle cx="228" cy="306" r="6" fill="#E975A8"/>
+<circle cx="292" cy="320" r="6" fill="#E975A8"/>
+<circle cx="355" cy="347" r="6" fill="#E975A8"/>
+<circle cx="418" cy="360" r="6" fill="#E975A8"/>
+<circle cx="482" cy="359" r="6" fill="#E975A8"/>
+<circle cx="545" cy="358" r="6" fill="#E975A8"/>
+<circle cx="608" cy="372" r="6" fill="#E975A8"/>
+<circle cx="672" cy="378" r="6" fill="#E975A8"/>
+<circle cx="735" cy="378" r="6" fill="#E975A8"/>
+<circle cx="798" cy="378" r="6" fill="#E975A8"/>
+<circle cx="862" cy="382" r="6" fill="#E975A8"/>
+<circle cx="925" cy="386" r="6" fill="#E975A8"/>
+<circle cx="988" cy="384" r="6" fill="#E975A8"/>
+<polyline fill="none" stroke="#A97BF0" stroke-width="5" stroke-linejoin="round" points="102,127 165,225 228,298 292,314 355,336 418,353 482,351 545,369 608,370 672,377 735,372 798,376 862,376 925,383 988,378"/>
+<circle cx="102" cy="127" r="6" fill="#A97BF0"/>
+<circle cx="165" cy="225" r="6" fill="#A97BF0"/>
+<circle cx="228" cy="298" r="6" fill="#A97BF0"/>
+<circle cx="292" cy="314" r="6" fill="#A97BF0"/>
+<circle cx="355" cy="336" r="6" fill="#A97BF0"/>
+<circle cx="418" cy="353" r="6" fill="#A97BF0"/>
+<circle cx="482" cy="351" r="6" fill="#A97BF0"/>
+<circle cx="545" cy="369" r="6" fill="#A97BF0"/>
+<circle cx="608" cy="370" r="6" fill="#A97BF0"/>
+<circle cx="672" cy="377" r="6" fill="#A97BF0"/>
+<circle cx="735" cy="372" r="6" fill="#A97BF0"/>
+<circle cx="798" cy="376" r="6" fill="#A97BF0"/>
+<circle cx="862" cy="376" r="6" fill="#A97BF0"/>
+<circle cx="925" cy="383" r="6" fill="#A97BF0"/>
+<circle cx="988" cy="378" r="6" fill="#A97BF0"/>
+<text x="70" y="454" font-size="24" text-anchor="middle" fill="#A6A2B4">1</text>
+<text x="382" y="454" font-size="24" text-anchor="middle" fill="#A6A2B4">50</text>
+<text x="701" y="454" font-size="24" text-anchor="middle" fill="#A6A2B4">100</text>
+<text x="1020" y="454" font-size="24" text-anchor="middle" fill="#A6A2B4">150</text>
+<text x="545" y="484" font-size="24" text-anchor="middle" fill="#A6A2B4">Episodio de entrenamiento</text>
+<text x="20" y="20" font-size="24" fill="#A6A2B4">Espera media de los carros (s)</text>
+</svg>
+<div style="display:flex;gap:36px"><p style="font-size:24px;color:#D9D5E2"><span style="color:#E975A8"><b>━━</b></span> Algoritmo 1</p><p style="font-size:24px;color:#D9D5E2"><span style="color:#A97BF0"><b>━━</b></span> Algoritmo 2</p><p style="font-size:24px;color:#D9D5E2"><span style="color:#D9D5E2"><b>╍╍</b></span> Tiempo fijo (evaluación)</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:4px;padding-top:14px;position:relative">
+<div style="position:absolute;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,0.35)"></div>
+<p style="font-size:52px;font-weight:800;line-height:1.1;color:#FFFFFF">23,1 → 2,4 s</p>
+<p style="font-size:24px;line-height:1.3;color:#A6A2B4">algoritmo 1: primeros y últimos 10 episodios en pico</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding-top:14px;position:relative">
+<div style="position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<p style="font-size:52px;font-weight:800;line-height:1.1;color:#E975A8">19,6 → 2,8 s</p>
+<p style="font-size:24px;line-height:1.3;color:#A6A2B4">algoritmo 2: primeros y últimos 10 episodios en pico</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding-top:14px;position:relative">
+<div style="position:absolute;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,0.35)"></div>
+<p style="font-size:52px;font-weight:800;line-height:1.1;color:#FFFFFF">≈ 30</p>
+<p style="font-size:24px;line-height:1.3;color:#A6A2B4">episodio en que se supera al tiempo fijo</p></div>
+</div></div>
+<aside class="notas">[Santi · 0:30 · acumulado 5:20]
+Esta es la curva de aprendizaje en hora pico de la configuración base, con las dos versiones. Al inicio la política es casi aleatoria y los carros esperan unos 23 segundos, tres veces más que con el tiempo fijo. Hacia el episodio 30 el agente ya lo supera, y al final la espera queda en 2,4 y 2,8 segundos. Las dos versiones aprenden al mismo ritmo.</aside>
+</section>
+<section id="resultados" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:30px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">10 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Resultados</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Desempeño en hora pico frente a las líneas base</h2>
+<p style="font-size:28px;line-height:1.4;color:#A6A2B4">Demanda nominal, 5 semillas pareadas · IA = configuración base, promedio de sus 3 semillas de entrenamiento</p>
+</div>
+<table style="font-size:25px;color:#D9D5E2;width:1664px">
+<tr style="background:#2E2140"><th style="width:32%;color:#FFFFFF;">Métrica</th><th style="width:13%;text-align:right;color:#FFFFFF;">Tiempo fijo</th><th style="width:13%;text-align:right;color:#FFFFFF;">Actuado</th><th style="width:15%;text-align:right;color:#FFFFFF;">Max-pressure</th><th style="width:13.5%;text-align:right;color:#FFFFFF;">IA · alg. 1</th><th style="width:13.5%;text-align:right;color:#FFFFFF;">IA · alg. 2</th></tr>
+<tr style="background:rgba(233,117,168,0.14)"><td style="">Espera media de los carros (s)</td><td style="text-align:right;">7,79</td><td style="text-align:right;">3,58</td><td style="text-align:right;">1,34</td><td style="text-align:right;">2,13</td><td style="text-align:right;">2,77</td></tr>
+<tr style="background:rgba(233,117,168,0.14)"><td style="">Espera media de los peatones (s)</td><td style="text-align:right;">12,9</td><td style="text-align:right;">14,7</td><td style="text-align:right;">34,8</td><td style="text-align:right;">8,1</td><td style="text-align:right;">9,4</td></tr>
+<tr style="background:#18151F"><td style="">Tiempo perdido por viaje (s)</td><td style="text-align:right;">172</td><td style="text-align:right;">100</td><td style="text-align:right;">99</td><td style="text-align:right;">117</td><td style="text-align:right;">116</td></tr>
+<tr style="background:#1C1924"><td style="">Espera por viaje, percentil 95 (s)</td><td style="text-align:right;">243</td><td style="text-align:right;">111</td><td style="text-align:right;">67</td><td style="text-align:right;">73</td><td style="text-align:right;">84</td></tr>
+<tr style="background:#18151F"><td style="">CO₂ emitido (kg/h)</td><td style="text-align:right;">799</td><td style="text-align:right;">618</td><td style="text-align:right;">598</td><td style="text-align:right;">643</td><td style="text-align:right;">646</td></tr>
+<tr style="background:#1C1924"><td style="">Viajes completados</td><td style="text-align:right;">1.805</td><td style="text-align:right;">2.041</td><td style="text-align:right;">2.045</td><td style="text-align:right;">2.021</td><td style="text-align:right;">2.022</td></tr>
+<tr style="background:#18151F"><td style="">Viajes sin terminar</td><td style="text-align:right;">150</td><td style="text-align:right;">37</td><td style="text-align:right;">33</td><td style="text-align:right;">55</td><td style="text-align:right;">52</td></tr>
+<tr style="background:#1C1924"><td style="">Cambios de fase</td><td style="text-align:right;">916</td><td style="text-align:right;">984</td><td style="text-align:right;">498</td><td style="text-align:right;">682</td><td style="text-align:right;">650</td></tr>
+</table>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:4px;padding-top:14px;position:relative">
+<div style="position:absolute;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,0.35)"></div>
+<p style="font-size:52px;font-weight:800;line-height:1.1;color:#FFFFFF">−73 % / −64 %</p>
+<p style="font-size:24px;line-height:1.3;color:#A6A2B4">espera de los carros frente al tiempo fijo (alg. 1 / alg. 2), p &lt; 0,001</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding-top:14px;position:relative">
+<div style="position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<p style="font-size:52px;font-weight:800;line-height:1.1;color:#E975A8">−37 % / −27 %</p>
+<p style="font-size:24px;line-height:1.3;color:#A6A2B4">espera de los peatones; max-pressure la sube +170 %</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding-top:14px;position:relative">
+<div style="position:absolute;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,0.35)"></div>
+<p style="font-size:52px;font-weight:800;line-height:1.1;color:#FFFFFF">+12 %</p>
+<p style="font-size:24px;line-height:1.3;color:#A6A2B4">viajes completados en la hora pico frente al tiempo fijo</p></div>
+</div>
+<aside class="notas">[Santi · 1:05 · acumulado 6:25]
+Estos son los resultados en hora pico con la demanda nominal. Frente al tiempo fijo, la espera de los carros baja 73 % con la versión 1 y 64 % con la versión 2, y la de los peatones también baja, de 12,9 a unos 8 segundos. Se completan 12 % más viajes y el CO₂ baja 20 %. Todo con p menor que 0,001. Frente a los controladores clásicos hay que ser honestos: max-pressure deja a los carros esperando menos, 1,3 segundos, y tanto max-pressure como el actuado tienen menor tiempo perdido por viaje. Pero max-pressure no ve a los peatones: los hace esperar 35 segundos. Eso se ve mejor en la siguiente gráfica.</aside>
+</section>
+<section id="compromiso" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">11 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Resultados</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Carros frente a peatones, y sensibilidad a la demanda</h2>
+<p style="font-size:28px;line-height:1.4;color:#A6A2B4">Hora pico · abajo a la izquierda es mejor · puntos pequeños: las 36 políticas entrenadas</p>
+</div>
+<div style="display:flex;gap:44px;align-items:flex-start">
+<div style="background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px"><svg width="900" height="600" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" aria-label="Espera de carros frente a espera de peatones en hora pico: el agente queda abajo a la izquierda; max-pressure abajo a la derecha">
+<line x1="70" y1="510" x2="870" y2="510" stroke="#6B6778" stroke-width="2"/>
+<text x="56" y="518" font-size="24" text-anchor="end" fill="#A6A2B4">0</text>
+<line x1="70" y1="355" x2="870" y2="355" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+<text x="56" y="363" font-size="24" text-anchor="end" fill="#A6A2B4">3</text>
+<line x1="70" y1="201" x2="870" y2="201" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+<text x="56" y="209" font-size="24" text-anchor="end" fill="#A6A2B4">6</text>
+<line x1="70" y1="46" x2="870" y2="46" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+<text x="56" y="54" font-size="24" text-anchor="end" fill="#A6A2B4">9</text>
+<text x="70" y="544" font-size="24" text-anchor="middle" fill="#A6A2B4">0</text>
+<text x="270" y="544" font-size="24" text-anchor="middle" fill="#A6A2B4">10</text>
+<text x="470" y="544" font-size="24" text-anchor="middle" fill="#A6A2B4">20</text>
+<text x="670" y="544" font-size="24" text-anchor="middle" fill="#A6A2B4">30</text>
+<text x="870" y="544" font-size="24" text-anchor="middle" fill="#A6A2B4">40</text>
+<text x="470" y="576" font-size="24" text-anchor="middle" fill="#A6A2B4">Espera media de los peatones (s)</text>
+<text x="20" y="20" font-size="24" fill="#A6A2B4">Espera media de los carros (s)</text>
+<circle cx="238" cy="410" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="218" cy="398" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="242" cy="392" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="257" cy="399" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="245" cy="398" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="246" cy="393" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="220" cy="397" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="224" cy="409" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="220" cy="397" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="238" cy="391" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="258" cy="394" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="222" cy="396" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="272" cy="394" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="222" cy="403" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="255" cy="394" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="247" cy="401" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="218" cy="394" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="218" cy="397" r="7" fill="#E975A8" fill-opacity="0.3"/>
+<circle cx="267" cy="396" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="269" cy="365" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="236" cy="340" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="283" cy="392" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="306" cy="381" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="287" cy="383" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="258" cy="383" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="225" cy="373" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="234" cy="392" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="281" cy="385" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="270" cy="381" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="232" cy="391" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="252" cy="384" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="252" cy="348" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="305" cy="382" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="256" cy="379" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="267" cy="401" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<circle cx="231" cy="366" r="7" fill="#A97BF0" fill-opacity="0.3"/>
+<rect x="317" y="97" width="22" height="22" fill="#FFFFFF" transform="rotate(45 328 108)"/>
+<text x="344" y="116" font-size="25" font-weight="700" text-anchor="start" fill="#FFFFFF">Tiempo fijo</text>
+<rect x="353" y="314" width="22" height="22" fill="#FFFFFF" transform="rotate(45 364 325)"/>
+<text x="380" y="333" font-size="25" font-weight="700" text-anchor="start" fill="#FFFFFF">Actuado</text>
+<rect x="755" y="430" width="22" height="22" fill="#FFFFFF" transform="rotate(45 766 441)"/>
+<text x="766" y="419" font-size="25" font-weight="700" text-anchor="middle" fill="#FFFFFF">Max-pressure</text>
+<circle cx="233" cy="400" r="13" fill="#E975A8" stroke="#1C1924" stroke-width="3"/>
+<text x="211" y="444" font-size="25" font-weight="700" text-anchor="end" fill="#E975A8">IA alg. 1</text>
+<circle cx="257" cy="367" r="13" fill="#A97BF0" stroke="#1C1924" stroke-width="3"/>
+<text x="235" y="327" font-size="25" font-weight="700" text-anchor="end" fill="#A97BF0">IA alg. 2</text>
+</svg></div>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:31px;font-weight:700;color:#FFFFFF">Espera de los carros (s) con otra demanda, sin reentrenar</h3>
+<table style="font-size:24px;color:#D9D5E2;width:100%">
+<tr style="background:#2E2140"><th style="width:19%;color:#FFFFFF;">Demanda</th><th style="width:15%;text-align:right;color:#FFFFFF;">Fijo</th><th style="width:33%;text-align:right;color:#FFFFFF;">IA alg. 1</th><th style="width:33%;text-align:right;color:#FFFFFF;">IA alg. 2</th></tr>
+<tr style="background:#18151F"><td style="">80 %</td><td style="text-align:right;">6,83</td><td style="text-align:right;">2,08 · −70 %</td><td style="text-align:right;">2,28 · −67 %</td></tr>
+<tr style="background:rgba(233,117,168,0.14)"><td style="">100 %</td><td style="text-align:right;">7,79</td><td style="text-align:right;">2,13 · −73 %</td><td style="text-align:right;">2,77 · −64 %</td></tr>
+<tr style="background:#18151F"><td style="">120 %</td><td style="text-align:right;">7,73</td><td style="text-align:right;">2,77 · −64 %</td><td style="text-align:right;">3,04 · −61 %</td></tr>
+</table>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #9D50BB;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">En valle</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">La mejora es menor: −43 % y −45 %, a la par del actuado (−47 %). La hora pico es donde el agente se diferencia.</p></div>
+</div></div>
+<aside class="notas">[Santi · 0:45 · acumulado 7:10]
+Aquí cada punto es un método: a la derecha más espera de peatones, arriba más espera de carros; lo ideal es abajo a la izquierda. Los puntos pequeños son las 36 políticas entrenadas. El agente es el único que baja las dos esperas a la vez frente al tiempo fijo: es un compromiso entre carros y peatones. A la derecha, la robustez: con 20 % menos o 20 % más tráfico, sin reentrenar, la espera sigue bajando más de 60 % en hora pico. En valle la mejora es menor, alrededor de 45 %, parecida al actuado. Mariana les cuenta qué aprendimos de las dos versiones.</aside>
+</section>
+<section id="comparacion" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">12 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Análisis</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Algoritmo 1 frente a 2, y ¿sirve la curiosidad?</h2>
+<p style="font-size:28px;line-height:1.4;color:#A6A2B4">18 políticas de cada versión, pareadas por configuración y semilla · promedio de las 3 demandas</p>
+</div>
+<table style="font-size:25px;color:#D9D5E2;width:1664px">
+<tr style="background:#2E2140"><th style="width:46%;color:#FFFFFF;">Métrica</th><th style="width:18%;text-align:right;color:#FFFFFF;">Algoritmo 1</th><th style="width:18%;text-align:right;color:#FFFFFF;">Algoritmo 2</th><th style="width:18%;text-align:right;color:#FFFFFF;">p</th></tr>
+<tr style="background:#18151F"><td style="">Espera de los carros, pico (s)</td><td style="text-align:right;">2,66</td><td style="text-align:right;">2,59</td><td style="text-align:right;">0,84</td></tr>
+<tr style="background:#1C1924"><td style="">Espera de los carros, valle (s)</td><td style="text-align:right;">3,21</td><td style="text-align:right;">3,29</td><td style="text-align:right;">0,30</td></tr>
+<tr style="background:#18151F"><td style="">Espera de los peatones, pico (s)</td><td style="text-align:right;">8,31</td><td style="text-align:right;">9,52</td><td style="text-align:right;">&lt; 0,001</td></tr>
+<tr style="background:#1C1924"><td style="">Espera de los peatones, valle (s)</td><td style="text-align:right;">7,67</td><td style="text-align:right;">8,51</td><td style="text-align:right;">&lt; 0,001</td></tr>
+<tr style="background:rgba(233,117,168,0.14)"><td style="">Variación entre semillas, pico (s)</td><td style="text-align:right;">0,66</td><td style="text-align:right;">0,21</td><td style="text-align:right;">—</td></tr>
+<tr style="background:rgba(233,117,168,0.14)"><td style="">Episodios trancados (gridlock)</td><td style="text-align:right;">1</td><td style="text-align:right;">0</td><td style="text-align:right;">—</td></tr>
+</table>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">RND no aporta</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Sin curiosidad se obtiene lo mismo: espera en pico 2,28 vs. 2,33 s (alg. 1) y 2,57 vs. 2,70 s (alg. 2). Con la versión 2 la conclusión es sólida, porque ahí R<sub>int</sub> sí pesa.</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #9D50BB;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Lectura</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">La versión 2 es más correcta y estable, pero con 150 episodios no mejora el desempeño. Causa probable: con λ = 1 al inicio explora demasiado.</p></div>
+</div>
+<aside class="notas">[Mariana · 0:55 · acumulado 8:05]
+Comparamos las 18 políticas de cada versión. En la espera de los carros no hay diferencia: 2,66 contra 2,59 segundos en pico, con p de 0,84. Los peatones esperan alrededor de un segundo más con la versión 2, y eso sí es significativo. Lo que mejora es la estabilidad: la variación entre semillas baja a la tercera parte en hora pico y ningún episodio se tranca; con la versión 1, una política cayó en gridlock con 20 % más demanda. Sobre la curiosidad: quitar RND da el mismo resultado en las dos versiones. Con la versión 1 era esperable, porque casi no pesaba; con la 2 sí pesa y aun así no aporta.</aside>
+</section>
+<section id="dashboard" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">13 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Herramienta</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Dashboard conectado a los resultados reales</h2>
+</div>
+<div style="display:flex;gap:44px">
+<img src="dashboard_final.png" alt="Captura del dashboard de C.I.T.A.D.E.L." style="width:1060px;border-radius:12px;border:1px solid rgba(255,255,255,0.07)">
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Qué se elige</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Versión de la IA (alg. 1 o 2), hora, tráfico y método de comparación, sobre las 36 corridas y los 1.170 episodios.</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #9D50BB;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">Simulación</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Dos métodos lado a lado, animados con 10 min de hora pico grabados en SUMO.</p></div>
+<div style="display:flex;gap:24px;align-items:center;background:linear-gradient(135deg,#2A1B38 0%,#1C1924 100%);border:1px solid rgba(233,117,168,0.35);border-radius:12px;padding:20px 24px">
+<img src="qr_dashboard.png" alt="Código QR del dashboard" style="width:240px;height:240px;border-radius:8px;flex:none">
+<div style="display:flex;flex-direction:column;gap:10px">
+<p style="font-size:34px;font-weight:800;line-height:1.1;color:#E975A8">Ábrelo en tu celular</p>
+<p style="font-size:23px;line-height:1.35;color:#D9D5E2">Escanea el código con la cámara</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:17px;line-height:1.35;color:#D9D5E2;opacity:0.85;overflow-wrap:anywhere">santisan1205.github.io/Taller-Control/dashboard/</p>
+</div></div>
+</div></div>
+<aside class="notas">[Mariana · 0:45 · acumulado 8:50]
+Todo esto se puede explorar en el dashboard, conectado a los datos reales: las 36 corridas, las tres líneas base y los 1.170 episodios. Se elige la versión de la IA, la hora, el tráfico y contra qué comparar, y se pueden ver dos métodos lado a lado animados con la simulación de SUMO. Está pensado para alguien que no conoce el proyecto, y funciona en el celular: pueden escanear este código y abrirlo ahora mismo.</aside>
+</section>
+<section id="conclusiones" style="background:#141118;color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:168px 128px 88px;display:flex;flex-direction:column;gap:36px">
+<div style="position:absolute;left:0;top:0;width:1920px;height:112px;background:#17141E"></div>
+<div style="position:absolute;left:0;top:112px;width:1920px;height:4px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div>
+<img src="citadel_emblema.png" alt="" style="position:absolute;left:128px;top:24px;width:64px;height:64px">
+<p style="position:absolute;left:210px;top:34px;font-size:30px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">C.I.T.A.D.E.L.</p>
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;right:128px;top:34px;width:200px;height:44px;object-fit:contain;filter:invert(1)">
+<div style="position:absolute;left:0;top:1040px;width:1920px;height:40px;background:#1C1924"></div>
+<p style="position:absolute;left:128px;top:1044px;width:1200px;font-size:24px;line-height:1.3;color:#A6A2B4">IELE · Taller de Control · Uniandes</p>
+<p style="position:absolute;right:128px;top:1044px;width:300px;text-align:right;font-size:24px;line-height:1.3;color:#A6A2B4">14 / 15</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:16px"><div style="width:40px;height:5px;background:linear-gradient(90deg,#9D50BB,#E975A8)"></div><p style="font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E975A8">Cierre</p></div>
+<h2 style="font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#FFFFFF">Conclusiones</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">01 · Desempeño</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">En hora pico la espera de los carros baja entre 64 y 73 % frente al tiempo fijo y se completan 12 % más viajes (p &lt; 0,001).</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #9D50BB;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">02 · Carros y peatones</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Es el único método que mejora las dos esperas. Max-pressure deja a los carros en 1,3 s, pero a los peatones en 35 s, contra 8–9 s con el agente.</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #9D50BB;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">03 · Robustez</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">Con 20 % más o menos demanda, sin reentrenar, la espera en pico sigue bajando más de 60 %.</p></div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#1C1924;border:1px solid rgba(255,255,255,0.07);border-left:6px solid #E975A8;border-radius:12px;padding:24px 30px">
+<h3 style="font-size:31px;font-weight:700;line-height:1.2;color:#FFFFFF">04 · Método</h3>
+<p style="font-size:25px;line-height:1.4;color:#D9D5E2">El algoritmo 2 corrige el crítico y RND: es más estable y no se tranca, pero no mejora el desempeño. La curiosidad no aporta en este problema.</p></div>
+</div>
+<div style="background:linear-gradient(135deg,#2A1B38 0%,#1C1924 100%);border:1px solid rgba(233,117,168,0.35);border-radius:12px;padding:26px 40px">
+<p style="font-size:27px;line-height:1.45;color:#D9D5E2"><b style="color:#E975A8">Trabajo futuro:</b> λ inicial menor o más episodios; reducir el tiempo perdido por viaje (hoy mayor que con actuado y max-pressure); validar con conteos reales de tráfico.</p>
+</div>
+<aside class="notas">[Mariana · 0:50 · acumulado 9:40]
+Para cerrar. Uno: en hora pico el agente reduce la espera de los carros entre 64 y 73 % frente al tiempo fijo y completa 12 % más viajes. Dos: es el único método que mejora a la vez a carros y peatones; max-pressure gana en carros pero castiga a los peatones. Tres: la mejora se mantiene con 20 % más o menos demanda sin reentrenar. Cuatro: la versión 2 es más estable, pero no mejora el desempeño, y la curiosidad no aporta en este problema. Como trabajo futuro: un peso inicial de curiosidad menor o más episodios, mejorar el tiempo perdido por viaje y validar con conteos reales.</aside>
+</section>
+<section id="cierre" style="background:linear-gradient(135deg,#2A1B38 0%,#0F0C14 100%);color:#FFFFFF;font-family:'Inter', Arial, sans-serif;padding:300px 128px 100px;display:flex;flex-direction:column;gap:24px">
+
+<img src="uniandes.png" alt="Universidad de los Andes" style="position:absolute;left:128px;top:72px;width:270px;height:74px;object-fit:contain;filter:invert(1)">
+<img src="citadel_logo.png" alt="" style="position:absolute;right:110px;top:260px;width:640px;filter:drop-shadow(0 0 40px rgba(233,117,168,0.25))">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#E975A8">Control semafórico multiagente con RND-MAPPO</p>
+<h1 style="font-size:88px;font-weight:800;line-height:1.05;letter-spacing:-1px;color:#FFFFFF">Gracias.<br><span style="background:linear-gradient(90deg,#9D50BB,#E975A8);-webkit-background-clip:text;background-clip:text;color:transparent">¿Preguntas?</span></h1>
+<div style="height:16px"></div>
+<p style="font-size:28px;line-height:1.4;color:#D9D5E2">Tomás Castro · Andrés Felipe Barbosa · Mariana Vanoy · Santiago Sánchez</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.4;color:#A6A2B4">github.com/santisan1205/Taller-Control</p>
+<aside class="notas">[Mariana · 0:10 · acumulado 9:50]
+Muchas gracias. Quedamos atentos a sus preguntas.</aside>
+</section>
+</div>
+<script>
+  const slides = [...document.querySelectorAll('section')];
+  let actual = 0;
+  function mostrar(i) {
+    actual = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, j) => s.classList.toggle('activa', j === actual));
+    history.replaceState(null, '', '#' + (actual + 1));
+  }
+  function ajustar() {
+    const e = Math.min(innerWidth / 1920, innerHeight / 1080);
+    document.getElementById('lienzo').style.transform = `translate(-50%, -50%) scale(${e})`;
+  }
+  addEventListener('resize', ajustar);
+  addEventListener('keydown', ev => {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(ev.key)) mostrar(actual + 1);
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(ev.key)) mostrar(actual - 1);
+    else if (ev.key === 'Home') mostrar(0);
+    else if (ev.key === 'End') mostrar(slides.length - 1);
+    else if (ev.key.toLowerCase() === 'n') document.body.classList.toggle('ver-notas');
+    else if (ev.key.toLowerCase() === 'f') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  });
+  addEventListener('click', ev => mostrar(actual + (ev.clientX > innerWidth / 3 ? 1 : -1)));
+  ajustar();
+  mostrar((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>

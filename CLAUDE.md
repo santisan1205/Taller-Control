@@ -45,9 +45,11 @@ Profesor: Jorge Alfredo López Jiménez. **Responder siempre en español.**
 - `datos_dashboard/`: datos para el dashboard. **`datos_dashboard/v2/` es la versión final**: las dos campañas del
   entorno v2, 36 corridas (18 `v2_` con el algoritmo 1 + 18 `v2a2_` con el 2) + 3 líneas base, 1170 episodios.
 - `presentacion/`: presentación del 28 de octubre, de v1 (`presentacion.html`/`.pdf`, fuente en `presentacion/fuente/`, `GUION.pdf`),
-  y **presentación final** de 8–10 min con las dos versiones del algoritmo: `python presentacion/generar_final.py` genera
-  `presentacion_final.html` y `guion_final.html` desde `datos_dashboard/v2/` (los PDF se exportan con Chrome headless).
-  Expositores: Tomy 1–3, Andrés 4–6, Santi 7–9, Mariana 10–13.
+  y **presentación final** de 8–10 min (misma estructura que la de octubre, con los resultados v2 y las dos versiones del
+  algoritmo): `python presentacion/generar_final.py` genera `presentacion_final_amarilla.html` (estilo Uniandes),
+  `presentacion_final_citadel.html` (colores del equipo: los del dashboard y el logo) y `guion_final.html`, desde
+  `datos_dashboard/v2/` (los PDF se exportan con Chrome headless). 15 diapositivas, ~9:50.
+  Expositores: Tomy 1–4, Andrés 5–8, Santi 9–11, Mariana 12–15.
 - `poster/`: póster 70×100 cm para la Semana de la Innovación.
   - `python poster/generar_graficas.py` → SVG en `poster/graficas/` + KPIs por consola.
   - `poster/poster.html` se exporta a PDF/PNG con Chrome headless.
